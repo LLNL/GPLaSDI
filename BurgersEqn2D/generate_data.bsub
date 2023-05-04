@@ -1,0 +1,12 @@
+#!/bin/tcsh
+
+#BSUB -nnodes 1
+#BSUB -J generate_test_data
+#BSUB -W 8:00
+#BSUB -q pbatch
+#BSUB -G darkstar
+
+cd //g/g92/cbonnevi
+source opence/bin/activate
+cd BayesianGLaSDI/BurgersEqn2D_1
+jsrun -r 1 python generate_data.py
