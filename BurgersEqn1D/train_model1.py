@@ -78,9 +78,9 @@ sindy_weight = 0.1
 coef_weight = 1e-6
 
 # Path
-path_data = '//p/gpfs1/cbonnevi/BurgersEqn1D_2/data/'
+path_data = '//p/gpfs1/cbonnevi/BurgersEqn1D/data/'
 path_checkpoint = 'checkpoint/'
-path_results = '//p/gpfs1/cbonnevi/BurgersEqn1D_2/results/'
+path_results = '//p/gpfs1/cbonnevi/BurgersEqn1D/results/'
 
 # CUDA
 cuda = torch.cuda.is_available()
