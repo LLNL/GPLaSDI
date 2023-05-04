@@ -64,16 +64,16 @@ n_a_grid = 21
 n_w_grid = 21
 
 # Autoencoder Definition
-hidden_units = [100, 50, 50, 50]
+hidden_units = [100]
 n_z = 5
 autoencoder = Autoencoder(space_dim, hidden_units, n_z)
 
 # Training Parameters
 n_samples = 20
 lr = 0.001
-n_iter = 26000
+n_iter = 28000
 n_greedy = 2000
-max_greedy_iter = 24001
+max_greedy_iter = 28000
 sindy_weight = 0.1
 coef_weight = 1e-6
 
