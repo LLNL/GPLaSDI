@@ -6,6 +6,15 @@ import numpy as np
 class BayesianGLaSDI:
     def __init__(self, autoencoder, model_parameters):
 
+        '''
+
+        This class runs a full GPLaSDI training. It takes into input the autoencoder defined as a PyTorch object and the
+        dictionnary containing all the training parameters.
+        The "train" method with run the active learning training loop, compute the reconstruction and SINDy loss, train the GPs,
+        and sample a new FOM data point.
+
+        '''
+
         self.autoencoder = autoencoder
 
         time_dim, space_dim = model_parameters['time_dim'], model_parameters['space_dim']
