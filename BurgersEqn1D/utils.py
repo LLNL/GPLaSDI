@@ -9,6 +9,13 @@ import matplotlib.pyplot as plt
 
 def residual_burgers(un, uw, c, idxn1):
 
+    '''
+
+    Compute 1D Burgers equation residual for generating the data
+    from https://github.com/LLNL/gLaSDI and https://github.com/LLNL/LaSDI
+
+    '''
+
     f = c * (uw ** 2 - uw * uw[idxn1])
     r = -un + uw + f
 
@@ -16,6 +23,13 @@ def residual_burgers(un, uw, c, idxn1):
 
 
 def jacobian(u, c, idxn1, nx):
+
+    '''
+
+    Compute 1D Burgers equation jacobian for generating the data
+    from https://github.com/LLNL/gLaSDI and https://github.com/LLNL/LaSDI
+
+    '''
 
     diag_comp = 1.0 + c * (2 * u - u[idxn1])
     subdiag_comp = np.ones(nx - 1)
@@ -28,6 +42,12 @@ def jacobian(u, c, idxn1, nx):
 
 
 def solver(u0, maxk, convergence_threshold, nt, nx, Dt, Dx):
+    '''
+
+    Solves 1D Burgers equation for generating the data
+    from https://github.com/LLNL/gLaSDI and https://github.com/LLNL/LaSDI
+
+    '''
 
     c = Dt / Dx
 
@@ -59,6 +79,12 @@ def solver(u0, maxk, convergence_threshold, nt, nx, Dt, Dx):
 
 def generate_initial_data(U0, nt, nx, Dt, Dx):
 
+    '''
+
+    Generates 1D Burgers equation initial training dataset
+
+    '''
+
     maxk = 10
     convergence_threshold = 1e-8
 
@@ -81,6 +107,15 @@ def generate_initial_data(U0, nt, nx, Dt, Dx):
 
 def compute_sindy_data(Z, Dt):
 
+    '''
+
+    Builds the SINDy dataset, assuming only linear terms in the SINDy dataset. The time derivatives are computed through
+    finite difference.
+
+    Z is the encoder output (3D tensor), with shape [n_train, time_dim, space_dim]
+
+    '''
+
     dZdt = (Z[:, 1:, :] - Z[:, :-1, :]) / Dt
     Z = Z[:, :-1, :]
 
@@ -88,6 +123,14 @@ def compute_sindy_data(Z, Dt):
 
 
 def solve_sindy(dZdt, Z):
+
+    '''
+
+    Computes the SINDy coefficients for each training points.
+    sindy_coef is the list of coefficient (length n_train), and each term in sindy_coef is a matrix of SINDy coefficients
+    corresponding to each training points.
+
+    '''
 
     sindy_coef = []
     n_train, time_dim, space_dim = dZdt.shape
@@ -104,6 +147,12 @@ def solve_sindy(dZdt, Z):
 
 
 def simulate_sindy(sindy_coef, Z0, t_grid):
+
+    '''
+
+    Integrates each system of ODEs corresponding to each training points, given the initial condition Z0 = encoder(U0)
+
+    '''
 
     n_sindy = len(sindy_coef)
 
@@ -124,6 +173,14 @@ def simulate_sindy(sindy_coef, Z0, t_grid):
 
 
 def build_interpolation_data(sindy_coef, params):
+
+    '''
+
+    Generates a regression training dataset dictionnary for each GP.
+    For example, interpolation_data['coef_1'][X] is the tensor of FOM simulation parameters and interpolation_data['coef_1'][y]
+    is a vector of the form [sindy_coef[0][0, 0], ... , sindy_coef[n_train][0, 0]]
+
+    '''
 
     n_sindy = len(sindy_coef)
     coef_x, coef_y = sindy_coef[0].shape
@@ -149,6 +206,13 @@ def build_interpolation_data(sindy_coef, params):
 
 def fit_gps(interpolation_data):
 
+    '''
+
+    Trains each GP given the interpolation dataset.
+    gp_dictionnary is a dataset containing the trained GPs (as sklearn objects)
+
+    '''
+
     n_coef = interpolation_data['n_coef']
     X = interpolation_data['coef_1']['X']
     if X.ndim == 1:
@@ -171,76 +235,15 @@ def fit_gps(interpolation_data):
     return gp_dictionnary
 
 
-# class ExactGPModel(gpytorch.models.ExactGP):
-#     def __init__(self, train_x, train_y, likelihood):
-#         super(ExactGPModel, self).__init__(train_x, train_y, likelihood)
-#         self.mean_module = gpytorch.means.ConstantMean()
-#         self.covar_module = gpytorch.kernels.ScaleKernel(gpytorch.kernels.RBFKernel())
-#
-#     def forward(self, x):
-#         mean_x = self.mean_module(x)
-#         covar_x = self.covar_module(x)
-#         return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
-#
-#
-# def train_gp(x_gp, y_gp, lr_gp, n_iter_gp):
-#
-#     likelihood = gpytorch.likelihoods.GaussianLikelihood()
-#     model = ExactGPModel(x_gp, y_gp, likelihood)
-#
-#     optimizer = torch.optim.Adam(model.parameters(), lr = lr_gp)
-#     mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
-#
-#     model.train()
-#     likelihood.train()
-#
-#     for i in range(n_iter_gp):
-#         optimizer.zero_grad()
-#         output = model(x_gp)
-#         loss = -mll(output, y_gp)
-#         loss.backward()
-#         optimizer.step()
-#
-#         print("Iter : %d/%d, Loss : %3.5f" % (i + 1, n_iter_gp, loss.item()))
-#
-#     model.eval()
-#     likelihood.eval()
-#
-#     return model, likelihood
-#
-#
-# def fit_gps_gpt(interpolation_data):
-#
-#     n_coef = interpolation_data['n_coef']
-#     X = interpolation_data['coef_1']['X']
-#     if X.ndim == 1:
-#         X = X.reshape(-1, 1)
-#
-#     X = torch.Tensor(X)
-#
-#     gp_dictionnary = {}
-#
-#     for i in range(n_coef):
-#
-#         y = interpolation_data['coef_' + str(i + 1)]['y']
-#         y = torch.Tensor(y)
-#
-#         # kernel = ConstantKernel() * RBF()
-#         # kernel = ConstantKernel() * DotProduct()
-#         # kernel = ConstantKernel() * Matern(nu = 1.5)
-#         # gp = GaussianProcessRegressor(kernel = kernel, n_restarts_optimizer = 20)
-#         # gp.fit(X, y)
-#
-#         model, likelihood = train_gp(X, y, 0.01, 100)
-#
-#
-#         gp_dictionnary['coef_' + str(i + 1)] = {'gp' : model, 'likelihood' : likelihood}
-#
-#
-#     return gp_dictionnary
 
 
 def eval_gp(gp_dictionnary, param_grid, n_coef):
+
+    '''
+
+    Computes the GPs predictive mean and standard deviation for points of the parameter space grid
+
+    '''
 
     gp_pred = {}
 
@@ -258,6 +261,14 @@ def eval_gp(gp_dictionnary, param_grid, n_coef):
 
 
 def interpolate_coef_matrix(gp_dictionnary, param, n_samples, n_coef, sindy_coef):
+
+    '''
+
+    Generates sample sets of ODEs for a given parameter.
+    coef_samples is a list of length n_samples, where each terms is a matrix of SINDy coefficients sampled from the GP predictive
+    distributions
+
+    '''
 
     coef_samples = []
     coef_x, coef_y = sindy_coef[0].shape
@@ -284,6 +295,12 @@ def interpolate_coef_matrix(gp_dictionnary, param, n_samples, n_coef, sindy_coef
 
 def simulate_uncertain_sindy(gp_dictionnary, param, n_samples, z0, t_grid, sindy_coef, n_coef, coef_samples = None):
 
+    '''
+
+    Integrates each ODE samples for a given parameter.
+
+    '''
+
     if coef_samples is None:
         coef_samples = interpolate_coef_matrix(gp_dictionnary, param, n_samples, n_coef, sindy_coef)
 
@@ -294,6 +311,13 @@ def simulate_uncertain_sindy(gp_dictionnary, param, n_samples, z0, t_grid, sindy
 
 
 def simulate_interpolated_sindy(param_grid, Z0, t_grid, n_samples, Dt, Z, param_train):
+
+    '''
+
+    Integrates each ODE samples for each parameter of the parameter grid.
+    Z_simulated is a list of length param_grid.shape[0], where each term is a 3D tensor of the form [n_samples, time_dim, n_z]
+
+    '''
 
     dZdt, Z = compute_sindy_data(Z, Dt)
     sindy_coef = solve_sindy(dZdt, Z)
@@ -311,6 +335,12 @@ def simulate_interpolated_sindy(param_grid, Z0, t_grid, n_samples, Dt, Z, param_
 
 def residual(U, Dt, Dx, n_ts = None):
 
+    '''
+
+    DEPRECATED
+
+    '''
+
     if n_ts is None:
         dUdt = (U[:, 1:] - U[:, :-1]) / Dt
         dUdx = (U[1:, :] - U[:-1, :]) / Dx
@@ -320,22 +350,28 @@ def residual(U, Dt, Dx, n_ts = None):
 
         return r, e
 
-    # else:
-    #     nt = U.shape[1]
-    #     time_steps = np.arange(0, nt - 1, 1)
-    #     np.random.shuffle(time_steps)
-    #     time_steps = time_steps[:n_ts]
-    #     dUdt = (U[:, time_steps + 1] - U[:, time_steps]) / Dt
-    #     dUdx2 = (U[2:, time_steps] - 2 * U[1:-1, time_steps] + U[:-2, time_steps]) / Dx / Dx
-    #     r = dUdt[1:-1, :] - k * dUdx2
-    #     e = np.linalg.norm(r).mean()
-    #
-    #     return r, e
+    else:
+        nt = U.shape[1]
+        time_steps = np.arange(0, nt - 1, 1)
+        np.random.shuffle(time_steps)
+        time_steps = time_steps[:n_ts]
+        dUdt = (U[:, time_steps + 1] - U[:, time_steps]) / Dt
+        dUdx2 = (U[2:, time_steps] - 2 * U[1:-1, time_steps] + U[:-2, time_steps]) / Dx / Dx
+        r = dUdt[1:-1, :] - k * dUdx2
+        e = np.linalg.norm(r).mean()
+
+        return r, e
 
 
 
 
 def plot_simlated_interpolated_sindy(Zis, index_of_param, param_grid, n_plot_x, n_plot_y, t_grid):
+
+    '''
+
+    Plot integrated SINDy sets of ODE - for debug purpose
+
+    '''
 
     n_samples = Zis[0].shape[0]
     n_z = Zis[0].shape[2]
@@ -355,6 +391,12 @@ def plot_simlated_interpolated_sindy(Zis, index_of_param, param_grid, n_plot_x, 
 
 
 def display_sindy_equations(index_of_k, k_grid, coef_samples):
+
+    '''
+
+    Display GP-interpolated SINDy equations - for debug purpose
+
+    '''
 
     n_display = index_of_k.shape[0]
 
@@ -416,6 +458,12 @@ def display_sindy_equations(index_of_k, k_grid, coef_samples):
 
 def plot_prediction(param, autoencoder, gp_dictionnary, n_samples, z0, t_grid, sindy_coef, n_coef, t_mesh, x_mesh, scale, true, Dt, Dx):
 
+    '''
+
+    DEPRECATED
+
+    '''
+
     Z = simulate_uncertain_sindy(gp_dictionnary, param, n_samples, z0, t_grid, sindy_coef, n_coef)
 
     n_z = Z.shape[2]
@@ -464,6 +512,12 @@ def plot_prediction(param, autoencoder, gp_dictionnary, n_samples, z0, t_grid, s
 
 
 def plot_gps(gp_dictionnary, param_train, sindy_coef, a_grid, b_grid, n_a_grid, n_b_grid, param_grid, n_coef):
+
+    '''
+
+    Plots GP predictive means and standard deviations
+
+    '''
 
     gp_pred = eval_gp(gp_dictionnary, param_grid, n_coef)
 
@@ -530,6 +584,12 @@ def plot_gps(gp_dictionnary, param_train, sindy_coef, a_grid, b_grid, n_a_grid, 
 
 def initial_condition_latent(param_grid, initial_condition, x_grid, autoencoder):
 
+    '''
+
+    Outputs the initial condition in the latent space: Z0 = encoder(U0)
+
+    '''
+
     n_param = param_grid.shape[0]
     Z0 = []
 
@@ -546,6 +606,12 @@ def initial_condition_latent(param_grid, initial_condition, x_grid, autoencoder)
 
 
 def find_sindy_coef(Z, Dt, n_train, time_dim, loss_function):
+
+    '''
+
+    Computes the SINDy loss, reconstruction loss, and sindy coefficients
+
+    '''
 
     loss_sindy = 0
     loss_coef = 0
@@ -568,6 +634,12 @@ def find_sindy_coef(Z, Dt, n_train, time_dim, loss_function):
 
 
 def get_residual_error(autoencoder, Zis, n_a_grid, n_b_grid, n_samples, Dt, Dx, metric = 'mean'):
+
+    '''
+
+    DEPRECATED
+
+    '''
 
     if metric == 'mean':
         max_mean_error_residual = 0
@@ -611,6 +683,12 @@ def get_residual_error(autoencoder, Zis, n_a_grid, n_b_grid, n_samples, Dt, Dx, 
 
 def get_max_std(autoencoder, Zis, n_a_grid, n_b_grid):
 
+    '''
+
+    Computes the maximum standard deviation accross the parameter space grid and finds the corresponding parameter location
+
+    '''
+
     max_std = 0
     m = 0
 
@@ -636,6 +714,12 @@ def get_max_std(autoencoder, Zis, n_a_grid, n_b_grid):
 
 def get_new_param(m_index, X_train, param_train, param_grid, x_grid, initial_condition, time_dim, space_dim, Dt, Dx):
 
+    '''
+
+    Generates a new FOM data point for the parameter yielding the largest uncertainty
+
+    '''
+
     new_a, new_b = param_grid[m_index, 0], param_grid[m_index, 1]
     u0 = initial_condition(new_a, new_b, x_grid)
 
@@ -652,6 +736,12 @@ def get_new_param(m_index, X_train, param_train, param_grid, x_grid, initial_con
 
 
 def compute_errors(n_a_grid, n_b_grid, Zis, autoencoder, X_test, Dt, Dx):
+
+    '''
+
+    Compute the maximum relative errors accross the parameter space grid
+
+    '''
 
     max_e_residual = np.zeros([n_a_grid, n_b_grid])
     max_e_relative = np.zeros([n_a_grid, n_b_grid])
@@ -686,6 +776,12 @@ def compute_errors(n_a_grid, n_b_grid, Zis, autoencoder, X_test, Dt, Dx):
 
 
 def plot_errors(error, n_a_grid, n_b_grid, a_grid, b_grid, param_train, n_init, normalize = False, title = None):
+
+    '''
+
+    Plot errors, "error" can be either the max residual error, relative errors, or standard deviations
+
+    '''
 
     if title is None:
         title = 'Error'
@@ -730,6 +826,13 @@ def plot_errors(error, n_a_grid, n_b_grid, a_grid, b_grid, param_train, n_init, 
 
 
 def direct_mean_prediction(a, b, u0, autoencoder, t_grid, gp_dictionnary, sindy_coef, device):
+
+    '''
+
+    Makes a ROM prediction for a given parameter using the predictive mean of the GPs (i.e. integrates only one system of ODEs,
+    instead of integrating multiple samples and making a forward pass for each of them)
+    
+    '''
 
     coef_matrix = np.zeros_like(sindy_coef[0])
     coef_y, coef_x = coef_matrix.shape
