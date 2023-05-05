@@ -1,0 +1,10 @@
+#!/bin/tcsh
+
+#BSUB -nnodes 1
+#BSUB -J timing_bubble
+#BSUB -W 12:00
+#BSUB -q pbatch
+#BSUB -G darkstar
+
+cd BayesianGLaSDI/RisingBubble
+jsrun -n1 -r1 -a1 -g0 -c1 python timing.py
