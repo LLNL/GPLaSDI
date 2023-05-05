@@ -1,0 +1,10 @@
+#!/bin/tcsh
+
+#BSUB -nnodes 1
+#BSUB -J data_vlasov
+#BSUB -W 12:00
+#BSUB -q pbatch
+#BSUB -G darkstar
+
+cd BayesianGLaSDI/Vlasov1D1V
+jsrun -n1 -r1 -a1 -g0 -c1 python generate_test_data.py

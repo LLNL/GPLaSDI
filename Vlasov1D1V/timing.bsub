@@ -1,0 +1,12 @@
+#!/bin/tcsh
+
+#BSUB -nnodes 1
+#BSUB -J timing_vlasov
+#BSUB -W 2:00
+#BSUB -q pbatch
+#BSUB -G darkstar
+
+cd //g/g92/cbonnevi
+source opence/bin/activate
+cd BayesianGLaSDI/Vlasov1D1V_2
+jsrun -n1 -r1 -a1 -g0 -c1 python timing.py
