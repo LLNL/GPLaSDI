@@ -127,7 +127,7 @@ class Autoencoder(torch.nn.Module):
         return x
 
 
-date = '05_10_2023_14_16'
+date = '05_11_2023_12_50'
 bglasdi_results = np.load('results/bglasdi_' + date + '.npy', allow_pickle = True).item()
 
 autoencoder_param = bglasdi_results['autoencoder_param']
@@ -180,6 +180,56 @@ Zis_mean, _, _, _, _, _ = simulate_interpolated_sindy_mean(param_grid, Z0, t_gri
 
 _, _, max_e_relative_mean, _ = compute_errors(n_a_grid, n_w_grid, Zis_mean, autoencoder, X_test, Dt, Dx)
 _, _, _, max_std = compute_errors(n_a_grid, n_w_grid, Zis_samples, autoencoder, X_test, Dt, Dx)
+
+gp_pred = eval_gp(gp_dictionnary, param_grid, n_coef)
+
+fig1, axs1 = plt.subplots(5, 6, figsize = (15, 13))
+fig2, axs2 = plt.subplots(5, 6, figsize = (15, 13))
+refine = 10
+cm = plt.cm.jet
+
+for i in range(5):
+    for j in range(6):
+        if j != 5:
+            coef_nbr = 6 + j * 5 + i
+        else:
+            coef_nbr = i + 1
+        coef_nbr = 'coef_' + str(coef_nbr)
+
+        std = gp_pred[coef_nbr]['std'].reshape(n_a_grid, n_w_grid)
+        p = axs1[i, j].contourf(a_grid, w_grid, std, refine, cmap = cm)
+        fig1.colorbar(p, ticks = np.array([std.min(), std.max()]), format='%2.2f', ax = axs1[i, j])
+        axs1[i, j].scatter(param_train[:, 0], param_train[:, 1], c='k', marker='+')
+        axs1[i, j].set_title(r'$\sqrt{\Sigma^*_{' + str(i + 1) + str(j + 1) + '}}$')
+        axs1[i, j].axis('equal')
+        axs1[i, j].set_xlim([0.68, 0.92])
+        axs1[i, j].set_ylim([0.88, 1.12])
+        axs1[i, j].invert_yaxis()
+        axs1[i, j].get_xaxis().set_visible(False)
+        axs1[i, j].get_yaxis().set_visible(False)
+
+        mean = gp_pred[coef_nbr]['mean'].reshape(n_a_grid, n_w_grid)
+        p = axs2[i, j].contourf(a_grid, w_grid, mean, refine, cmap = cm)
+        fig2.colorbar(p, ticks = np.array([mean.min(), mean.max()]), format='%2.2f', ax = axs2[i, j])
+        axs2[i, j].scatter(param_train[:, 0], param_train[:, 1], c='k', marker='+')
+        axs2[i, j].set_title(r'$\mu^*_{' + str(i + 1) + str(j + 1) + '}$')
+        axs2[i, j].axis('equal')
+        axs2[i, j].set_xlim([0.68, 0.92])
+        axs2[i, j].set_ylim([0.88, 1.12])
+        axs2[i, j].invert_yaxis()
+        axs2[i, j].get_xaxis().set_visible(False)
+        axs2[i, j].get_yaxis().set_visible(False)
+
+        if j == 0:
+            axs1[i, j].set_ylabel('w')
+            axs1[i, j].get_yaxis().set_visible(True)
+            axs2[i, j].set_ylabel('w')
+            axs2[i, j].get_yaxis().set_visible(True)
+        if i == 4:
+            axs1[i, j].set_xlabel('a')
+            axs1[i, j].get_xaxis().set_visible(True)
+            axs2[i, j].set_xlabel('a')
+            axs2[i, j].get_xaxis().set_visible(True)
 
 
 fig, ax = plt.subplots(1, 1, figsize = (10, 10))
@@ -292,3 +342,5 @@ pred = autoencoder.decoder(torch.Tensor(Z)).detach().numpy()
 pred_std = pred.std(0)
 
 plot_prediction(param, autoencoder, gp_dictionnary, n_samples, z0, t_grid, sindy_coef, n_coef, t_mesh, x_mesh, scale, true, Dt, Dx)
+
+DEBUG_FLAG = 1
