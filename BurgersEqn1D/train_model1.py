@@ -2,6 +2,9 @@ import numpy as np
 import torch
 from train_framework import BayesianGLaSDI
 
+torch.manual_seed(0)
+np.random.rand(0)
+
 def initial_condition(a, w, x_grid):
 
     return a * np.exp(-x_grid ** 2 / 2 / w / w)
@@ -78,9 +81,11 @@ sindy_weight = 0.1
 coef_weight = 1e-6
 
 # Path
-path_data = '//p/gpfs1/cbonnevi/BurgersEqn1D/data/'
+# path_data = '//p/gpfs1/cbonnevi/BurgersEqn1D/data/'
+path_data = 'data/'
 path_checkpoint = 'checkpoint/'
-path_results = '//p/gpfs1/cbonnevi/BurgersEqn1D/results/'
+# path_results = '//p/gpfs1/cbonnevi/BurgersEqn1D/results/'
+path_results = 'results/'
 
 # CUDA
 cuda = torch.cuda.is_available()
