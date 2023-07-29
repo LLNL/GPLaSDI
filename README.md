@@ -39,7 +39,7 @@ Four examples are provided, including
 * ```utils.py``` contains FOM solvers (for the 1D/2D Burgers equations) and all the relevant functions to compute the SINDy coefficients, compute the SINDy loss, generate the GPs training datasets and train the GPs, generate ODE sample sets for new parameters, integrate the sets of ODEs, and compute the maximum variance accross the parameter space for FOM sampling. All the function in ```utils.py``` are being called in the main iteration loop in the ```BayesianGLaSDI``` class. For the 1D1V Vlasov equation and rising bubble examples, ```utils.py``` doesn't explicitly exist but the functions are instead defined in ```utils/utils_sindy.py```
 * ```evaluate_model.py``` and/or ```compute_errors.py``` can be run to plot model predictions and compute relative errors between the ROM and FOM solutions
 
-* For the 1D1V Vlasov equation and rising bubble examples, additional files are being running within the training loop:
+* For the 1D1V Vlasov equation and rising bubble examples, additional files are being runned within the training loop:
   * ```solver.py``` contains all the python functions to run **HyPar**. **HyPar** is a finite difference PDE solver written in C. ```init.c``` must be compiled before running GPLaSDI for the first time, using ```gcc init.c -o INIT```. ```INIT``` loads input parameter files written by ```solver.py/write_files``` and convert them into **HyPar**-readable format. Then, ```solver.py/run_hypar``` and ```solver.py/post_process_data``` run **HyPar** and convert FOM solutions into numpy arrays.
   * In the rising bubble example, an additional C file, ```PostProcess.c``` needs to be compiled before running GPLaSDI for the first time, using ```gcc PostProcess.c -o PP```
  
