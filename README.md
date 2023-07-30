@@ -44,8 +44,13 @@ Four examples are provided, including
   * In the rising bubble example, an additional C file, ```PostProcess.c``` needs to be compiled before running GPLaSDI for the first time, using ```gcc PostProcess.c -o PP```
  
 ## Citation
+[Bonneville, C., Choi, Y., Ghosh, D., & Belof, J. L. (2023). GPLaSDI: Gaussian Process-based Interpretable Latent Space Dynamics Identification through Deep Autoencoder. arXiv preprint.]()
 
 ## Acknowledgement
+Y. Choi was supported for this work by the CHaRMNET Mathematical Multifaceted Integrated Capability Center (MMICC).
 
 ## Licence
+GPLaSDI is distributed under the terms of the MIT license. All new contributions must be made under the MIT. See
+[LICENSE-MIT](https://github.com/LLNL/libROM/blob/master/LICENSE-MIT)
 
+LLNL Release Nubmer: LLNL-CODE-850536
