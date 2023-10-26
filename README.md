@@ -21,6 +21,10 @@ make
 make install
 ```
 
+## For LLNL LC Lassen users
+
+Please install [OpenCE-1.1.2](https://lc.llnl.gov/confluence/pages/viewpage.action?pageId=678892406)
+
 ## Examples
 
 Four examples are provided, including
