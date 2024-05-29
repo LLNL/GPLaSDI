@@ -1,0 +1,32 @@
+[project]
+name = "lasdi"
+version = "2.0.0-dev"
+authors = [
+  { name="Christophe Bonneville", email="cpb97@cornell.edu" },
+  { name="Kevin (Seung Whan) Chung", email="chung28@llnl.gov" },
+  { name="Youngsoo Choi", email="choi15@llnl.gov" }
+]
+description = "LaSDI: Parametric latent space dynamics identification"
+readme = "README.md"
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+  "torch>=2.3.0",
+  "numpy>=1.26.4",
+  "scikit-learn>=1.4.2",
+  "scipy>=1.13.1",
+  "matplotlib>=3.8.4"
+]
+
+[project.urls]
+Homepage = "https://github.com/LLNL/GPLaSDI"
+Issues = "https://github.com/LLNL/GPLaSDI/issues"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
