@@ -85,19 +85,6 @@ class BayesianGLaSDI:
         self.param_grid = np.hstack((self.a_grid.reshape(-1, 1), self.w_grid.reshape(-1, 1)))
         self.n_test = self.param_grid.shape[0]
 
-        # data_train = model_parameters['data_train']
-        # data_test = model_parameters['data_test']
-
-        # self.param_train = data_train['param_train']
-        # X_train = data_train['X_train']
-        # self.X_train = torch.Tensor(X_train)
-
-        # self.n_init = data_train['n_train']
-        # self.n_train = data_train['n_train']
-
-        # self.param_grid = data_test['param_grid']
-        # self.n_test = data_test['n_test']
-
         self.n_samples = model_parameters['n_samples']
         self.lr = model_parameters['lr']
         self.n_iter = model_parameters['n_iter']
@@ -112,8 +99,13 @@ class BayesianGLaSDI:
         self.path_checkpoint = model_parameters['path_checkpoint']
         self.path_results = model_parameters['path_results']
 
-        if torch.cuda.is_available():
-            self.device = 'cuda'
+        device = model_parameters['device']
+        if (device == 'cuda'):
+            assert(torch.cuda.is_available())
+            self.device = device
+        elif (device == 'mps'):
+            assert(torch.backends.mps.is_available())
+            self.device = device
         else:
             self.device = 'cpu'
 
@@ -123,39 +115,6 @@ class BayesianGLaSDI:
         return
 
     def train(self):
-
-        # n_iter = self.n_iter
-        # n_train = self.n_train
-        # n_test = self.n_test
-        # n_greedy = self.n_greedy
-        # max_greedy_iter = self.max_greedy_iter
-        # time_dim = self.time_dim
-        # space_dim = self.space_dim
-        # n_samples = self.n_samples
-
-        # n_a_grid = self.n_a_grid
-        # n_w_grid = self.n_w_grid
-
-        # Dt = self.Dt
-        # Dx = self.Dx
-
-        # x_grid = self.x_grid
-        # t_grid = self.t_grid
-
-        # autoencoder = self.autoencoder
-        # optimizer = self.optimizer
-        # MSE = self.MSE
-        # sindy_weight = self.sindy_weight
-        # coef_weight = self.coef_weight
-
-        # param_train = self.param_train
-        # param_grid = self.param_grid
-        # X_train = self.X_train
-
-        # path_checkpoint = self.path_checkpoint
-        # path_results = self.path_results
-
-        # initial_condition = self.initial_condition
 
         device = self.device
         autoencoder_device = self.autoencoder.to(device)
@@ -252,9 +211,6 @@ class BayesianGLaSDI:
         tic_end = time.time()
         total_time = tic_end - tic_start
 
-        # autoencoder = autoencoder_device.cpu()
-        # X_train = X_train_device.cpu()
-
         bglasdi_results = {'autoencoder_param': self.autoencoder.state_dict(), 'final_param_train': self.param_train,
                            'final_X_train': self.X_train, 'param_grid': self.param_grid,
                            'sindy_coef': sindy_coef, 'gp_dictionnary': gp_dictionnary, 'lr': self.lr, 'n_iter': self.n_iter,
@@ -262,6 +218,7 @@ class BayesianGLaSDI:
                            'n_init': self.n_init, 'n_samples' : self.n_samples, 'n_a_grid' : self.n_a_grid, 'n_w_grid' : self.n_w_grid,
                            'a_grid' : self.a_grid, 'w_grid' : self.w_grid,
                            't_grid' : self.t_grid, 'x_grid' : self.x_grid, 'Dt' : self.Dt, 'Dx' : self.Dx,
+                           # TODO(kevin): need to fix timer.
                            'total_time' : total_time, 'start_train_phase' : start_train_phase,
                            'start_fom_phase' : start_fom_phase, 'end_train_phase' : end_train_phase, 'end_fom_phase' : end_fom_phase}
 
