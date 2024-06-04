@@ -1,6 +1,8 @@
 import numpy as np
 import yaml
 import torch
+import argparse
+import sys
 from .enums import *
 from .gplasdi import BayesianGLaSDI
 from .latent_space import Autoencoder
@@ -9,8 +11,17 @@ trainer_dict = {'gplasdi': BayesianGLaSDI}
 
 latent_dict = {'ae': Autoencoder}
 
-def main(cfg_filename):
-    with open(cfg_filename, 'r') as f:
+parser = argparse.ArgumentParser(description = "",
+                                 formatter_class=argparse.RawTextHelpFormatter)
+parser.add_argument('config_file', metavar='string', type=str,
+                    help='config file to run LasDI workflow.\n')
+
+def main():
+    args = parser.parse_args(sys.argv[1:])
+    print("args: ", args)
+    print("config file: %s" % args.config_file)
+
+    with open(args.config_file, 'r') as f:
         config = yaml.safe_load(f)
 
     trainer = initialize_trainer(config)
@@ -120,3 +131,6 @@ def initial_step(trainer, config):
     result = Result.Success
 
     return result, next_step
+
+if __name__ == "__main__":
+    main()
