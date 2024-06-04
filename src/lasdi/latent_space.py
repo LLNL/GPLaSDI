@@ -50,39 +50,63 @@ def get_max_std(autoencoder, Zis, n_a_grid, n_b_grid):
             m += 1
 
     return a_index, b_index, m_index
-
+    
 class Autoencoder(torch.nn.Module):
     def __init__(self, space_dim, hidden_units, n_z):
         super(Autoencoder, self).__init__()
 
-        fc1_e = torch.nn.Linear(space_dim, hidden_units)
-        fc2_e = torch.nn.Linear(hidden_units, n_z)
+        n_layers = len(hidden_units)
+        self.n_layers = n_layers
 
+        fc1_e = torch.nn.Linear(space_dim, hidden_units[0])
+        self.fc1_e = fc1_e
+
+        if n_layers > 1:
+            for i in range(n_layers - 1):
+                fc_e = torch.nn.Linear(hidden_units[i], hidden_units[i + 1])
+                setattr(self, 'fc' + str(i + 2) + '_e', fc_e)
+
+        fc_e = torch.nn.Linear(hidden_units[-1], n_z)
+        setattr(self, 'fc' + str(n_layers + 1) + '_e', fc_e)
+
+        # g_e = torch.nn.Softplus()
         g_e = torch.nn.Sigmoid()
 
-        self.fc1_e = fc1_e
-        self.fc2_e = fc2_e
         self.g_e = g_e
 
-        fc1_d = torch.nn.Linear(n_z, hidden_units)
-        fc2_d = torch.nn.Linear(hidden_units, space_dim)
-
+        fc1_d = torch.nn.Linear(n_z, hidden_units[-1])
         self.fc1_d = fc1_d
-        self.fc2_d = fc2_d
+
+        if n_layers > 1:
+            for i in range(n_layers - 1, 0, -1):
+                fc_d = torch.nn.Linear(hidden_units[i], hidden_units[i - 1])
+                setattr(self, 'fc' + str(n_layers - i + 1) + '_d', fc_d)
+
+        fc_d = torch.nn.Linear(hidden_units[0], space_dim)
+        setattr(self, 'fc' + str(n_layers + 1) + '_d', fc_d)
+
 
 
     def encoder(self, x):
 
-        x = self.g_e(self.fc1_e(x))
-        x = self.fc2_e(x)
+        for i in range(1, self.n_layers + 1):
+            fc = getattr(self, 'fc' + str(i) + '_e')
+            x = self.g_e(fc(x))
+
+        fc = getattr(self, 'fc' + str(self.n_layers + 1) + '_e')
+        x = fc(x)
 
         return x
 
 
     def decoder(self, x):
 
-        x = self.g_e(self.fc1_d(x))
-        x = self.fc2_d(x)
+        for i in range(1, self.n_layers + 1):
+            fc = getattr(self, 'fc' + str(i) + '_d')
+            x = self.g_e(fc(x))
+
+        fc = getattr(self, 'fc' + str(self.n_layers + 1) + '_d')
+        x = fc(x)
 
         return x
 

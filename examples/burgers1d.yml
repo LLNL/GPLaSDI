@@ -1,0 +1,53 @@
+lasdi:
+  type: gplasdi
+  gplasdi:
+    # device: mps
+    n_samples: 20
+    lr: 0.001
+    n_iter: 28000
+    n_greedy: 2000
+    max_greedy_iter: 28000
+    sindy_weight: 0.1
+    coef_weight: 1.e-6
+    path_checkpoint: checkpoint/
+    path_results: results/
+    # This probably should be specified on physics part.
+    time_dim: 1001
+    space_dim: 1001
+    xmin: -3.
+    xmax: 3.
+    tmax: 1.
+    # This probably should be specified as parameters.
+    a_min: 0.7
+    a_max: 0.9
+    w_min: 0.9
+    w_max: 1.1
+    n_a_grid: 21
+    n_w_grid: 21
+
+latent_space:
+  type: ae
+  ae:
+  # we should not specify fom_dimension here. temporarily.
+    fom_dimension: 1001
+    hidden_units: [100]
+    latent_dimension: 5
+
+physics:
+  type: burgers1d
+  burgers1d:
+    time_dim: 1001
+    space_dim: 1001
+    xmin: -3.
+    xmax: 3.
+    tmax: 1.
+    initial_train:
+      train_data: data/data_train.npy
+      test_data: data/data_test.npy
+      # This probably should be specified as parameters.
+      a_min: 0.7
+      a_max: 0.9
+      w_min: 0.9
+      w_max: 1.1
+      n_a_grid: 21
+      n_w_grid: 21
