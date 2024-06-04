@@ -99,3 +99,61 @@ def generate_initial_data(U0, nt, nx, Dt, Dx):
         print(i)
 
     return X_train
+
+def initial_train_data(config):
+
+    time_dim = config['time_dim']
+    space_dim = config['space_dim']
+
+    xmin = config['xmin']
+    xmax = config['xmax']
+    tmax = config['tmax']
+
+    Dx = (xmax - xmin) / (space_dim - 1)
+    Dt = tmax / (time_dim - 1)
+    assert(Dx > 0.)
+    assert(Dt > 0.)
+
+    x_grid = np.linspace(xmin, xmax, space_dim)
+    t_grid = np.linspace(0, tmax, time_dim)
+
+    # TODO(kevin): generalize parameters
+    a_min = config['initial_train']['a_min']
+    a_max = config['initial_train']['a_max']
+    w_min = config['initial_train']['w_min']
+    w_max = config['initial_train']['w_max']
+
+    a_train = np.array([a_min, a_max])
+    w_train = np.array([w_min, w_max])
+
+    a_train, w_train = np.meshgrid(a_train, w_train)
+    param_train = np.hstack((a_train.reshape(-1, 1), w_train.reshape(-1, 1)))
+    n_train = param_train.shape[0]
+
+    n_a_grid = config['initial_train']['n_a_grid']
+    n_w_grid = config['initial_train']['n_w_grid']
+    a_grid = np.linspace(a_min, a_max, n_a_grid)
+    w_grid = np.linspace(w_min, w_max, n_w_grid)
+    a_grid, w_grid = np.meshgrid(a_grid, w_grid)
+    param_grid = np.hstack((a_grid.reshape(-1, 1), w_grid.reshape(-1, 1)))
+    n_test = param_grid.shape[0]
+
+    U0 = [initial_condition(param_train[i, 0], param_train[i, 1], x_grid) for i in range(n_train)]
+    X_train = generate_initial_data(U0, time_dim, space_dim, Dt, Dx)
+
+    data_train = {'param_train' : param_train, 'X_train' : X_train, 'n_train' : n_train, 'U0' : U0}
+    train_filename = config['initial_train']['train_data']
+    from os.path import dirname
+    from pathlib import Path
+    Path(dirname(train_filename)).mkdir(parents=True, exist_ok=True)
+    np.save(train_filename, data_train)
+
+    U0 = [initial_condition(param_grid[i, 0], param_grid[i, 1], x_grid) for i in range(n_test)]
+    X_test = generate_initial_data(U0, time_dim, space_dim, Dt, Dx)
+
+    data_test = {'param_grid' : param_grid, 'X_test' : X_test, 'n_test' : n_test, 'U0' : U0}
+    test_filename = config['initial_train']['test_data']
+    Path(dirname(test_filename)).mkdir(parents=True, exist_ok=True)
+    np.save(test_filename, data_test)
+
+    return data_train

@@ -18,7 +18,6 @@ parser.add_argument('config_file', metavar='string', type=str,
 
 def main():
     args = parser.parse_args(sys.argv[1:])
-    print("args: ", args)
     print("config file: %s" % args.config_file)
 
     with open(args.config_file, 'r') as f:
@@ -119,8 +118,9 @@ def initial_step(trainer, config):
 
     print("Collecting initial training data..")
 
-    initial_train_data = config['initial_train_data']
-    initial_train_data = np.load(initial_train_data, allow_pickle = True).item()
+    # TODO(kevin): generalize for physics
+    from .physics.burgers1d import initial_train_data as burgers_train
+    initial_train_data = burgers_train(config['physics']['burgers1d'])
 
     trainer.param_train = initial_train_data['param_train']
     trainer.X_train = torch.Tensor(initial_train_data['X_train'])

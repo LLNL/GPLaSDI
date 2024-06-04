@@ -99,7 +99,12 @@ class BayesianGLaSDI:
         self.path_checkpoint = model_parameters['path_checkpoint']
         self.path_results = model_parameters['path_results']
 
-        device = model_parameters['device']
+        from os.path import dirname
+        from pathlib import Path
+        Path(dirname(self.path_checkpoint)).mkdir(parents=True, exist_ok=True)
+        Path(dirname(self.path_results)).mkdir(parents=True, exist_ok=True)
+
+        device = model_parameters['device'] if 'device' in model_parameters else 'cpu'
         if (device == 'cuda'):
             assert(torch.cuda.is_available())
             self.device = device
