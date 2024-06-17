@@ -6,10 +6,13 @@ import sys
 from .enums import *
 from .gplasdi import BayesianGLaSDI
 from .latent_space import Autoencoder
+from .physics.burgers1d import Burgers1D
 
 trainer_dict = {'gplasdi': BayesianGLaSDI}
 
 latent_dict = {'ae': Autoencoder}
+
+physics_dict = {'burgers1d': Burgers1D}
 
 parser = argparse.ArgumentParser(description = "",
                                  formatter_class=argparse.RawTextHelpFormatter)
@@ -85,12 +88,13 @@ def initialize_trainer(config):
     '''
 
     latent_space = initialize_latent_space(config)
+    physics = initialize_physics(config)
 
     trainer_type = config['lasdi']['type']
     assert(trainer_type in config['lasdi'])
     assert(trainer_type in trainer_dict)
 
-    trainer = trainer_dict[trainer_type](latent_space, config['lasdi'][trainer_type])
+    trainer = trainer_dict[trainer_type](latent_space, physics, config['lasdi'][trainer_type])
 
     return trainer
 
@@ -114,18 +118,49 @@ def initialize_latent_space(config):
 
     return latent_space
 
+def initialize_physics(config):
+    '''
+    Initialize a physics FOM model according to config file.
+    Currently only 'burgers1d' is available.
+    '''
+
+    physics_cfg = config['physics']
+    physics_type = physics_cfg['type']
+    physics = physics_dict[physics_type](physics_cfg)
+
+    return physics
+
 def initial_step(trainer, config):
+    from os.path import dirname
+    from pathlib import Path
 
     print("Collecting initial training data..")
 
-    # TODO(kevin): generalize for physics
-    from .physics.burgers1d import initial_train_data as burgers_train
-    initial_train_data = burgers_train(config['physics']['burgers1d'])
+    # TODO(kevin): this is a temporary placeholder until parameter class is generalized.
+    a_train = np.array([trainer.a_min, trainer.a_max])
+    w_train = np.array([trainer.w_min, trainer.w_max])
+    a_train, w_train = np.meshgrid(a_train, w_train)
+    param_train = np.hstack((a_train.reshape(-1, 1), w_train.reshape(-1, 1)))
+    n_train = param_train.shape[0]
 
-    trainer.param_train = initial_train_data['param_train']
-    trainer.X_train = torch.Tensor(initial_train_data['X_train'])
-    trainer.n_init = initial_train_data['n_train']
-    trainer.n_train = initial_train_data['n_train']
+    trainer.param_train = param_train
+    trainer.X_train = trainer.physics.generate_solutions(param_train)
+    trainer.n_init = n_train
+    trainer.n_train = n_train
+
+    data_train = {'param_train' : param_train, 'X_train' : trainer.X_train, 'n_train' : n_train}
+    train_filename = config['initial_train']['train_data']
+    Path(dirname(train_filename)).mkdir(parents=True, exist_ok=True)
+    np.save(train_filename, data_train)
+
+    # TODO(kevin): this is a temporary placeholder until parameter class is generalized.
+    X_test = trainer.physics.generate_solutions(trainer.param_grid)
+    n_test = trainer.param_grid.shape[0]
+
+    data_test = {'param_grid' : trainer.param_grid, 'X_test' : X_test, 'n_test' : n_test}
+    test_filename = config['initial_train']['test_data']
+    Path(dirname(test_filename)).mkdir(parents=True, exist_ok=True)
+    np.save(test_filename, data_test)
 
     next_step = NextStep.Train
     result = Result.Success
