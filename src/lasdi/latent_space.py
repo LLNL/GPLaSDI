@@ -17,7 +17,6 @@ def initial_condition_latent(param_grid, physics, autoencoder):
     for i in range(n_param):
         # TODO(kevin): generalize parameter class.
         u0 = physics.initial_condition(param_grid[i])
-        # TODO(kevin): generalize physics dimension
         u0 = u0.reshape(sol_shape)
         u0 = torch.Tensor(u0)
         z0 = autoencoder.encoder(u0)
