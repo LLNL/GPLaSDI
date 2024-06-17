@@ -8,6 +8,9 @@ class Physics:
     qdim = -1
     # grid_size is the shape of the grid nd-array.
     grid_size = []
+    # the shape of the solution nd-array.
+    qgrid_size = []
+
     '''
         numpy nd-array, assuming the shape of:
         - 1d: (space_dim[0],)

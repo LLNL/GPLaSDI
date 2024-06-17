@@ -87,8 +87,8 @@ def initialize_trainer(config):
     Currently only 'gplasdi' is available.
     '''
 
-    latent_space = initialize_latent_space(config)
     physics = initialize_physics(config)
+    latent_space = initialize_latent_space(physics, config)
 
     trainer_type = config['lasdi']['type']
     assert(trainer_type in config['lasdi'])
@@ -98,7 +98,7 @@ def initialize_trainer(config):
 
     return trainer
 
-def initialize_latent_space(config):
+def initialize_latent_space(physics, config):
     '''
     Initialize a latent space model according to config file.
     Currently only 'ae' (autoencoder) is available.
@@ -108,13 +108,9 @@ def initialize_latent_space(config):
 
     assert(latent_type in config['latent_space'])
     assert(latent_type in latent_dict)
+    
     latent_cfg = config['latent_space'][latent_type]
-
-    # TODO(kevin): we might want to pass the config dict directly, for generalization.
-    fom_dim = latent_cfg['fom_dimension']
-    hidden_units = latent_cfg['hidden_units']
-    latent_dim = latent_cfg['latent_dimension']
-    latent_space = latent_dict[latent_type](fom_dim, hidden_units, latent_dim)
+    latent_space = latent_dict[latent_type](physics, latent_cfg)
 
     return latent_space
 

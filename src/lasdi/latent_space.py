@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 
 def initial_condition_latent(param_grid, physics, autoencoder):
 
@@ -11,11 +12,13 @@ def initial_condition_latent(param_grid, physics, autoencoder):
     n_param = param_grid.shape[0]
     Z0 = []
 
+    sol_shape = [1, 1] + physics.qgrid_size
+
     for i in range(n_param):
         # TODO(kevin): generalize parameter class.
         u0 = physics.initial_condition(param_grid[i])
         # TODO(kevin): generalize physics dimension
-        u0 = u0.reshape(1, 1, -1)
+        u0 = u0.reshape(sol_shape)
         u0 = torch.Tensor(u0)
         z0 = autoencoder.encoder(u0)
         z0 = z0[0, 0, :].detach().numpy()
@@ -54,13 +57,23 @@ def get_max_std(autoencoder, Zis, n_a_grid, n_b_grid):
     return a_index, b_index, m_index
     
 class Autoencoder(torch.nn.Module):
-    def __init__(self, space_dim, hidden_units, n_z):
+    # set by physics.qgrid_size
+    qgrid_size = []
+    # prod(qgrid_size)
+    space_dim = -1
+
+    def __init__(self, physics, config):
         super(Autoencoder, self).__init__()
+
+        self.qgrid_size = physics.qgrid_size
+        self.space_dim = np.prod(self.qgrid_size)
+        hidden_units = config['hidden_units']
+        n_z = config['latent_dimension']
 
         n_layers = len(hidden_units)
         self.n_layers = n_layers
 
-        fc1_e = torch.nn.Linear(space_dim, hidden_units[0])
+        fc1_e = torch.nn.Linear(self.space_dim, hidden_units[0])
         torch.nn.init.xavier_uniform_(fc1_e.weight)
         self.fc1_e = fc1_e
 
@@ -89,13 +102,18 @@ class Autoencoder(torch.nn.Module):
                 torch.nn.init.xavier_uniform_(fc_d.weight)
                 setattr(self, 'fc' + str(n_layers - i + 1) + '_d', fc_d)
 
-        fc_d = torch.nn.Linear(hidden_units[0], space_dim)
+        fc_d = torch.nn.Linear(hidden_units[0], self.space_dim)
         torch.nn.init.xavier_uniform_(fc_d.weight)
         setattr(self, 'fc' + str(n_layers + 1) + '_d', fc_d)
 
 
 
     def encoder(self, x):
+        # make sure the input has a proper shape
+        assert(list(x.shape[-len(self.qgrid_size):]) == self.qgrid_size)
+        # we use torch.Tensor.view instead of torch.Tensor.reshape,
+        # in order to avoid data copying.
+        x = x.view(list(x.shape[:-len(self.qgrid_size)]) + [self.space_dim])
 
         for i in range(1, self.n_layers + 1):
             fc = getattr(self, 'fc' + str(i) + '_e')
@@ -115,6 +133,10 @@ class Autoencoder(torch.nn.Module):
 
         fc = getattr(self, 'fc' + str(self.n_layers + 1) + '_d')
         x = fc(x)
+
+        # we use torch.Tensor.view instead of torch.Tensor.reshape,
+        # in order to avoid data copying.
+        x = x.view(list(x.shape[:-1]) + self.qgrid_size)
 
         return x
 

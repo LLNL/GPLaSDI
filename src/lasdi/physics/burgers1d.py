@@ -9,6 +9,8 @@ class Burgers1D(Physics):
     def __init__(self, cfg):
         super().__init__(cfg)
 
+        self.qdim = 1
+        self.dim = 1
         self.offline = False
 
         assert('burgers1d' in cfg)
@@ -16,8 +18,8 @@ class Burgers1D(Physics):
 
         self.nt = parser.getInput(['number_of_timesteps'], datatype=int)
         self.grid_size = parser.getInput(['grid_size'], datatype=list)
-        self.dim = len(self.grid_size)
-        assert(self.dim == 1)
+        self.qgrid_size = self.grid_size
+        assert(self.dim == len(self.grid_size))
 
         self.xmin = parser.getInput(['xmin'], datatype=float)
         self.xmax = parser.getInput(['xmax'], datatype=float)
