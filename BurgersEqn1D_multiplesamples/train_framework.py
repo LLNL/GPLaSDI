@@ -2,6 +2,7 @@ from utils import *
 import torch
 import time
 import numpy as np
+import os
 
 class BayesianGLaSDI:
     def __init__(self, autoencoder, model_parameters):
@@ -166,6 +167,7 @@ class BayesianGLaSDI:
             optimizer.step()
 
             if loss.item() < best_loss:
+                os.makedirs(os.path.dirname(path_checkpoint + 'checkpoint.pt'), exist_ok=True)
                 torch.save(autoencoder.state_dict(), path_checkpoint + 'checkpoint.pt')
                 best_sindy_coef = sindy_coef
                 best_loss = loss.item()
