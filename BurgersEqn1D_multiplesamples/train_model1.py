@@ -85,7 +85,7 @@ path_checkpoint = 'checkpoint/'
 path_results = 'results/'
 
 # where to store simulations run during training
-sim_dir = '/p/lustre1/wilander/BurgersEqn1D_randgrid/simulations/' 
+sim_dir = '/p/lustre1/wilander/GPLaSDI/BurgersEqn1D_multiplesamples/simulations/' 
 
 # CUDA
 cuda = torch.cuda.is_available()
