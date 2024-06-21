@@ -714,7 +714,8 @@ def get_max_std(autoencoder, Zis, n_param):
     return m_index
 
 def get_sample_points(gp_dictionnary, param_test, n_coef,sindy_coef,sample_points):
-    
+
+    #calculate sum of standard deviations for each SINDy coefficient
     n_param = param_test.shape[0]
     gp_pred = eval_gp(gp_dictionnary, param_test, n_coef)
     std = np.zeros(len(param_test))
@@ -724,12 +725,16 @@ def get_sample_points(gp_dictionnary, param_test, n_coef,sindy_coef,sample_point
         for j in range(coef_y):
             std = std + gp_pred['coef_' + str(k)]['std']
             k += 1     
-    m_index = [np.argmax(std)]
+    m_index = [np.argmax(std)] #sample at largest standard deviation
     maxsort = np.flip(np.sort(std))
     maxsortind = np.flip(np.argsort(std))
 
+    #normalize parameter values to [0,1]
     X = (param_test - np.min(param_test,axis=0)) / (np.max(param_test,axis=0) - np.min(param_test,axis=0))
-    
+
+    # we find the parameter point which has the highest standard deviation and is 
+    # dist 0.5 away from the already chosen parameters to sample. We reduced the distance if not enough
+    # parameters are found.
     k = len(m_index)
     dist_threshhold = 0.5
     while k < sample_points:
