@@ -272,4 +272,5 @@ class BayesianGLaSDI:
         date = time.localtime()
         date_str = "{month:02d}_{day:02d}_{year:04d}_{hour:02d}_{minute:02d}"
         date_str = date_str.format(month = date.tm_mon, day = date.tm_mday, year = date.tm_year, hour = date.tm_hour + 3, minute = date.tm_min)
+        os.makedirs(os.path.dirname(path_results + 'bglasdi_' + date_str + '.npy'), exist_ok=True)
         np.save(path_results + 'bglasdi_' + date_str + '.npy', bglasdi_results)
