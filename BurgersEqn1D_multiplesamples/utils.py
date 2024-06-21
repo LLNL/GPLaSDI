@@ -476,8 +476,6 @@ def plot_prediction(param, autoencoder, gp_dictionnary, n_samples, z0, t_grid, s
     pred_std = pred.std(0)
 
     r, e = residual(pred_mean.T, Dt, Dx)
-    
-    print('Relative error is ' + str(LA.norm(true - pred_mean.T)/(LA.norm(true))))
 
     plt.figure()
 
