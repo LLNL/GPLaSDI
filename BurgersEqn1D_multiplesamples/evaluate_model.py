@@ -127,21 +127,8 @@ class Autoencoder(torch.nn.Module):
         return x
 
 
-# date = '06_19_2024_15_14'
-# bglasdi_results = np.load('results/bglasdi_' + date + '.npy', allow_pickle = True).item()
-
-bglasdi_results = np.load('results/bglasdi_06_19_2024_17_18.npy', allow_pickle = True).item()
-# bglasdi_results = np.load('results/bglasdi_06_19_2024_19_03.npy', allow_pickle = True).item()
-# bglasdi_results = np.load('results/bglasdi_06_19_2024_19_21.npy', allow_pickle = True).item()
-
-# bglasdi_results = np.load('results/bglasdi_06_20_2024_12_25.npy', allow_pickle = True).item() #rbf?
-bglasdi_results = np.load('results/bglasdi_06_20_2024_12_52.npy', allow_pickle = True).item() #matern 0.01
-bglasdi_results = np.load('results/bglasdi_06_20_2024_13_28.npy', allow_pickle = True).item() #matern 0.1
-
-bglasdi_results = np.load('results/bglasdi_06_20_2024_13_54.npy', allow_pickle = True).item() #rbf, remove training from param_test
-
-bglasdi_results = np.load('results/bglasdi_06_20_2024_15_28.npy', allow_pickle = True).item() #rbf, remove training from param_test
- 
+date = '06_20_2024_15_28'
+bglasdi_results = np.load('results/bglasdi_' + date + '.npy', allow_pickle = True).item()
 
 autoencoder_param = bglasdi_results['autoencoder_param']
 
