@@ -12,7 +12,7 @@ class BayesianGLaSDI:
         This class runs a full GPLaSDI training. It takes into input the autoencoder defined as a PyTorch object and the
         dictionnary containing all the training parameters.
         The "train" method with run the active learning training loop, compute the reconstruction and SINDy loss, train the GPs,
-        and sample a new FOM data point.
+        and sample new FOM data points.
 
         '''
 
@@ -257,17 +257,6 @@ class BayesianGLaSDI:
                            't_grid' : t_grid, 'x_grid' : x_grid, 'Dt' : Dt, 'Dx' : Dx,
                            'total_time' : total_time, 'start_train_phase' : start_train_phase,
                            'start_fom_phase' : start_fom_phase, 'end_train_phase' : end_train_phase, 'end_fom_phase' : end_fom_phase,'m_index' : m_index}
-
-
-        # bglasdi_results = {'autoencoder_param': autoencoder.state_dict(), 'final_param_train': param_train,
-        #                    'final_X_train': X_train, 'param_test': param_test,
-        #                    'sindy_coef': sindy_coef, 'gp_dictionnary': gp_dictionnary, 'lr': self.lr, 'n_iter': n_iter,
-        #                    'n_greedy': n_greedy, 'sindy_weight': sindy_weight, 'coef_weight': coef_weight,
-        #                    'n_init': self.n_init, 'n_samples' : n_samples, 'n_a_grid' : n_a_grid, 'n_w_grid' : n_w_grid,
-        #                    'a_grid' : self.a_grid, 'w_grid' : self.w_grid,
-        #                    't_grid' : t_grid, 'x_grid' : x_grid, 'Dt' : Dt, 'Dx' : Dx,
-        #                    'total_time' : total_time, 'start_train_phase' : start_train_phase,
-        #                    'start_fom_phase' : start_fom_phase, 'end_train_phase' : end_train_phase, 'end_fom_phase' : end_fom_phase,'m_index' : m_index}
 
         date = time.localtime()
         date_str = "{month:02d}_{day:02d}_{year:04d}_{hour:02d}_{minute:02d}"
