@@ -141,13 +141,6 @@ gp_dictionnary = bglasdi_results['gp_dictionnary']
 
 n_init = bglasdi_results['n_init']
 n_samples = 20
-# n_a_grid = 21
-# n_w_grid = 21
-# a_min, a_max = 0.7, 0.9
-# w_min, w_max = 0.9, 1.1
-# a_grid = np.linspace(a_min, a_max, n_a_grid)
-# w_grid = np.linspace(w_min, w_max, n_w_grid)
-# a_grid, w_grid = np.meshgrid(a_grid, w_grid)
 
 t_grid = bglasdi_results['t_grid']
 x_grid = bglasdi_results['x_grid']
@@ -162,11 +155,7 @@ end_train_phase = bglasdi_results['end_train_phase']
 end_fom_phase = bglasdi_results['end_fom_phase']
 
 data_test = np.load('data/data_test.npy', allow_pickle = True).item()
-# X_test = data_test['X_test']
-
-data_sim = np.load('data/data_sim2.npy', allow_pickle = True).item()
-X_sim = data_sim['X_sim']
-# X_sim = X_sim[5:-1,:,:]
+X_test = data_test['X_test']
 
 time_dim, space_dim = t_grid.shape[0], x_grid.shape[0]
 
@@ -182,8 +171,8 @@ Z0 = initial_condition_latent(param_test, initial_condition, x_grid, autoencoder
 Zis_samples, gp_dictionnary, interpolation_data, sindy_coef, n_coef, coef_samples = simulate_interpolated_sindy(param_test, Z0, t_grid, n_samples, Dt, Z, param_train)
 Zis_mean, _, _, _, _, _ = simulate_interpolated_sindy_mean(param_test, Z0, t_grid, Dt, Z, param_train)
 
-_, _, max_e_relative_mean, _ = compute_errors_vec(param_test, Zis_mean, autoencoder, X_sim, Dt, Dx)
-_, _, _, max_std = compute_errors_vec(param_test, Zis_samples, autoencoder, X_sim, Dt, Dx)
+_, _, max_e_relative_mean, _ = compute_errors_vec(param_test, Zis_mean, autoencoder, X_test, Dt, Dx)
+_, _, _, max_std = compute_errors_vec(param_test, Zis_samples, autoencoder, X_test, Dt, Dx)
 
 gp_pred = eval_gp(gp_dictionnary, param_test, n_coef)
 
@@ -208,6 +197,7 @@ for i in range(coef_y):
 
         fig1.colorbar(im1, ax = axs1[i,j],ticks = np.array([mean.min(), mean.max()]), format = '%2.1f')
         fig2.colorbar(im2, ax = axs2[i,j],ticks = np.array([std.min(), std.max()]), format = '%2.1f')
+        
         axs1[i,j].set_title(r'$\mu^*_{' + str(i + 1) + str(j + 1) + '}$')
         axs1[i, j].axis('equal')
         axs1[i, j].set_xlim([np.min(param_test[:, 0]) - 0.02, np.max(param_test[:, 0]) + 0.02])
@@ -244,7 +234,7 @@ for i in range(coef_y):
         k += 1
 
         
-
+#Plot relative error for each parameter
 fig, ax = plt.subplots(1, 1, figsize = (10, 10))
 
 cmap = LinearSegmentedColormap.from_list('rg', ['C0', 'w', 'C3'], N = 256)
@@ -255,7 +245,7 @@ ax.set_ylabel('w', fontsize=15)
 ax.set_title('Maximum Relative Error', fontsize=25)
 ax.scatter(param_train[:, 0], param_train[:, 1],marker='X',color='k',s=200)
 
-
+#Plot standard deviation for each parameter
 fig, ax = plt.subplots(1, 1, figsize = (10, 10))
 
 cmap = LinearSegmentedColormap.from_list('rg', ['C0', 'w', 'C3'], N = 256)
@@ -266,7 +256,7 @@ ax.set_ylabel('w', fontsize=15)
 ax.set_title(r'max$_{(t,x)}\sqrt{V[\tilde{u}_{\xi^*}]}$', fontsize=25)
 ax.scatter(param_train[:, 0], param_train[:, 1],marker='X',color='k',s=200)
 
-
+#Prediction for one parameter pair
 a, w = 0.8, .95
 maxk = 10
 convergence_threshold = 1e-8
