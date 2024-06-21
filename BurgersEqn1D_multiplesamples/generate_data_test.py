@@ -3,7 +3,8 @@
 
 '''
 
-Generates the data for all possible testing points. This allows us assess accuracy of our results.
+Generates the data for all possible testing points. 
+We do not need this to train, but it allows us to assess accuracy of our results.
 
 '''
 
@@ -44,12 +45,12 @@ data_test = np.load('data/data_test.npy', allow_pickle = True).item()
 param_test = data_test['param_test']
 
 U0 = [initial_condition(param_test[i, 0], param_test[i, 1], x_grid) for i in range(param_test.shape[0])]
-X_sim = generate_initial_data(U0, time_dim, space_dim, Dt, Dx)
+X_test = generate_initial_data(U0, time_dim, space_dim, Dt, Dx)
 
 
-data_sim = {'param_test' : param_test, 'X_sim' : X_sim, 'n_sim' : param_test.shape[0]}
-os.makedirs(os.path.dirname("./data/data_sim.npy"), exist_ok=True)
-np.save('data/data_sim.npy', data_sim)
+data_test = {'param_test' : param_test, 'X_test' : X_test, 'n_test' : param_test.shape[0]}
+os.makedirs(os.path.dirname("./data/data_test.npy"), exist_ok=True)
+np.save('data/data_test.npy', data_test)
 
 
 
