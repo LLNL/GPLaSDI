@@ -9,17 +9,24 @@ int main()
   double pi = 4.0 * atan(1.0);
   double two_pi = 8.0 * atan(1.0);
 
-  double L = two_pi;
-  double T = 1.0;
-  double k = 1.0;
-  
-  FILE *param_T;
-  FILE *param_k;
-  param_T = fopen("param_T.inp", "r");
-  param_k = fopen("param_k.inp", "r");
+  double k_Dr = 1.0;
+  int    N_mode = 1;
+//  double L = two_pi;
+  double T1 = 1.0;
+  double T2 = 1.0;
+  double eps = 0.1;
+  double v_d = 2.0;
 
-  fscanf(param_T, "%lf", &T);
-  fscanf(param_k, "%lf", &k);
+//  FILE *param_T;
+//  FILE *param_k;
+//  param_T1 = fopen("param_T1.inp", "r");
+//  param_T2 = fopen("param_T2.inp", "r");
+//  param_k_Dr = fopen("param_k_Dr.inp", "r");
+//  param_eps = fopen("param_eps.inp", "r");
+//  param_V_d = fopen("param_V_d.inp", "r");
+
+//  fscanf(param_T, "%lf", &T);
+//  fscanf(param_k, "%lf", &k);
 
   int NI,NJ,ndims,n_iter;
   FILE *in;
@@ -45,8 +52,24 @@ int main()
         else if (!strcmp(word, "size")) {
           fscanf(in,"%d",&NI);
           fscanf(in,"%d",&NJ);
-        } else if (!strcmp(word, "ip_file_type")) {
+        }
+        else if (!strcmp(word, "ip_file_type")) {
            fscanf(in,"%s",ip_file_type);
+        }
+        else if (!strcmp(word, "v_drift")) {
+           fscanf(in,"%lf",&v_d);
+        }
+        else if (!strcmp(word, "T1")) {
+           fscanf(in,"%lf",&T1);
+        }
+        else if (!strcmp(word, "T2")) {
+           fscanf(in,"%lf",&T2);
+        }
+        else if (!strcmp(word, "eps")) {
+           fscanf(in,"%lf",&eps);
+        }
+        else if (!strcmp(word, "k_Dr")) {
+           fscanf(in,"%lf",&k_Dr);
         }
       }
 
@@ -66,9 +89,15 @@ int main()
     return(0);
   }
   printf("Grid: %d, %d\n",NI,NJ);
+  printf("v_drift: %f\n",v_d);
+  printf("T1: %f\n",T1);
+  printf("T2: %f\n",T2);
+  printf("eps: %f\n",eps);
+  printf("k_Dr: %f\n",k_Dr);
 
   int i,j;
-  double dx = two_pi / ((double)NI);
+  double L_box = two_pi * N_mode / k_Dr;
+  double dx = L_box / ((double)NI);
   double dv = 14.0 / ((double)NJ);
   double start_x = 0.0;
   double start_v = -7.0;
@@ -83,11 +112,12 @@ int main()
       x[i] = start_x + i*dx;
       v[j] = start_v + j*dv;
       int p = NJ*i + j;
-      double temp1 = cos(2.0 * k * pi * x[i] / L);
-      double temp2 = exp(- (v[j] -2.0) * (v[j] - 2.0) / (2.0 * T));
-      double temp3 = exp(- (v[j] + 2.0) * (v[j] + 2.0) / (2.0 * T));
-      double temp4 = sqrt(2.0 * pi * T);
-      f[p] = 16.0 * (1.0 + 0.1 * temp1) * 0.5 * (temp2 / temp4 + temp3 / temp4);
+      double temp1 = cos(2.0 * k_Dr * pi * x[i] / L_box);
+      double temp2 = exp(- (v[j] - v_d) * (v[j] - v_d) / (2.0 * T1));
+      double temp3 = exp(- (v[j] + v_d) * (v[j] + v_d) / (2.0 * T2));
+      double temp4 = sqrt(2.0 * pi * T1);
+      double temp5 = sqrt(2.0 * pi * T2);
+      f[p] = 8.0 * (1.0 + eps * temp1) * (temp2 / temp4 + temp3 / temp5);
       //f[p] = 16.*(1. + 0.1*cos(2.*k*pi*x[i]/L))*(exp(-((v[j]-2.)*(v[j]-2.))/(2.*T))/sqrt(2.*pi*T) + exp(-((v[j]+2.)*(v[j]+2.))/(2.*T))/sqrt(2.*pi*T))/2.;
     }
   }
