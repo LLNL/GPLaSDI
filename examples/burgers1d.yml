@@ -9,14 +9,8 @@ lasdi:
     max_greedy_iter: 28000
     sindy_weight: 0.1
     coef_weight: 1.e-6
-    path_checkpoint: checkpoint/
-    path_results: results/
-    # This probably should be specified on physics part.
-    time_dim: 1001
-    space_dim: 1001
-    xmin: -3.
-    xmax: 3.
-    tmax: 1.
+    path_checkpoint: checkpoint
+    path_results: results
     # This probably should be specified as parameters.
     a_min: 0.7
     a_max: 0.9
@@ -33,21 +27,16 @@ latent_space:
     hidden_units: [100]
     latent_dimension: 5
 
+# TODO(kevin): temporary placeholder
+initial_train:
+  train_data: data/data_train.npy
+  test_data: data/data_test.npy
+
 physics:
   type: burgers1d
   burgers1d:
-    time_dim: 1001
-    space_dim: 1001
+    number_of_timesteps: 1001
+    simulation_time: 1.
+    grid_size: [1001]
     xmin: -3.
     xmax: 3.
-    tmax: 1.
-    initial_train:
-      train_data: data/data_train.npy
-      test_data: data/data_test.npy
-      # This probably should be specified as parameters.
-      a_min: 0.7
-      a_max: 0.9
-      w_min: 0.9
-      w_max: 1.1
-      n_a_grid: 21
-      n_w_grid: 21
