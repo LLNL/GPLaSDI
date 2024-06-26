@@ -25,7 +25,7 @@ make install
 
 Please install [OpenCE-1.1.2](https://lc.llnl.gov/confluence/pages/viewpage.action?pageId=678892406)
 
-## Python packaging (ongoing)
+## Python packaging (work-in-progress)
 
 The repository is in transition to python packaging. Users can install the repository as a python package:
 ```
@@ -48,6 +48,20 @@ cd examples
 lasdi burgers1d.yml
 ```
 Post-processing & visualization of the Burgers 1D equation can be seen in the jupyter notebook `examples/burgers1d.ipynb`.
+
+### For LLNL LC Lassen users
+
+The work-in-progress python package is compatiable with [OpenCE-1.9.1](https://lc.llnl.gov/confluence/pages/viewpage.action?pageId=785286611).
+For installing GPLasDI on opence environment:
+```
+source /your/anaconda
+conda activate /your/opence/environment
+
+conda install scikit-learn
+pip install argparse
+
+pip install .
+```
 
 ## Examples
 

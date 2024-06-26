@@ -8,20 +8,20 @@ authors = [
 ]
 description = "LaSDI: Parametric latent space dynamics identification"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.9"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 dependencies = [
-  "torch>=2.3.0",
-  "numpy>=1.26.4",
-  "scikit-learn>=1.4.2",
-  "scipy>=1.13.1",
+  "torch>=2.0.1",
+  "numpy>=1.23.0",
+  "scikit-learn>=1.3",
+  "scipy>=1.10",
   "pyyaml>=6.0",
-  "matplotlib>=3.8.4",
-  "argparse>=1.4.0"
+  "matplotlib>=3.8.0",
+  "argparse>=1.1"
 ]
 
 [project.urls]
