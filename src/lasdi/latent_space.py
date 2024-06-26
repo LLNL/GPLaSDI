@@ -61,6 +61,10 @@ class Autoencoder(torch.nn.Module):
     # prod(qgrid_size)
     space_dim = -1
 
+    # activation dict
+    act_dict = {'sigmoid': torch.nn.Sigmoid,
+                'softplus': torch.nn.Softplus}
+
     def __init__(self, physics, config):
         super(Autoencoder, self).__init__()
 
@@ -86,10 +90,8 @@ class Autoencoder(torch.nn.Module):
         torch.nn.init.xavier_uniform_(fc_e.weight)
         setattr(self, 'fc' + str(n_layers + 1) + '_e', fc_e)
 
-        # g_e = torch.nn.Softplus()
-        g_e = torch.nn.Sigmoid()
-
-        self.g_e = g_e
+        act_type = config['activation'] if 'activation' in config else 'sigmoid'
+        self.g_e = self.act_dict[act_type]()
 
         fc1_d = torch.nn.Linear(n_z, hidden_units[-1])
         torch.nn.init.xavier_uniform_(fc1_d.weight)
