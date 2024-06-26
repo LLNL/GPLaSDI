@@ -25,6 +25,30 @@ make install
 
 Please install [OpenCE-1.1.2](https://lc.llnl.gov/confluence/pages/viewpage.action?pageId=678892406)
 
+## Python packaging (ongoing)
+
+The repository is in transition to python packaging. Users can install the repository as a python package:
+```
+pip install .
+```
+This python package requires updated prerequistes:
+```
+"torch>=2.3.0",
+"numpy>=1.26.4",
+"scikit-learn>=1.4.2",
+"scipy>=1.13.1",
+"pyyaml>=6.0",
+"matplotlib>=3.8.4",
+"argparse>=1.4.0"
+```
+
+Currently, not all features are supported. The example of Burgers 1D equation can be run:
+```
+cd examples
+lasdi burgers1d.yml
+```
+Post-processing & visualization of the Burgers 1D equation can be seen in the jupyter notebook `examples/burgers1d.ipynb`.
+
 ## Examples
 
 Four examples are provided, including
