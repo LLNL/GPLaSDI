@@ -48,7 +48,7 @@ def compute_sindy_data(Z, Dt, poly_order, library_size = None, sine_term = False
     if poly_order == 2:
 
         k = 0
-        poly_terms = torch.zeros([n_train, time_dim, library_size])
+        poly_terms = torch.zeros([n_train, time_dim, library_size], device=Z.device)
         for i in range(n_z):
             for j in range(i, n_z):
                 poly_terms[:, :, k] = Z[:, :, i] * Z[:, :, j]
@@ -56,7 +56,7 @@ def compute_sindy_data(Z, Dt, poly_order, library_size = None, sine_term = False
 
         Z = torch.cat([Z, poly_terms], dim = 2)
 
-    Z = torch.cat([torch.ones([n_train, time_dim, 1]), Z], dim = 2)
+    Z = torch.cat([torch.ones([n_train, time_dim, 1], device=Z.device), Z], dim = 2)
     
     if sine_term:
         Z = torch.cat([Z, torch.sin(Z[:, :, 1:])], dim = 2)
@@ -351,7 +351,7 @@ def find_sindy_coef(Z, Dt, n_train, loss_function, poly_order = 1, library_size 
         loss_sindy += loss_function(dZdt_i, Z_i @ coef_matrix_i)
         loss_coef += torch.norm(coef_matrix_i)
 
-        sindy_coef.append(coef_matrix_i.detach().numpy())
+        sindy_coef.append(coef_matrix_i.detach().cpu().numpy())
 
     return loss_sindy, loss_coef, sindy_coef
 

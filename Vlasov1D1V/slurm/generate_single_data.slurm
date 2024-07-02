@@ -4,8 +4,11 @@
 #SBATCH -J data_vlasov
 #SBATCH -p pbatch
 #SBATCH -t 24:00:00
-#SBATCH -A priarpae
+#SBATCH -A # bank_name
 
+
+# cd path_to_project(Vlasov1D1V)
+# activate python environment
 
 v_drift=$1
 T1=$2
