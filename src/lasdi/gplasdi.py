@@ -35,7 +35,7 @@ def find_sindy_coef(Z, Dt, n_train, time_dim, loss_function):
     return loss_sindy, loss_coef, sindy_coef
 
 class BayesianGLaSDI:
-    def __init__(self, autoencoder, model_parameters):
+    def __init__(self, autoencoder, physics, model_parameters):
 
         '''
 
@@ -47,28 +47,7 @@ class BayesianGLaSDI:
         '''
 
         self.autoencoder = autoencoder
-
-        # TODO(kevin): we need to simply possess physics object.
-        self.time_dim = model_parameters['time_dim']
-        self.space_dim = model_parameters['space_dim']
-        # self.n_z = model_parameters['n_z']
-
-        # TODO(kevin): we need to simply possess physics object.
-        xmin = model_parameters['xmin']
-        xmax = model_parameters['xmax']
-        self.Dx = (xmax - xmin) / (self.space_dim - 1)
-        assert(self.Dx > 0.)
-
-        tmax = model_parameters['tmax']
-        self.Dt = tmax / (self.time_dim - 1)
-
-        self.x_grid = np.linspace(xmin, xmax, self.space_dim)
-        self.t_grid = np.linspace(0, tmax, self.time_dim)
-
-        # TODO(kevin): generalize physics
-        # self.initial_condition = model_parameters['initial_condition']
-        from .physics.burgers1d import initial_condition
-        self.initial_condition = initial_condition
+        self.physics = physics
 
         # TODO(kevin): generalize parameters
         self.a_min = model_parameters['a_min']
@@ -131,6 +110,9 @@ class BayesianGLaSDI:
         end_train_phase = []
         end_fom_phase = []
 
+        from pathlib import Path
+        Path(self.path_checkpoint).mkdir(parents=True, exist_ok=True)
+        Path(self.path_results).mkdir(parents=True, exist_ok=True)
 
         start_train_phase.append(tic_start)
 
@@ -142,7 +124,7 @@ class BayesianGLaSDI:
             Z = Z.cpu()
 
             loss_ae = self.MSE(X_train_device, X_pred)
-            loss_sindy, loss_coef, sindy_coef = find_sindy_coef(Z, self.Dt, self.n_train, self.time_dim, self.MSE)
+            loss_sindy, loss_coef, sindy_coef = find_sindy_coef(Z, self.physics.dt, self.n_train, self.physics.nt, self.MSE)
 
             max_coef = np.abs(np.array(sindy_coef)).max()
 
@@ -152,7 +134,7 @@ class BayesianGLaSDI:
             self.optimizer.step()
 
             if loss.item() < self.best_loss:
-                torch.save(autoencoder_device.state_dict(), self.path_checkpoint + 'checkpoint.pt')
+                torch.save(autoencoder_device.state_dict(), self.path_checkpoint + '/' + 'checkpoint.pt')
                 self.best_sindy_coef = sindy_coef
                 self.best_loss = loss.item()
 
@@ -184,19 +166,19 @@ class BayesianGLaSDI:
                 start_fom_phase.append(time.time())
                 # X_train = X_train_device.cpu()
                 autoencoder = autoencoder_device.cpu()
-                autoencoder.load_state_dict(torch.load(self.path_checkpoint + 'checkpoint.pt'))
+                autoencoder.load_state_dict(torch.load(self.path_checkpoint + '/' + 'checkpoint.pt'))
 
                 if len(self.best_sindy_coef) == self.n_train:
                     sindy_coef = self.best_sindy_coef
 
-                Z0 = initial_condition_latent(self.param_grid, self.initial_condition, self.x_grid, autoencoder)
+                Z0 = initial_condition_latent(self.param_grid, self.physics, autoencoder)
 
                 interpolation_data = build_interpolation_data(sindy_coef, self.param_train)
                 gp_dictionnary = fit_gps(interpolation_data)
                 n_coef = interpolation_data['n_coef']
 
                 coef_samples = [interpolate_coef_matrix(gp_dictionnary, self.param_grid[i, :], self.n_samples, n_coef, sindy_coef) for i in range(self.n_test)]
-                Zis = [simulate_uncertain_sindy(gp_dictionnary, self.param_grid[i, 0], self.n_samples, Z0[i], self.t_grid, sindy_coef, n_coef, coef_samples[i]) for i in range(self.n_test)]
+                Zis = [simulate_uncertain_sindy(gp_dictionnary, self.param_grid[i, 0], self.n_samples, Z0[i], self.physics.t_grid, sindy_coef, n_coef, coef_samples[i]) for i in range(self.n_test)]
 
                 a_index, w_index, m_index = get_max_std(autoencoder, Zis, self.n_a_grid, self.n_w_grid)
 
@@ -222,34 +204,30 @@ class BayesianGLaSDI:
                            'n_greedy': self.n_greedy, 'sindy_weight': self.sindy_weight, 'coef_weight': self.coef_weight,
                            'n_init': self.n_init, 'n_samples' : self.n_samples, 'n_a_grid' : self.n_a_grid, 'n_w_grid' : self.n_w_grid,
                            'a_grid' : self.a_grid, 'w_grid' : self.w_grid,
-                           't_grid' : self.t_grid, 'x_grid' : self.x_grid, 'Dt' : self.Dt, 'Dx' : self.Dx,
                            # TODO(kevin): need to fix timer.
                            'total_time' : total_time, 'start_train_phase' : start_train_phase,
                            'start_fom_phase' : start_fom_phase, 'end_train_phase' : end_train_phase, 'end_fom_phase' : end_fom_phase}
+        bglasdi_results['physics'] = self.physics.export()
 
         date = time.localtime()
         date_str = "{month:02d}_{day:02d}_{year:04d}_{hour:02d}_{minute:02d}"
         date_str = date_str.format(month = date.tm_mon, day = date.tm_mday, year = date.tm_year, hour = date.tm_hour + 3, minute = date.tm_min)
-        np.save(self.path_results + 'bglasdi_' + date_str + '.npy', bglasdi_results)
+        np.save(self.path_results + '/' + 'bglasdi_' + date_str + '.npy', bglasdi_results)
 
         next_step, result = None, Result.Complete
         return result, next_step
     
     def sample_fom(self):
 
-        # TODO(kevin): generalize this physics part.
-        from .physics.burgers1d import solver
-
+        # TODO(kevin): generalize the parameter class.
         new_a, new_b = self.new_param[0], self.new_param[1]
-        # TODO(kevin): generalize this physics part.
-        u0 = self.initial_condition(new_a, new_b, self.x_grid)
 
-        maxk = 10
-        convergence_threshold = 1e-8
-        new_X = solver(u0, maxk, convergence_threshold, self.time_dim - 1, self.space_dim, self.Dt, self.Dx)
-        new_X = new_X.reshape(1, self.time_dim, self.space_dim)
-        new_X = torch.Tensor(new_X)
+        if not self.physics.offline:
+            new_X = self.physics.solve(self.new_param)
 
-        self.X_train = torch.cat([self.X_train, new_X], dim = 0)
-        self.param_train = np.vstack((self.param_train, np.array([[new_a, new_b]])))
-        self.n_train += 1
+            self.X_train = torch.cat([self.X_train, new_X], dim = 0)
+            self.param_train = np.vstack((self.param_train, np.array([[new_a, new_b]])))
+            self.n_train += 1
+        else:
+            # TODO(kevin): interface for offline FOM simulation
+            raise RuntimeError("Offline FOM simulation is not supported yet!")
