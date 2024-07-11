@@ -11,13 +11,26 @@ lasdi:
     coef_weight: 1.e-6
     path_checkpoint: checkpoint
     path_results: results
-    # This probably should be specified as parameters.
-    a_min: 0.7
-    a_max: 0.9
-    w_min: 0.9
-    w_max: 1.1
-    n_a_grid: 21
-    n_w_grid: 21
+
+parameter_space:
+  parameters:
+    - name: a
+      min: 0.7
+      max: 0.9
+      test_space_type: uniform
+      sample_size: 21
+      log_scale: false
+    - name: w
+      min: 0.9
+      max: 1.1
+      # another way of specifying test space.
+      test_space_type: list
+      list: [0.9, 0.91, 0.92, 0.93, 0.94,
+             0.95, 0.96, 0.97, 0.98, 0.99,
+             1.0, 1.01, 1.02, 1.03, 1.04,
+             1.05, 1.06, 1.07, 1.08, 1.09, 1.1]
+  test_space:
+    type: grid
 
 latent_space:
   type: ae

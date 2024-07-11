@@ -7,6 +7,7 @@ from .enums import *
 from .gplasdi import BayesianGLaSDI
 from .latent_space import Autoencoder
 from .physics.burgers1d import Burgers1D
+from .param import ParameterSpace
 
 trainer_dict = {'gplasdi': BayesianGLaSDI}
 
@@ -87,7 +88,10 @@ def initialize_trainer(config):
     Currently only 'gplasdi' is available.
     '''
 
-    physics = initialize_physics(config)
+    # TODO(kevin): load parameter train space from a restart file.
+    param_space = ParameterSpace(config)
+
+    physics = initialize_physics(param_space, config)
     latent_space = initialize_latent_space(physics, config)
 
     trainer_type = config['lasdi']['type']
@@ -114,7 +118,7 @@ def initialize_latent_space(physics, config):
 
     return latent_space
 
-def initialize_physics(config):
+def initialize_physics(param_space, config):
     '''
     Initialize a physics FOM model according to config file.
     Currently only 'burgers1d' is available.
@@ -122,7 +126,7 @@ def initialize_physics(config):
 
     physics_cfg = config['physics']
     physics_type = physics_cfg['type']
-    physics = physics_dict[physics_type](physics_cfg)
+    physics = physics_dict[physics_type](param_space, physics_cfg)
 
     return physics
 
@@ -132,31 +136,24 @@ def initial_step(trainer, config):
 
     print("Collecting initial training data..")
 
-    # TODO(kevin): this is a temporary placeholder until parameter class is generalized.
-    a_train = np.array([trainer.a_min, trainer.a_max])
-    w_train = np.array([trainer.w_min, trainer.w_max])
-    a_train, w_train = np.meshgrid(a_train, w_train)
-    param_train = np.hstack((a_train.reshape(-1, 1), w_train.reshape(-1, 1)))
-    n_train = param_train.shape[0]
+    trainer.X_train = trainer.physics.generate_solutions(trainer.param_space.train_space)
 
-    trainer.param_train = param_train
-    trainer.X_train = trainer.physics.generate_solutions(param_train)
-    trainer.n_init = n_train
-    trainer.n_train = n_train
-
-    data_train = {'param_train' : param_train, 'X_train' : trainer.X_train, 'n_train' : n_train}
+    data_train = {'param_train' : trainer.param_space.train_space,
+                  'X_train' : trainer.X_train,
+                  'n_train' : trainer.param_space.n_train}
     train_filename = config['initial_train']['train_data']
     Path(dirname(train_filename)).mkdir(parents=True, exist_ok=True)
     np.save(train_filename, data_train)
 
-    # TODO(kevin): this is a temporary placeholder until parameter class is generalized.
-    X_test = trainer.physics.generate_solutions(trainer.param_grid)
-    n_test = trainer.param_grid.shape[0]
+    if (trainer.param_space.test_space is not None):
+        X_test = trainer.physics.generate_solutions(trainer.param_space.test_space)
 
-    data_test = {'param_grid' : trainer.param_grid, 'X_test' : X_test, 'n_test' : n_test}
-    test_filename = config['initial_train']['test_data']
-    Path(dirname(test_filename)).mkdir(parents=True, exist_ok=True)
-    np.save(test_filename, data_test)
+        data_test = {'param_grid' : trainer.param_space.test_space,
+                     'X_test' : X_test,
+                     'n_test' : trainer.param_space.n_test}
+        test_filename = config['initial_train']['test_data']
+        Path(dirname(test_filename)).mkdir(parents=True, exist_ok=True)
+        np.save(test_filename, data_test)
 
     next_step = NextStep.Train
     result = Result.Success

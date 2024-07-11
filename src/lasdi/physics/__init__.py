@@ -31,7 +31,11 @@ class Physics:
     # Set at the initialization.
     offline = False
 
-    def __init__(self, cfg):
+    # ParameterSpace object to parse parameters.
+    param_space = None
+
+    def __init__(self, param_space, cfg):
+        self.param_space = param_space
         return
     
     def initial_condition(self, param):

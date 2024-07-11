@@ -25,7 +25,7 @@ def initial_condition_latent(param_grid, physics, autoencoder):
 
     return Z0
 
-def get_max_std(autoencoder, Zis, n_a_grid, n_b_grid):
+def get_max_std(autoencoder, Zis):
 
     '''
 
@@ -34,26 +34,18 @@ def get_max_std(autoencoder, Zis, n_a_grid, n_b_grid):
     '''
 
     max_std = 0
-    m = 0
 
-    for j in range(n_b_grid):
-        for i in range(n_a_grid):
+    for m, Zi in enumerate(Zis):
+        Z_m = torch.Tensor(Zi)
+        X_pred_m = autoencoder.decoder(Z_m).detach().numpy()
+        X_pred_m_std = X_pred_m.std(0)
+        max_std_m = X_pred_m_std.max()
 
-            Z_m = torch.Tensor(Zis[m])
-            X_pred_m = autoencoder.decoder(Z_m).detach().numpy()
-            X_pred_m_std = X_pred_m.std(0)
-            max_std_m = X_pred_m_std.max()
+        if max_std_m > max_std:
+            m_index = m
+            max_std = max_std_m
 
-
-            if max_std_m > max_std:
-                    a_index = i
-                    b_index = j
-                    m_index = m
-                    max_std = max_std_m
-
-            m += 1
-
-    return a_index, b_index, m_index
+    return m_index
     
 class Autoencoder(torch.nn.Module):
     # set by physics.qgrid_size
