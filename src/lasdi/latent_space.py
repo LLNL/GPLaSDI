@@ -62,8 +62,30 @@ class Autoencoder(torch.nn.Module):
     space_dim = -1
 
     # activation dict
-    act_dict = {'sigmoid': torch.nn.Sigmoid,
-                'softplus': torch.nn.Softplus}
+    act_dict = {'ELU': torch.nn.ELU,
+                'hardshrink': torch.nn.Hardshrink,
+                'hardsigmoid': torch.nn.Hardsigmoid,
+                'hardtanh': torch.nn.Hardtanh,
+                'hardswish': torch.nn.Hardswish,
+                'leakyReLU': torch.nn.LeakyReLU,
+                'logsigmoid': torch.nn.LogSigmoid,
+                'multihead': torch.nn.MultiheadAttention,
+                'PReLU': torch.nn.PReLU,
+                'ReLU': torch.nn.ReLU,
+                'ReLU6': torch.nn.ReLU6,
+                'RReLU': torch.nn.RReLU,
+                'SELU': torch.nn.SELU,
+                'CELU': torch.nn.CELU,
+                'GELU': torch.nn.GELU,
+                'sigmoid': torch.nn.Sigmoid,
+                'SiLU': torch.nn.SiLU,
+                'mish': torch.nn.Mish,
+                'softplus': torch.nn.Softplus,
+                'softshrink': torch.nn.Softshrink,
+                'tanh': torch.nn.Tanh,
+                'tanhshrink': torch.nn.Tanhshrink,
+                'threshold': torch.nn.Threshold,
+                'GLU': torch.nn.GLU,}
 
     def __init__(self, physics, config):
         super(Autoencoder, self).__init__()
