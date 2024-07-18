@@ -6,8 +6,8 @@ from ..inputs import InputParser
 from . import Physics
 
 class Burgers1D(Physics):
-    def __init__(self, cfg):
-        super().__init__(cfg)
+    def __init__(self, param_space, cfg):
+        super().__init__(param_space, cfg)
 
         self.qdim = 1
         self.dim = 1
@@ -37,8 +37,9 @@ class Burgers1D(Physics):
         return
     
     def initial_condition(self, param):
-        # TODO(kevin): generalize parameter class
-        a, w = param[0], param[1]
+        param = self.param_space.getParameter(param)
+        a = param['a'] if 'a' in param else 1.0
+        w = param['w'] if 'w' in param else 1.0
 
         return a * np.exp(- self.x_grid ** 2 / 2 / w / w)
     
