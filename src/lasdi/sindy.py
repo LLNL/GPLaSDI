@@ -1,8 +1,14 @@
 import numpy as np
 import torch
 from scipy.integrate import odeint
+from .fd import SBP12, SBP24, SBP36, SBP48
 
-def compute_sindy_data(Z, Dt):
+FDdict = {'sbp12': SBP12(),
+          'sbp24': SBP24(),
+          'sbp36': SBP36(),
+          'sbp48': SBP48()}
+
+def compute_time_derivative(Z, Dt, fd_type):
 
     '''
 
@@ -10,13 +16,26 @@ def compute_sindy_data(Z, Dt):
     finite difference.
 
     Z is the encoder output (3D tensor), with shape [n_train, time_dim, space_dim]
+    Dt is the size of timestep (assumed to be a uniform scalar)
+    fd_type is the string that specifies finite-difference scheme for time derivative:
+        - 'sbp12': summation-by-parts 1st/2nd (boundary/interior) order operator
+        - 'sbp24': summation-by-parts 2nd/4th order operator
+        - 'sbp36': summation-by-parts 3rd/6th order operator
+        - 'sbp48': summation-by-parts 4th/8th order operator
+
+    The output dZdt is a 3D tensor with the same shape of Z.
 
     '''
 
-    dZdt = (Z[:, 1:, :] - Z[:, :-1, :]) / Dt
-    Z = Z[:, :-1, :]
+    fd = FDdict[fd_type]
+    oper, _, _ = fd.getOperators(Z.size(1))
+    
+    ''' Is full vectorization possible? '''
+    dZdt = torch.zeros(Z.size())
+    for k, Zk in enumerate(Z):
+        dZdt[k] = 1. / Dt * torch.sparse.mm(oper, Zk) 
 
-    return dZdt, Z
+    return dZdt
 
 def solve_sindy(dZdt, Z):
 
@@ -85,7 +104,7 @@ def simulate_uncertain_sindy(gp_dictionnary, param, n_samples, z0, t_grid, sindy
 
     return Z
 
-def simulate_interpolated_sindy(param_grid, Z0, t_grid, n_samples, Dt, Z, param_train):
+def simulate_interpolated_sindy(param_grid, Z0, t_grid, n_samples, Dt, Z, param_train, fd_type):
 
     '''
 
@@ -96,7 +115,7 @@ def simulate_interpolated_sindy(param_grid, Z0, t_grid, n_samples, Dt, Z, param_
 
     from .interp import build_interpolation_data, fit_gps, interpolate_coef_matrix
 
-    dZdt, Z = compute_sindy_data(Z, Dt)
+    dZdt = compute_time_derivative(Z, Dt, fd_type)
     sindy_coef = solve_sindy(dZdt, Z)
     interpolation_data = build_interpolation_data(sindy_coef, param_train)
     gp_dictionnary = fit_gps(interpolation_data)
