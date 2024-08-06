@@ -94,9 +94,6 @@ class Autoencoder(torch.nn.Module):
         self.space_dim = np.prod(self.qgrid_size)
         hidden_units = config['hidden_units']
         n_z = config['latent_dimension']
-        threshold = config["threshold"] if "threshold" in config else 0.1
-        value = config["value"] if "value" in config else 0.0
-        num_heads = config['num_heads'] if 'num_heads' in config else 1
 
         n_layers = len(hidden_units)
         self.n_layers = n_layers
@@ -117,12 +114,20 @@ class Autoencoder(torch.nn.Module):
 
         act_type = config['activation'] if 'activation' in config else 'sigmoid'
         if act_type == "threshold":
+            #grab relevant initialization values from config
+            threshold = config["threshold"] if "threshold" in config else 0.1
+            value = config["value"] if "value" in config else 0.0
             self.g_e = self.act_dict[act_type](threshold, value)
+
         elif act_type == "multihead":
+            #grab relevant initialization values from config
+            num_heads = config['num_heads'] if 'num_heads' in config else 1
             if n_layers > 1:
                 for i in range(n_layers):
                     setattr(self, 'a' + str(i + 1), self.act_dict[act_type](hidden_units[i], num_heads))
             self.g_e = torch.nn.Identity()  # No additional activation
+
+        #all other activation functions initialized here
         else:
             self.g_e = self.act_dict[act_type]()
 
@@ -153,10 +158,8 @@ class Autoencoder(torch.nn.Module):
             fc = getattr(self, 'fc' + str(i) + '_e')
             x = fc(x) # apply linear layer
             if hasattr(self, 'a1'): # test if there is at least one attention layer
-                x = x.unsqueeze(1)  # Add sequence dimension for attention
-                a = getattr(self, 'a' + str(i))
-                x, _ = a(x, x, x) # apply attention
-                x = x.squeeze(1)  # Remove sequence dimension
+                x = self.apply_attention(self, x, i)
+                
             x = self.g_e(x) # apply activation function
 
         fc = getattr(self, 'fc' + str(self.n_layers + 1) + '_e')
@@ -171,10 +174,8 @@ class Autoencoder(torch.nn.Module):
             fc = getattr(self, 'fc' + str(i) + '_d')
             x = fc(x) # apply linear layer
             if hasattr(self, 'a1'): # test if there is at least one attention layer
-                x = x.unsqueeze(1)  # Add sequence dimension for attention
-                a = getattr(self, 'a' + str(n_layer - i))
-                x, _ = a(x, x, x) # apply attention
-                x = x.squeeze(1)  # Remove sequence dimension
+                x = self.apply_attention(self, x, self.n_layers - i)
+
             x = self.g_e(x) # apply activation function
 
         fc = getattr(self, 'fc' + str(self.n_layers + 1) + '_d')
@@ -192,4 +193,13 @@ class Autoencoder(torch.nn.Module):
         x = self.encoder(x)
         x = self.decoder(x)
 
+        return x
+
+
+    def apply_attention(self, x, layer):
+        x = x.unsqueeze(1)  # Add sequence dimension for attention
+        a = getattr(self, 'a' + str(layer))
+        x, _ = a(x, x, x) # apply attention
+        x = x.squeeze(1)  # Remove sequence dimension
+        
         return x
