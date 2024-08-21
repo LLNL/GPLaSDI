@@ -38,7 +38,7 @@ def find_sindy_coef(Z, Dt, n_train, time_dim, loss_function, fd_type):
 class BayesianGLaSDI:
     X_train = None
 
-    def __init__(self, autoencoder, physics, model_parameters):
+    def __init__(self, physics, autoencoder, latent_dynamics, model_parameters):
 
         '''
 
@@ -50,12 +50,10 @@ class BayesianGLaSDI:
         '''
 
         self.autoencoder = autoencoder
+        self.latent_dynamics = latent_dynamics
         self.physics = physics
         self.param_space = physics.param_space
         self.timer = Timer()
-
-        # TODO(kevin): factorize sindy class
-        self.fd_type = model_parameters['fd_type'] if 'fd_type' in model_parameters else 'sbp12'
 
         self.n_samples = model_parameters['n_samples']
         self.lr = model_parameters['lr']
@@ -104,6 +102,7 @@ class BayesianGLaSDI:
         Path(self.path_results).mkdir(parents=True, exist_ok=True)
 
         ps = self.param_space
+        ld = self.latent_dynamics
 
         for iter in range(self.restart_iter, self.n_iter):
             self.timer.start("train_step")
@@ -114,7 +113,7 @@ class BayesianGLaSDI:
             Z = Z.cpu()
 
             loss_ae = self.MSE(X_train_device, X_pred)
-            loss_sindy, loss_coef, sindy_coef = find_sindy_coef(Z, self.physics.dt, ps.n_train, self.physics.nt, self.MSE, self.fd_type)
+            sindy_coef, loss_sindy, loss_coef = ld.calibrate(Z, self.physics.dt, compute_loss=True, numpy=True)
 
             max_coef = np.abs(np.array(sindy_coef)).max()
 
@@ -190,12 +189,13 @@ class BayesianGLaSDI:
         bglasdi_results = {'autoencoder_param': self.autoencoder.state_dict(), 'final_X_train': self.X_train,
                            'sindy_coef': sindy_coef, 'gp_dictionnary': gp_dictionnary, 'lr': self.lr, 'n_iter': self.n_iter,
                            'n_greedy': self.n_greedy, 'sindy_weight': self.sindy_weight, 'coef_weight': self.coef_weight,
-                           'n_samples' : self.n_samples, 'fd_type': self.fd_type,
+                           'n_samples' : self.n_samples,
                            }
         bglasdi_results['physics'] = self.physics.export()
         bglasdi_results['parameters'] = self.param_space.export()
         # TODO(kevin): restart capability for timer.
         bglasdi_results['timer'] = self.timer.export()
+        bglasdi_results['latent_dynamics'] = self.latent_dynamics.export()
 
         date = time.localtime()
         date_str = "{month:02d}_{day:02d}_{year:04d}_{hour:02d}_{minute:02d}"

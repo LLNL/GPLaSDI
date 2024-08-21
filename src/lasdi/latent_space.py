@@ -52,6 +52,7 @@ class Autoencoder(torch.nn.Module):
     qgrid_size = []
     # prod(qgrid_size)
     space_dim = -1
+    n_z = -1
 
     # activation dict
     act_dict = {'ELU': torch.nn.ELU,
@@ -86,6 +87,7 @@ class Autoencoder(torch.nn.Module):
         self.space_dim = np.prod(self.qgrid_size)
         hidden_units = config['hidden_units']
         n_z = config['latent_dimension']
+        self.n_z = n_z
 
         n_layers = len(hidden_units)
         self.n_layers = n_layers

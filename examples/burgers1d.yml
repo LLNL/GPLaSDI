@@ -36,10 +36,14 @@ parameter_space:
 latent_space:
   type: ae
   ae:
-  # we should not specify fom_dimension here. temporarily.
-    fom_dimension: 1001
     hidden_units: [100]
     latent_dimension: 5
+
+latent_dynamics:
+  type: sindy
+  sindy:
+    fd_type: sbp12
+    coef_norm_order: 2
 
 # TODO(kevin): temporary placeholder
 initial_train:
