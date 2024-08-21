@@ -2,6 +2,7 @@ from .sindy import *
 from .interp import *
 from .latent_space import *
 from .enums import *
+from .timing import Timer
 import torch
 import time
 import numpy as np
@@ -51,6 +52,7 @@ class BayesianGLaSDI:
         self.autoencoder = autoencoder
         self.physics = physics
         self.param_space = physics.param_space
+        self.timer = Timer()
 
         # TODO(kevin): factorize sindy class
         self.fd_type = model_parameters['fd_type'] if 'fd_type' in model_parameters else 'sbp12'
@@ -97,21 +99,14 @@ class BayesianGLaSDI:
         autoencoder_device = self.autoencoder.to(device)
         X_train_device = self.X_train.to(device)
 
-        tic_start = time.time()
-        start_train_phase = []
-        start_fom_phase = []
-        end_train_phase = []
-        end_fom_phase = []
-
         from pathlib import Path
         Path(self.path_checkpoint).mkdir(parents=True, exist_ok=True)
         Path(self.path_results).mkdir(parents=True, exist_ok=True)
 
         ps = self.param_space
 
-        start_train_phase.append(tic_start)
-
         for iter in range(self.restart_iter, self.n_iter):
+            self.timer.start("train_step")
 
             self.optimizer.zero_grad()
             Z = autoencoder_device.encoder(X_train_device)
@@ -150,15 +145,15 @@ class BayesianGLaSDI:
                     print(', ' + str(np.round(ps.train_space[-6 + i, :], 4)), end = '')
                 print(', ' + str(np.round(ps.train_space[-1, :], 4)))
 
+            self.timer.end("train_step")
 
             if ((iter > self.restart_iter) and (iter < self.max_greedy_iter) and (iter % self.n_greedy == 0)):
 
-                end_train_phase.append(time.time())
+                self.timer.start("new_sample")
 
                 print('\n~~~~~~~ Finding New Point ~~~~~~~')
                 # TODO(kevin): need to re-write this part.
 
-                start_fom_phase.append(time.time())
                 # X_train = X_train_device.cpu()
                 autoencoder = autoencoder_device.cpu()
                 autoencoder.load_state_dict(torch.load(self.path_checkpoint + '/' + 'checkpoint.pt'))
@@ -181,32 +176,34 @@ class BayesianGLaSDI:
                 ps.appendTrainSpace(ps.test_space[m_index, :])
                 self.restart_iter = iter
                 next_step, result = NextStep.RunSample, Result.Success
-                end_fom_phase.append(time.time())
                 print('New param: ' + str(np.round(ps.test_space[m_index, :], 4)) + '\n') 
+                self.timer.end("new_sample")
                 return result, next_step
         
+        self.timer.start("finalize")
+
         if len(self.best_sindy_coef) == ps.n_train:
             sindy_coef = self.best_sindy_coef
         interpolation_data = build_interpolation_data(sindy_coef, ps.train_space)
         gp_dictionnary = fit_gps(interpolation_data)
 
-        tic_end = time.time()
-        total_time = tic_end - tic_start
-
         bglasdi_results = {'autoencoder_param': self.autoencoder.state_dict(), 'final_X_train': self.X_train,
                            'sindy_coef': sindy_coef, 'gp_dictionnary': gp_dictionnary, 'lr': self.lr, 'n_iter': self.n_iter,
                            'n_greedy': self.n_greedy, 'sindy_weight': self.sindy_weight, 'coef_weight': self.coef_weight,
                            'n_samples' : self.n_samples, 'fd_type': self.fd_type,
-                           # TODO(kevin): need to fix timer.
-                           'total_time' : total_time, 'start_train_phase' : start_train_phase,
-                           'start_fom_phase' : start_fom_phase, 'end_train_phase' : end_train_phase, 'end_fom_phase' : end_fom_phase}
+                           }
         bglasdi_results['physics'] = self.physics.export()
         bglasdi_results['parameters'] = self.param_space.export()
+        # TODO(kevin): restart capability for timer.
+        bglasdi_results['timer'] = self.timer.export()
 
         date = time.localtime()
         date_str = "{month:02d}_{day:02d}_{year:04d}_{hour:02d}_{minute:02d}"
         date_str = date_str.format(month = date.tm_mon, day = date.tm_mday, year = date.tm_year, hour = date.tm_hour + 3, minute = date.tm_min)
         np.save(self.path_results + '/' + 'bglasdi_' + date_str + '.npy', bglasdi_results)
+
+        self.timer.end("finalize")
+        self.timer.print()
 
         next_step, result = None, Result.Complete
         return result, next_step
