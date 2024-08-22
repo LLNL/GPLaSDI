@@ -148,41 +148,44 @@ class BayesianGLaSDI:
 
             if ((iter > self.restart_iter) and (iter < self.max_greedy_iter) and (iter % self.n_greedy == 0)):
 
-                self.timer.start("new_sample")
+                # self.timer.start("new_sample")
 
-                print('\n~~~~~~~ Finding New Point ~~~~~~~')
-                # TODO(kevin): need to re-write this part.
+                # print('\n~~~~~~~ Finding New Point ~~~~~~~')
+                # # TODO(kevin): need to re-write this part.
 
-                # X_train = X_train_device.cpu()
-                autoencoder = autoencoder_device.cpu()
-                autoencoder.load_state_dict(torch.load(self.path_checkpoint + '/' + 'checkpoint.pt'))
+                # # X_train = X_train_device.cpu()
+                # autoencoder = autoencoder_device.cpu()
+                # autoencoder.load_state_dict(torch.load(self.path_checkpoint + '/' + 'checkpoint.pt'))
 
-                if len(self.best_sindy_coef) == ps.n_train:
+                if (self.best_sindy_coef.shape[0] == ps.n_train):
                     sindy_coef = self.best_sindy_coef
 
-                Z0 = initial_condition_latent(ps.test_space, self.physics, autoencoder)
+                # Z0 = initial_condition_latent(ps.test_space, self.physics, autoencoder)
 
-                interpolation_data = build_interpolation_data(sindy_coef, ps.train_space)
-                gp_dictionnary = fit_gps(interpolation_data)
-                n_coef = interpolation_data['n_coef']
+                # interpolation_data = build_interpolation_data(sindy_coef, ps.train_space)
+                # gp_dictionnary = fit_gps(interpolation_data)
+                # n_coef = interpolation_data['n_coef']
 
-                coef_samples = [interpolate_coef_matrix(gp_dictionnary, ps.test_space[i, :], self.n_samples, n_coef, sindy_coef) for i in range(ps.n_test)]
-                Zis = [simulate_uncertain_sindy(gp_dictionnary, ps.test_space[i, 0], self.n_samples, Z0[i], self.physics.t_grid, sindy_coef, n_coef, coef_samples[i]) for i in range(ps.n_test)]
+                # coef_samples = [interpolate_coef_matrix(gp_dictionnary, ps.test_space[i, :], self.n_samples, n_coef, sindy_coef) for i in range(ps.n_test)]
+                # Zis = [simulate_uncertain_sindy(gp_dictionnary, ps.test_space[i, 0], self.n_samples, Z0[i], self.physics.t_grid, sindy_coef, n_coef, coef_samples[i]) for i in range(ps.n_test)]
 
-                m_index = get_max_std(autoencoder, Zis)
+                # m_index = get_max_std(autoencoder, Zis)
+                new_sample = self.get_new_sample_point(sindy_coef)
 
                 # TODO(kevin): implement save/load the new parameter
-                ps.appendTrainSpace(ps.test_space[m_index, :])
+                # ps.appendTrainSpace(ps.test_space[m_index, :])
+                ps.appendTrainSpace(new_sample)
                 self.restart_iter = iter
                 next_step, result = NextStep.RunSample, Result.Success
-                print('New param: ' + str(np.round(ps.test_space[m_index, :], 4)) + '\n') 
-                self.timer.end("new_sample")
+                print('New param: ' + str(np.round(new_sample, 4)) + '\n')
+                # self.timer.end("new_sample")
                 return result, next_step
         
         self.timer.start("finalize")
 
-        if len(self.best_sindy_coef) == ps.n_train:
+        if (self.best_sindy_coef.shape[0] == ps.n_train):
             sindy_coef = self.best_sindy_coef
+        sindy_coef = sindy_coef.reshape([ps.n_train, autoencoder_device.n_z+1, autoencoder_device.n_z])
         interpolation_data = build_interpolation_data(sindy_coef, ps.train_space)
         gp_dictionnary = fit_gps(interpolation_data)
 
@@ -207,6 +210,35 @@ class BayesianGLaSDI:
 
         next_step, result = None, Result.Complete
         return result, next_step
+    
+    def get_new_sample_point(self, sindy_coef):
+        self.timer.start("new_sample")
+
+        print('\n~~~~~~~ Finding New Point ~~~~~~~')
+
+        # X_train = X_train_device.cpu()
+        ae = self.autoencoder.cpu()
+        ps = self.param_space
+        ae.load_state_dict(torch.load(self.path_checkpoint + '/' + 'checkpoint.pt'))
+
+        # if (self.best_sindy_coef.shape[0] == ps.n_train):
+        #     sindy_coef = self.best_sindy_coef
+        # copy is inevitable for numpy==1.26. temporary placeholder.
+        sindy_coef = sindy_coef.reshape([ps.n_train, ae.n_z+1, ae.n_z])
+
+        Z0 = initial_condition_latent(ps.test_space, self.physics, ae)
+
+        interpolation_data = build_interpolation_data(sindy_coef, ps.train_space)
+        gp_dictionnary = fit_gps(interpolation_data)
+        n_coef = interpolation_data['n_coef']
+
+        coef_samples = [interpolate_coef_matrix(gp_dictionnary, ps.test_space[i, :], self.n_samples, n_coef, sindy_coef) for i in range(ps.n_test)]
+        Zis = [simulate_uncertain_sindy(gp_dictionnary, ps.test_space[i, 0], self.n_samples, Z0[i], self.physics.t_grid, sindy_coef, n_coef, coef_samples[i]) for i in range(ps.n_test)]
+
+        m_index = get_max_std(ae, Zis)
+
+        self.timer.end("new_sample")
+        return ps.test_space[m_index, :]
     
     def sample_fom(self):
 

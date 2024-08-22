@@ -42,26 +42,31 @@ class SINDy(LatentDynamics):
         return
     
     def calibrate(self, Z, dt, compute_loss=True, numpy=False):
-
+        ''' loop over all train cases, if Z dimension is 3 '''
         if (Z.dim() == 3):
-            coefs = []
+            n_train = Z.size(0)
+
+            if (numpy):
+                coefs = np.zeros([n_train, self.ncoefs])
+            else:
+                coefs = torch.Tensor([n_train, self.ncoefs])
             loss_sindy, loss_coef = 0.0, 0.0
 
-            n_train = Z.size(0)
             for i in range(n_train):
                 result = self.calibrate(Z[i], dt, compute_loss, numpy)
                 if (compute_loss):
-                    coefs += result[0]
+                    coefs[i] = result[0]
                     loss_sindy += result[1]
                     loss_coef += result[2]
                 else:
-                    coefs += result
+                    coefs[i] = result
             
             if (compute_loss):
                 return coefs, loss_sindy, loss_coef
             else:
                 return coefs
 
+        ''' evaluate for one train case '''
         assert(Z.dim() == 2)
         dZdt = self.compute_time_derivative(Z, dt)
         time_dim, space_dim = dZdt.shape
@@ -74,13 +79,15 @@ class SINDy(LatentDynamics):
             # NOTE(kevin): by default, this will be L1 norm.
             loss_coef = torch.norm(coefs, self.coef_norm_order)
 
+        # output of lstsq is not contiguous in memory.
+        coefs = coefs.detach().flatten()
         if (numpy):
-            coefs = coefs.detach().numpy()
+            coefs = coefs.numpy()
 
         if (compute_loss):
-            return [coefs], loss_sindy, loss_coef
+            return coefs, loss_sindy, loss_coef
         else:
-            return [coefs]
+            return coefs
 
     def compute_time_derivative(self, Z, Dt):
 
@@ -106,8 +113,7 @@ class SINDy(LatentDynamics):
         Integrates each system of ODEs corresponding to each training points, given the initial condition Z0 = encoder(U0)
 
         '''
-
-        c_i = coefs.T
+        c_i = coefs.reshape([self.dim+1, self.dim], copy=False).T
         dzdt = lambda z, t : c_i[:, 1:] @ z + c_i[:, 0]
 
         Z_i = odeint(dzdt, z0, t_grid)

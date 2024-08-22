@@ -9,7 +9,6 @@ lasdi:
     max_greedy_iter: 28000
     sindy_weight: 0.1
     coef_weight: 1.e-6
-    fd_type: sbp12
     path_checkpoint: checkpoint
     path_results: results
 
