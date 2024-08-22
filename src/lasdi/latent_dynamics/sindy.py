@@ -67,11 +67,6 @@ class SINDy(LatentDynamics):
         time_dim, space_dim = dZdt.shape
 
         Z_i = torch.cat([torch.ones(time_dim, 1), Z], dim = 1)
-
-        if (numpy):
-            Z_i = Z_i.detach()
-            dZdt = dZdt.detach()
-
         coefs = torch.linalg.lstsq(Z_i, dZdt).solution
 
         if (compute_loss):

@@ -34,8 +34,9 @@ class InputParser:
 
         if (fallback != None):
             if (type(val) != type(fallback)):
-                raise RuntimeError("%s does not match the type with the fallback value %s!" % (str(type(val)), str(type(fallback))))
-        elif (datatype != None):
+                warn("%s does not match the type with the fallback value %s!" % (str(type(val)), str(type(fallback))))
+                
+        if (datatype != None):
             if (type(val) != datatype):
                 raise RuntimeError("%s does not match the specified datatype %s!" % (str(type(val)), str(datatype)))
         else:
