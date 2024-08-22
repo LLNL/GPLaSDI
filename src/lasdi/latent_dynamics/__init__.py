@@ -3,13 +3,16 @@ import torch
 
 class LatentDynamics:
     dim = -1
+    nt = -1
     ncoefs = -1
     # TODO(kevin): do we want to store coefficients as a member variable?
     coefs = torch.Tensor([])
 
-    def __init__(self, dim_):
+    def __init__(self, dim_, nt_):
         self.dim = dim_
+        self.nt = nt_
         assert(self.dim > 0)
+        assert(self.nt > 0)
         return
     
     def calibrate(self, Z, dt, compute_loss=True, numpy=False):

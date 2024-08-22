@@ -101,7 +101,7 @@ def initialize_trainer(config):
     ld_type = config['latent_dynamics']['type']
     assert(ld_type in config['latent_dynamics'])
     assert(ld_type in ld_dict)
-    latent_dynamics = ld_dict[ld_type](latent_space.n_z, config['latent_dynamics'])
+    latent_dynamics = ld_dict[ld_type](latent_space.n_z, physics.nt, config['latent_dynamics'])
 
     trainer_type = config['lasdi']['type']
     assert(trainer_type in config['lasdi'])

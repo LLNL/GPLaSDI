@@ -13,9 +13,10 @@ FDdict = {'sbp12': SBP12(),
 class SINDy(LatentDynamics):
     fd_type = ''
     fd = None
+    fd_oper = None
 
-    def __init__(self, dim, config):
-        super().__init__(dim)
+    def __init__(self, dim, nt, config):
+        super().__init__(dim, nt)
 
         #TODO(kevin): generalize for high-order dynamics
         self.ncoefs = self.dim * (self.dim + 1)
@@ -32,6 +33,7 @@ class SINDy(LatentDynamics):
         '''
         self.fd_type = parser.getInput(['fd_type'], fallback='sbp12')
         self.fd = FDdict[self.fd_type]
+        self.fd_oper, _, _ = self.fd.getOperators(self.nt)
 
         # NOTE(kevin): by default, this will be L1 norm.
         self.coef_norm_order = parser.getInput(['coef_norm_order'], fallback=1)
@@ -102,9 +104,7 @@ class SINDy(LatentDynamics):
         The output dZdt is a 2D tensor with the same shape of Z.
 
         '''
-
-        oper, _, _ = self.fd.getOperators(Z.size(0))
-        return 1. / Dt * torch.sparse.mm(oper, Z)
+        return 1. / Dt * torch.sparse.mm(self.fd_oper, Z)
 
     def simulate(self, coefs, z0, t_grid):
 
