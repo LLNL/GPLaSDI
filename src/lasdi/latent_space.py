@@ -24,28 +24,6 @@ def initial_condition_latent(param_grid, physics, autoencoder):
         Z0.append(z0)
 
     return Z0
-
-def get_max_std(autoencoder, Zis):
-
-    '''
-
-    Computes the maximum standard deviation accross the parameter space grid and finds the corresponding parameter location
-
-    '''
-
-    max_std = 0
-
-    for m, Zi in enumerate(Zis):
-        Z_m = torch.Tensor(Zi)
-        X_pred_m = autoencoder.decoder(Z_m).detach().numpy()
-        X_pred_m_std = X_pred_m.std(0)
-        max_std_m = X_pred_m_std.max()
-
-        if max_std_m > max_std:
-            m_index = m
-            max_std = max_std_m
-
-    return m_index
     
 class Autoencoder(torch.nn.Module):
     # set by physics.qgrid_size

@@ -7,33 +7,91 @@ import torch
 import time
 import numpy as np
 
-def find_sindy_coef(Z, Dt, n_train, time_dim, loss_function, fd_type):
+# def find_sindy_coef(Z, Dt, n_train, time_dim, loss_function, fd_type):
+
+#     '''
+
+#     Computes the SINDy loss, reconstruction loss, and sindy coefficients
+
+#     '''
+
+#     loss_sindy = 0
+#     loss_coef = 0
+
+#     dZdt = compute_time_derivative(Z, Dt, fd_type)
+#     sindy_coef = []
+
+#     for i in range(n_train):
+
+#         dZdt_i = dZdt[i, :, :]
+#         Z_i = torch.cat([torch.ones(time_dim, 1), Z[i, :, :]], dim = 1)
+#         # coef_matrix_i = Z_i.pinverse() @ dZdt_i
+#         coef_matrix_i = torch.linalg.lstsq(Z_i, dZdt_i).solution
+
+#         loss_sindy += loss_function(dZdt_i, Z_i @ coef_matrix_i)
+#         loss_coef += torch.norm(coef_matrix_i)
+
+#         sindy_coef.append(coef_matrix_i.detach().numpy())
+
+#     return loss_sindy, loss_coef, sindy_coef
+
+def average_rom(autoencoder, physics, latent_dynamics, gp_dictionary, param_grid):
+
+    if (param_grid.ndim == 1):
+        param_grid = param_grid.reshape(1, -1)
+    n_test = param_grid.shape[0]
+
+    Z0 = initial_condition_latent(param_grid, physics, autoencoder)
+
+    pred_mean, _ = eval_gp(gp_dictionary, param_grid)
+
+    Zis = np.zeros([n_test, physics.nt, autoencoder.n_z])
+    for i in range(n_test):
+        Zis[i] = latent_dynamics.simulate(pred_mean[i], Z0[i], physics.t_grid)
+
+    return Zis
+
+def sample_roms(autoencoder, physics, latent_dynamics, gp_dictionary, param_grid, n_samples):
+
+    if (param_grid.ndim == 1):
+        param_grid = param_grid.reshape(1, -1)
+    n_test = param_grid.shape[0]
+
+    Z0 = initial_condition_latent(param_grid, physics, autoencoder)
+
+    coef_samples = [sample_coefs(gp_dictionary, param_grid[i], n_samples) for i in range(n_test)]
+
+    Zis = np.zeros([n_test, n_samples, physics.nt, autoencoder.n_z])
+    for i, Zi in enumerate(Zis):
+        z_ic = Z0[i]
+        for j, coef_sample in enumerate(coef_samples[i]):
+            Zi[j] = latent_dynamics.simulate(coef_sample, z_ic, physics.t_grid)
+
+    return Zis
+
+def get_fom_max_std(autoencoder, Zis):
 
     '''
 
-    Computes the SINDy loss, reconstruction loss, and sindy coefficients
+    Computes the maximum standard deviation accross the parameter space grid and finds the corresponding parameter location
 
     '''
+    # TODO(kevin): currently this evaluate pointwise maximum standard deviation.
+    #              is this a proper metric? we might want to consider an average, or L2 norm of std.
 
-    loss_sindy = 0
-    loss_coef = 0
+    max_std = 0
 
-    dZdt = compute_time_derivative(Z, Dt, fd_type)
-    sindy_coef = []
+    for m, Zi in enumerate(Zis):
+        Z_m = torch.Tensor(Zi)
+        X_pred_m = autoencoder.decoder(Z_m).detach().numpy()
+        X_pred_m_std = X_pred_m.std(0)
+        max_std_m = X_pred_m_std.max()
 
-    for i in range(n_train):
+        if max_std_m > max_std:
+            m_index = m
+            max_std = max_std_m
 
-        dZdt_i = dZdt[i, :, :]
-        Z_i = torch.cat([torch.ones(time_dim, 1), Z[i, :, :]], dim = 1)
-        # coef_matrix_i = Z_i.pinverse() @ dZdt_i
-        coef_matrix_i = torch.linalg.lstsq(Z_i, dZdt_i).solution
-
-        loss_sindy += loss_function(dZdt_i, Z_i @ coef_matrix_i)
-        loss_coef += torch.norm(coef_matrix_i)
-
-        sindy_coef.append(coef_matrix_i.detach().numpy())
-
-    return loss_sindy, loss_coef, sindy_coef
+    return m_index
 
 class BayesianGLaSDI:
     X_train = None
@@ -113,9 +171,9 @@ class BayesianGLaSDI:
             Z = Z.cpu()
 
             loss_ae = self.MSE(X_train_device, X_pred)
-            sindy_coef, loss_sindy, loss_coef = ld.calibrate(Z, self.physics.dt, compute_loss=True, numpy=True)
+            coefs, loss_sindy, loss_coef = ld.calibrate(Z, self.physics.dt, compute_loss=True, numpy=True)
 
-            max_coef = np.abs(np.array(sindy_coef)).max()
+            max_coef = np.abs(coefs).max()
 
             loss = loss_ae + self.sindy_weight * loss_sindy / ps.n_train + self.coef_weight * loss_coef / ps.n_train
 
@@ -124,7 +182,7 @@ class BayesianGLaSDI:
 
             if loss.item() < self.best_loss:
                 torch.save(autoencoder_device.state_dict(), self.path_checkpoint + '/' + 'checkpoint.pt')
-                self.best_sindy_coef = sindy_coef
+                self.best_coefs = coefs
                 self.best_loss = loss.item()
 
             print("Iter: %05d/%d, Loss: %3.10f, Loss AE: %3.10f, Loss SI: %3.10f, Loss COEF: %3.10f, max|c|: %04.1f, "
@@ -148,32 +206,12 @@ class BayesianGLaSDI:
 
             if ((iter > self.restart_iter) and (iter < self.max_greedy_iter) and (iter % self.n_greedy == 0)):
 
-                # self.timer.start("new_sample")
+                if (self.best_coefs.shape[0] == ps.n_train):
+                    coefs = self.best_coefs
 
-                # print('\n~~~~~~~ Finding New Point ~~~~~~~')
-                # # TODO(kevin): need to re-write this part.
-
-                # # X_train = X_train_device.cpu()
-                # autoencoder = autoencoder_device.cpu()
-                # autoencoder.load_state_dict(torch.load(self.path_checkpoint + '/' + 'checkpoint.pt'))
-
-                if (self.best_sindy_coef.shape[0] == ps.n_train):
-                    sindy_coef = self.best_sindy_coef
-
-                # Z0 = initial_condition_latent(ps.test_space, self.physics, autoencoder)
-
-                # interpolation_data = build_interpolation_data(sindy_coef, ps.train_space)
-                # gp_dictionnary = fit_gps(interpolation_data)
-                # n_coef = interpolation_data['n_coef']
-
-                # coef_samples = [interpolate_coef_matrix(gp_dictionnary, ps.test_space[i, :], self.n_samples, n_coef, sindy_coef) for i in range(ps.n_test)]
-                # Zis = [simulate_uncertain_sindy(gp_dictionnary, ps.test_space[i, 0], self.n_samples, Z0[i], self.physics.t_grid, sindy_coef, n_coef, coef_samples[i]) for i in range(ps.n_test)]
-
-                # m_index = get_max_std(autoencoder, Zis)
-                new_sample = self.get_new_sample_point(sindy_coef)
+                new_sample = self.get_new_sample_point(coefs)
 
                 # TODO(kevin): implement save/load the new parameter
-                # ps.appendTrainSpace(ps.test_space[m_index, :])
                 ps.appendTrainSpace(new_sample)
                 self.restart_iter = iter
                 next_step, result = NextStep.RunSample, Result.Success
@@ -183,14 +221,13 @@ class BayesianGLaSDI:
         
         self.timer.start("finalize")
 
-        if (self.best_sindy_coef.shape[0] == ps.n_train):
-            sindy_coef = self.best_sindy_coef
-        sindy_coef = sindy_coef.reshape([ps.n_train, autoencoder_device.n_z+1, autoencoder_device.n_z])
-        interpolation_data = build_interpolation_data(sindy_coef, ps.train_space)
-        gp_dictionnary = fit_gps(interpolation_data)
+        if (self.best_coefs.shape[0] == ps.n_train):
+            coefs = self.best_coefs
+
+        gp_dictionnary = fit_gps(ps.train_space, coefs)
 
         bglasdi_results = {'autoencoder_param': self.autoencoder.state_dict(), 'final_X_train': self.X_train,
-                           'sindy_coef': sindy_coef, 'gp_dictionnary': gp_dictionnary, 'lr': self.lr, 'n_iter': self.n_iter,
+                           'coefs': coefs, 'gp_dictionnary': gp_dictionnary, 'lr': self.lr, 'n_iter': self.n_iter,
                            'n_greedy': self.n_greedy, 'sindy_weight': self.sindy_weight, 'coef_weight': self.coef_weight,
                            'n_samples' : self.n_samples,
                            }
@@ -211,31 +248,29 @@ class BayesianGLaSDI:
         next_step, result = None, Result.Complete
         return result, next_step
     
-    def get_new_sample_point(self, sindy_coef):
+    def get_new_sample_point(self, coefs):
         self.timer.start("new_sample")
 
         print('\n~~~~~~~ Finding New Point ~~~~~~~')
+        # TODO(kevin): william, this might be the place for new sampling routine.
 
-        # X_train = X_train_device.cpu()
         ae = self.autoencoder.cpu()
         ps = self.param_space
         ae.load_state_dict(torch.load(self.path_checkpoint + '/' + 'checkpoint.pt'))
 
-        # if (self.best_sindy_coef.shape[0] == ps.n_train):
-        #     sindy_coef = self.best_sindy_coef
-        # copy is inevitable for numpy==1.26. temporary placeholder.
-        sindy_coef = sindy_coef.reshape([ps.n_train, ae.n_z+1, ae.n_z])
-
         Z0 = initial_condition_latent(ps.test_space, self.physics, ae)
 
-        interpolation_data = build_interpolation_data(sindy_coef, ps.train_space)
-        gp_dictionnary = fit_gps(interpolation_data)
-        n_coef = interpolation_data['n_coef']
+        gp_dictionnary = fit_gps(ps.train_space, coefs)
 
-        coef_samples = [interpolate_coef_matrix(gp_dictionnary, ps.test_space[i, :], self.n_samples, n_coef, sindy_coef) for i in range(ps.n_test)]
-        Zis = [simulate_uncertain_sindy(gp_dictionnary, ps.test_space[i, 0], self.n_samples, Z0[i], self.physics.t_grid, sindy_coef, n_coef, coef_samples[i]) for i in range(ps.n_test)]
+        coef_samples = [sample_coefs(gp_dictionnary, ps.test_space[i], self.n_samples) for i in range(ps.n_test)]
 
-        m_index = get_max_std(ae, Zis)
+        Zis = np.zeros([ps.n_test, self.n_samples, self.physics.nt, ae.n_z])
+        for i, Zi in enumerate(Zis):
+            z_ic = Z0[i]
+            for j, coef_sample in enumerate(coef_samples[i]):
+                Zi[j] = self.latent_dynamics.simulate(coef_sample, z_ic, self.physics.t_grid)
+
+        m_index = get_fom_max_std(ae, Zis)
 
         self.timer.end("new_sample")
         return ps.test_space[m_index, :]

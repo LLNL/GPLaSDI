@@ -113,12 +113,12 @@ def simulate_interpolated_sindy(param_grid, Z0, t_grid, n_samples, Dt, Z, param_
 
     '''
 
-    from .interp import build_interpolation_data, fit_gps, interpolate_coef_matrix
+    from .interp import build_interpolation_data, fit_gps_obsolete, interpolate_coef_matrix
 
     dZdt = compute_time_derivative(Z, Dt, fd_type)
     sindy_coef = solve_sindy(dZdt, Z)
     interpolation_data = build_interpolation_data(sindy_coef, param_train)
-    gp_dictionnary = fit_gps(interpolation_data)
+    gp_dictionnary = fit_gps_obsolete(interpolation_data)
     n_coef = interpolation_data['n_coef']
 
     coef_samples = [interpolate_coef_matrix(gp_dictionnary, param_grid[i, :], n_samples, n_coef, sindy_coef) for i in range(param_grid.shape[0])]

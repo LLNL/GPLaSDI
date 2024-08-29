@@ -2,14 +2,14 @@ import numpy as np
 import torch
 
 def interpolate_coef_matrix_mean(gp_dictionnary, param, n_coef, sindy_coef):
-    from .interp import eval_gp
+    from .interp import eval_gp_obsolete
 
     coef_samples = []
     coef_x, coef_y = sindy_coef[0].shape
     if param.ndim == 1:
         param = param.reshape(1, -1)
 
-    gp_pred = eval_gp(gp_dictionnary, param, n_coef)
+    gp_pred = eval_gp_obsolete(gp_dictionnary, param, n_coef)
 
 
     coeff_matrix = np.zeros([coef_x, coef_y])
@@ -37,12 +37,12 @@ def simulate_uncertain_sindy_mean(gp_dictionnary, param, z0, t_grid, sindy_coef,
 
 def simulate_interpolated_sindy_mean(param_grid, Z0, t_grid, Dt, Z, param_train, fd_type):
     from .sindy import compute_time_derivative, solve_sindy
-    from .interp import build_interpolation_data, fit_gps
+    from .interp import build_interpolation_data, fit_gps_obsolete
 
     dZdt = compute_time_derivative(Z, Dt, fd_type)
     sindy_coef = solve_sindy(dZdt, Z)
     interpolation_data = build_interpolation_data(sindy_coef, param_train)
-    gp_dictionnary = fit_gps(interpolation_data)
+    gp_dictionnary = fit_gps_obsolete(interpolation_data)
     n_coef = interpolation_data['n_coef']
 
     coef_samples = [interpolate_coef_matrix_mean(gp_dictionnary, param_grid[i, :], n_coef, sindy_coef) for i in range(param_grid.shape[0])]

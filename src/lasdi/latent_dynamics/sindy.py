@@ -113,7 +113,8 @@ class SINDy(LatentDynamics):
         Integrates each system of ODEs corresponding to each training points, given the initial condition Z0 = encoder(U0)
 
         '''
-        c_i = coefs.reshape([self.dim+1, self.dim], copy=False).T
+        # copy is inevitable for numpy==1.26. removed copy=False temporarily.
+        c_i = coefs.reshape([self.dim+1, self.dim]).T
         dzdt = lambda z, t : c_i[:, 1:] @ z + c_i[:, 0]
 
         Z_i = odeint(dzdt, z0, t_grid)
