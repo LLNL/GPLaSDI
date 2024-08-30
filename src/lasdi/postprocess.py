@@ -35,11 +35,11 @@ def simulate_uncertain_sindy_mean(gp_dictionnary, param, z0, t_grid, sindy_coef,
 
     return Z
 
-def simulate_interpolated_sindy_mean(param_grid, Z0, t_grid, Dt, Z, param_train):
-    from .sindy import compute_sindy_data, solve_sindy
+def simulate_interpolated_sindy_mean(param_grid, Z0, t_grid, Dt, Z, param_train, fd_type):
+    from .sindy import compute_time_derivative, solve_sindy
     from .interp import build_interpolation_data, fit_gps
 
-    dZdt, Z = compute_sindy_data(Z, Dt)
+    dZdt = compute_time_derivative(Z, Dt, fd_type)
     sindy_coef = solve_sindy(dZdt, Z)
     interpolation_data = build_interpolation_data(sindy_coef, param_train)
     gp_dictionnary = fit_gps(interpolation_data)

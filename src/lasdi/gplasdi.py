@@ -6,7 +6,7 @@ import torch
 import time
 import numpy as np
 
-def find_sindy_coef(Z, Dt, n_train, time_dim, loss_function):
+def find_sindy_coef(Z, Dt, n_train, time_dim, loss_function, fd_type):
 
     '''
 
@@ -17,13 +17,13 @@ def find_sindy_coef(Z, Dt, n_train, time_dim, loss_function):
     loss_sindy = 0
     loss_coef = 0
 
-    dZdt, Z = compute_sindy_data(Z, Dt)
+    dZdt = compute_time_derivative(Z, Dt, fd_type)
     sindy_coef = []
 
     for i in range(n_train):
 
         dZdt_i = dZdt[i, :, :]
-        Z_i = torch.cat([torch.ones(time_dim - 1, 1), Z[i, :, :]], dim = 1)
+        Z_i = torch.cat([torch.ones(time_dim, 1), Z[i, :, :]], dim = 1)
         # coef_matrix_i = Z_i.pinverse() @ dZdt_i
         coef_matrix_i = torch.linalg.lstsq(Z_i, dZdt_i).solution
 
@@ -51,6 +51,9 @@ class BayesianGLaSDI:
         self.autoencoder = autoencoder
         self.physics = physics
         self.param_space = physics.param_space
+
+        # TODO(kevin): factorize sindy class
+        self.fd_type = model_parameters['fd_type'] if 'fd_type' in model_parameters else 'sbp12'
 
         self.n_samples = model_parameters['n_samples']
         self.lr = model_parameters['lr']
@@ -116,7 +119,7 @@ class BayesianGLaSDI:
             Z = Z.cpu()
 
             loss_ae = self.MSE(X_train_device, X_pred)
-            loss_sindy, loss_coef, sindy_coef = find_sindy_coef(Z, self.physics.dt, ps.n_train, self.physics.nt, self.MSE)
+            loss_sindy, loss_coef, sindy_coef = find_sindy_coef(Z, self.physics.dt, ps.n_train, self.physics.nt, self.MSE, self.fd_type)
 
             max_coef = np.abs(np.array(sindy_coef)).max()
 
@@ -193,7 +196,7 @@ class BayesianGLaSDI:
         bglasdi_results = {'autoencoder_param': self.autoencoder.state_dict(), 'final_X_train': self.X_train,
                            'sindy_coef': sindy_coef, 'gp_dictionnary': gp_dictionnary, 'lr': self.lr, 'n_iter': self.n_iter,
                            'n_greedy': self.n_greedy, 'sindy_weight': self.sindy_weight, 'coef_weight': self.coef_weight,
-                           'n_samples' : self.n_samples,
+                           'n_samples' : self.n_samples, 'fd_type': self.fd_type,
                            # TODO(kevin): need to fix timer.
                            'total_time' : total_time, 'start_train_phase' : start_train_phase,
                            'start_fom_phase' : start_fom_phase, 'end_train_phase' : end_train_phase, 'end_fom_phase' : end_fom_phase}
