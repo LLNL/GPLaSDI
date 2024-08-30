@@ -54,8 +54,30 @@ class Autoencoder(torch.nn.Module):
     space_dim = -1
 
     # activation dict
-    act_dict = {'sigmoid': torch.nn.Sigmoid,
-                'softplus': torch.nn.Softplus}
+    act_dict = {'ELU': torch.nn.ELU,
+                'hardshrink': torch.nn.Hardshrink,
+                'hardsigmoid': torch.nn.Hardsigmoid,
+                'hardtanh': torch.nn.Hardtanh,
+                'hardswish': torch.nn.Hardswish,
+                'leakyReLU': torch.nn.LeakyReLU,
+                'logsigmoid': torch.nn.LogSigmoid,
+                'multihead': torch.nn.MultiheadAttention,
+                'PReLU': torch.nn.PReLU,
+                'ReLU': torch.nn.ReLU,
+                'ReLU6': torch.nn.ReLU6,
+                'RReLU': torch.nn.RReLU,
+                'SELU': torch.nn.SELU,
+                'CELU': torch.nn.CELU,
+                'GELU': torch.nn.GELU,
+                'sigmoid': torch.nn.Sigmoid,
+                'SiLU': torch.nn.SiLU,
+                'mish': torch.nn.Mish,
+                'softplus': torch.nn.Softplus,
+                'softshrink': torch.nn.Softshrink,
+                'tanh': torch.nn.Tanh,
+                'tanhshrink': torch.nn.Tanhshrink,
+                'threshold': torch.nn.Threshold,
+                }
 
     def __init__(self, physics, config):
         super(Autoencoder, self).__init__()
@@ -83,7 +105,23 @@ class Autoencoder(torch.nn.Module):
         setattr(self, 'fc' + str(n_layers + 1) + '_e', fc_e)
 
         act_type = config['activation'] if 'activation' in config else 'sigmoid'
-        self.g_e = self.act_dict[act_type]()
+        if act_type == "threshold":
+            #grab relevant initialization values from config
+            threshold = config["threshold"] if "threshold" in config else 0.1
+            value = config["value"] if "value" in config else 0.0
+            self.g_e = self.act_dict[act_type](threshold, value)
+
+        elif act_type == "multihead":
+            #grab relevant initialization values from config
+            num_heads = config['num_heads'] if 'num_heads' in config else 1
+            if n_layers > 1:
+                for i in range(n_layers):
+                    setattr(self, 'a' + str(i + 1), self.act_dict[act_type](hidden_units[i], num_heads))
+            self.g_e = torch.nn.Identity()  # No additional activation
+
+        #all other activation functions initialized here
+        else:
+            self.g_e = self.act_dict[act_type]()
 
         fc1_d = torch.nn.Linear(n_z, hidden_units[-1])
         torch.nn.init.xavier_uniform_(fc1_d.weight)
@@ -110,7 +148,11 @@ class Autoencoder(torch.nn.Module):
 
         for i in range(1, self.n_layers + 1):
             fc = getattr(self, 'fc' + str(i) + '_e')
-            x = self.g_e(fc(x))
+            x = fc(x) # apply linear layer
+            if hasattr(self, 'a1'): # test if there is at least one attention layer
+                x = self.apply_attention(self, x, i)
+                
+            x = self.g_e(x) # apply activation function
 
         fc = getattr(self, 'fc' + str(self.n_layers + 1) + '_e')
         x = fc(x)
@@ -122,7 +164,11 @@ class Autoencoder(torch.nn.Module):
 
         for i in range(1, self.n_layers + 1):
             fc = getattr(self, 'fc' + str(i) + '_d')
-            x = self.g_e(fc(x))
+            x = fc(x) # apply linear layer
+            if hasattr(self, 'a1'): # test if there is at least one attention layer
+                x = self.apply_attention(self, x, self.n_layers - i)
+
+            x = self.g_e(x) # apply activation function
 
         fc = getattr(self, 'fc' + str(self.n_layers + 1) + '_d')
         x = fc(x)
@@ -139,4 +185,13 @@ class Autoencoder(torch.nn.Module):
         x = self.encoder(x)
         x = self.decoder(x)
 
+        return x
+
+
+    def apply_attention(self, x, layer):
+        x = x.unsqueeze(1)  # Add sequence dimension for attention
+        a = getattr(self, 'a' + str(layer))
+        x, _ = a(x, x, x) # apply attention
+        x = x.squeeze(1)  # Remove sequence dimension
+        
         return x
