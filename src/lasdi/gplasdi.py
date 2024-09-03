@@ -52,6 +52,15 @@ def average_rom(autoencoder, physics, latent_dynamics, gp_dictionary, param_grid
     return Zis
 
 def sample_roms(autoencoder, physics, latent_dynamics, gp_dictionary, param_grid, n_samples):
+    '''
+        Collect n_samples of ROM trajectories on param_grid.
+        gp_dictionary: list of Gaussian process regressors (size of n_test)
+        param_grid: numpy 2d array
+        n_samples: integer
+        assert(len(gp_dictionnary) == param_grid.shape[0])
+
+        output: np.array of size [n_test, n_samples, physics.nt, autoencoder.n_z]
+    '''
 
     if (param_grid.ndim == 1):
         param_grid = param_grid.reshape(1, -1)

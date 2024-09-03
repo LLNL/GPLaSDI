@@ -51,46 +51,63 @@ def simulate_interpolated_sindy_mean(param_grid, Z0, t_grid, Dt, Z, param_train,
 
     return Z_simulated, gp_dictionnary, interpolation_data, sindy_coef, n_coef, coef_samples
 
-def compute_errors(n_a_grid, n_b_grid, Zis, autoencoder, X_test, Dt, Dx):
+# def compute_errors(n_a_grid, n_b_grid, Zis, autoencoder, X_test, Dt, Dx):
+
+#     '''
+
+#     Compute the maximum relative errors accross the parameter space grid
+
+#     '''
+
+#     max_e_residual = np.zeros([n_a_grid, n_b_grid])
+#     max_e_relative = np.zeros([n_a_grid, n_b_grid])
+#     max_e_relative_mean = np.zeros([n_a_grid, n_b_grid])
+#     max_std = np.zeros([n_a_grid, n_b_grid])
+
+#     m = 0
+
+#     for j in range(n_b_grid):
+#         for i in range(n_a_grid):
+
+#             Z_m = torch.Tensor(Zis[m])
+#             X_pred_m = autoencoder.decoder(Z_m).detach().numpy()
+#             e_relative_m = np.linalg.norm((X_test[m:m + 1, :, :] - X_pred_m), axis = 2) / np.linalg.norm(X_test[m:m + 1, :, :], axis = 2)
+#             e_relative_m_mean = np.linalg.norm((X_test[m, :, :] - X_pred_m.mean(0)), axis = 1) / np.linalg.norm(X_test[m, :, :], axis = 1)
+#             max_e_relative_m = e_relative_m.max()
+#             max_e_relative_m_mean = e_relative_m_mean.max()
+#             max_std_m = X_pred_m.std(0).max()
+
+#             X_pred_m = X_pred_m.mean(0)
+#             # TODO(kevin): detach physics here.
+#             # TODO(kevin): we're still using deprecated function here?
+#             _, e_residual_m = residual(X_pred_m.T, Dt, Dx)
+#             max_e_residual_m = e_residual_m.max()
+
+#             max_e_relative[j, i] = max_e_relative_m
+#             max_e_relative_mean[j, i] = max_e_relative_m_mean
+#             max_e_residual[j, i] = max_e_residual_m
+#             max_std[j, i] = max_std_m
+
+#             m += 1
+
+#     return max_e_residual, max_e_relative, max_e_relative_mean, max_std
+
+def compute_errors(X_pred, physics, X_test):
 
     '''
 
-    Compute the maximum relative errors accross the parameter space grid
+    Compute the maximum relative errors on a parameter
 
     '''
 
-    max_e_residual = np.zeros([n_a_grid, n_b_grid])
-    max_e_relative = np.zeros([n_a_grid, n_b_grid])
-    max_e_relative_mean = np.zeros([n_a_grid, n_b_grid])
-    max_std = np.zeros([n_a_grid, n_b_grid])
+    assert(X_pred.shape == X_test.shape)
+    residual = physics.residual(X_pred)
+    
+    X_pred = X_pred.reshape(X_pred.shape[0], -1)
+    X_test = X_test.reshape(X_test.shape[0], -1)
+    rel_error = np.linalg.norm(X_pred - X_test, axis=1) / np.linalg.norm(X_test, axis=1)
 
-    m = 0
-
-    for j in range(n_b_grid):
-        for i in range(n_a_grid):
-
-            Z_m = torch.Tensor(Zis[m])
-            X_pred_m = autoencoder.decoder(Z_m).detach().numpy()
-            e_relative_m = np.linalg.norm((X_test[m:m + 1, :, :] - X_pred_m), axis = 2) / np.linalg.norm(X_test[m:m + 1, :, :], axis = 2)
-            e_relative_m_mean = np.linalg.norm((X_test[m, :, :] - X_pred_m.mean(0)), axis = 1) / np.linalg.norm(X_test[m, :, :], axis = 1)
-            max_e_relative_m = e_relative_m.max()
-            max_e_relative_m_mean = e_relative_m_mean.max()
-            max_std_m = X_pred_m.std(0).max()
-
-            X_pred_m = X_pred_m.mean(0)
-            # TODO(kevin): detach physics here.
-            # TODO(kevin): we're still using deprecated function here?
-            _, e_residual_m = residual(X_pred_m.T, Dt, Dx)
-            max_e_residual_m = e_residual_m.max()
-
-            max_e_relative[j, i] = max_e_relative_m
-            max_e_relative_mean[j, i] = max_e_relative_m_mean
-            max_e_residual[j, i] = max_e_residual_m
-            max_std[j, i] = max_std_m
-
-            m += 1
-
-    return max_e_residual, max_e_relative, max_e_relative_mean, max_std
+    return rel_error.max(), residual
 
 def residual(U, Dt, Dx, n_ts = None):
 

@@ -71,3 +71,7 @@ class Physics:
             print("%d/%d complete" % (k+1, n_param))
         
         return X_train
+
+    def residual(self, Xhist):
+        raise RuntimeError("Abstract method Physics.residual!")
+        return res, res_norm

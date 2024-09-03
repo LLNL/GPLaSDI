@@ -4,6 +4,7 @@ from scipy.sparse import spdiags
 import torch
 from ..inputs import InputParser
 from . import Physics
+from ..fd import FDdict
 
 class Burgers1D(Physics):
     def __init__(self, param_space, cfg):
@@ -53,6 +54,16 @@ class Burgers1D(Physics):
     def export(self):
         dict_ = {'t_grid' : self.t_grid, 'x_grid' : self.x_grid, 'dt' : self.dt, 'dx' : self.dx}
         return dict_
+    
+    def residual(self, Xhist):
+        # first axis is time index, and second index is spatial index.
+        dUdx = (Xhist[:, 1:] - Xhist[:, :-1]) / self.dx
+        dUdt = (Xhist[1:, :] - Xhist[:-1, :]) / self.dt
+
+        r = dUdt[:, :-1] - Xhist[:-1, :-1] * dUdx[:-1, :]
+        e = np.linalg.norm(r)
+
+        return r, e
 
 def residual_burgers(un, uw, c, idxn1):
 

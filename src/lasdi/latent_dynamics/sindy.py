@@ -3,12 +3,7 @@ import torch
 from scipy.integrate import odeint
 from . import LatentDynamics
 from ..inputs import InputParser
-from ..fd import SBP12, SBP24, SBP36, SBP48
-
-FDdict = {'sbp12': SBP12(),
-          'sbp24': SBP24(),
-          'sbp36': SBP36(),
-          'sbp48': SBP48()}
+from ..fd import FDdict
 
 class SINDy(LatentDynamics):
     fd_type = ''
