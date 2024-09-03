@@ -1,4 +1,4 @@
-from .interp import *
+from .gp import *
 from .latent_space import *
 from .enums import *
 from .timing import Timer
