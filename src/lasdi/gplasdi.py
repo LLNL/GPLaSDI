@@ -1,4 +1,3 @@
-from .sindy import *
 from .interp import *
 from .latent_space import *
 from .enums import *
@@ -6,34 +5,6 @@ from .timing import Timer
 import torch
 import time
 import numpy as np
-
-# def find_sindy_coef(Z, Dt, n_train, time_dim, loss_function, fd_type):
-
-#     '''
-
-#     Computes the SINDy loss, reconstruction loss, and sindy coefficients
-
-#     '''
-
-#     loss_sindy = 0
-#     loss_coef = 0
-
-#     dZdt = compute_time_derivative(Z, Dt, fd_type)
-#     sindy_coef = []
-
-#     for i in range(n_train):
-
-#         dZdt_i = dZdt[i, :, :]
-#         Z_i = torch.cat([torch.ones(time_dim, 1), Z[i, :, :]], dim = 1)
-#         # coef_matrix_i = Z_i.pinverse() @ dZdt_i
-#         coef_matrix_i = torch.linalg.lstsq(Z_i, dZdt_i).solution
-
-#         loss_sindy += loss_function(dZdt_i, Z_i @ coef_matrix_i)
-#         loss_coef += torch.norm(coef_matrix_i)
-
-#         sindy_coef.append(coef_matrix_i.detach().numpy())
-
-#     return loss_sindy, loss_coef, sindy_coef
 
 def average_rom(autoencoder, physics, latent_dynamics, gp_dictionary, param_grid):
 
