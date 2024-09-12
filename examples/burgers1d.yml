@@ -12,6 +12,10 @@ lasdi:
     path_checkpoint: checkpoint
     path_results: results
 
+workflow:
+  use_restart: true
+  restart_file: restarts/burgers1d.restart.npy
+
 parameter_space:
   parameters:
     - name: a

@@ -73,6 +73,21 @@ def get_fom_max_std(autoencoder, Zis):
 
     return m_index
 
+# move optimizer parameters to device
+def optimizer_to(optim, device):
+    for param in optim.state.values():
+        # Not sure there are any global tensors in the state dict
+        if isinstance(param, torch.Tensor):
+            param.data = param.data.to(device)
+            if param._grad is not None:
+                param._grad.data = param._grad.data.to(device)
+        elif isinstance(param, dict):
+            for subparam in param.values():
+                if isinstance(subparam, torch.Tensor):
+                    subparam.data = subparam.data.to(device)
+                    if subparam._grad is not None:
+                        subparam._grad.data = subparam._grad.data.to(device)
+
 class BayesianGLaSDI:
     X_train = None
 
@@ -161,7 +176,8 @@ class BayesianGLaSDI:
             self.optimizer.step()
 
             if loss.item() < self.best_loss:
-                torch.save(autoencoder_device.state_dict(), self.path_checkpoint + '/' + 'checkpoint.pt')
+                torch.save(autoencoder_device.cpu().state_dict(), self.path_checkpoint + '/' + 'checkpoint.pt')
+                autoencoder_device = self.autoencoder.to(device)
                 self.best_coefs = coefs
                 self.best_loss = loss.item()
 
@@ -202,25 +218,9 @@ class BayesianGLaSDI:
         self.timer.start("finalize")
 
         if (self.best_coefs.shape[0] == ps.n_train):
+            state_dict = torch.load(self.path_checkpoint + '/' + 'checkpoint.pt')
+            self.autoencoder.load_state_dict(state_dict)
             coefs = self.best_coefs
-
-        gp_dictionnary = fit_gps(ps.train_space, coefs)
-
-        bglasdi_results = {'autoencoder_param': self.autoencoder.state_dict(), 'final_X_train': self.X_train,
-                           'coefs': coefs, 'gp_dictionnary': gp_dictionnary, 'lr': self.lr, 'n_iter': self.n_iter,
-                           'n_greedy': self.n_greedy, 'sindy_weight': self.sindy_weight, 'coef_weight': self.coef_weight,
-                           'n_samples' : self.n_samples,
-                           }
-        bglasdi_results['physics'] = self.physics.export()
-        bglasdi_results['parameters'] = self.param_space.export()
-        # TODO(kevin): restart capability for timer.
-        bglasdi_results['timer'] = self.timer.export()
-        bglasdi_results['latent_dynamics'] = self.latent_dynamics.export()
-
-        date = time.localtime()
-        date_str = "{month:02d}_{day:02d}_{year:04d}_{hour:02d}_{minute:02d}"
-        date_str = date_str.format(month = date.tm_mon, day = date.tm_mday, year = date.tm_year, hour = date.tm_hour + 3, minute = date.tm_min)
-        np.save(self.path_results + '/' + 'bglasdi_' + date_str + '.npy', bglasdi_results)
 
         self.timer.end("finalize")
         self.timer.print()
@@ -268,3 +268,19 @@ class BayesianGLaSDI:
         else:
             # TODO(kevin): interface for offline FOM simulation
             raise RuntimeError("Offline FOM simulation is not supported yet!")
+        
+    def export(self):
+        dict_ = {'X_train': self.X_train, 'lr': self.lr, 'n_iter': self.n_iter, 'n_samples' : self.n_samples,
+                 'n_greedy': self.n_greedy, 'sindy_weight': self.sindy_weight, 'coef_weight': self.coef_weight,
+                 'restart_iter': self.restart_iter, 'timer': self.timer.export(), 'optimizer': self.optimizer.state_dict()
+                 }
+        return dict_
+    
+    def load(self, dict_):
+        self.X_train = dict_['X_train']
+        self.restart_iter = dict_['restart_iter']
+        self.timer.load(dict_['timer'])
+        self.optimizer.load_state_dict(dict_['optimizer'])
+        if (self.device != 'cpu'):
+            optimizer_to(self.optimizer, self.device)
+        return

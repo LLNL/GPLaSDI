@@ -175,3 +175,11 @@ class Autoencoder(torch.nn.Module):
         x = x.squeeze(1)  # Remove sequence dimension
         
         return x
+    
+    def export(self):
+        dict_ = {'autoencoder_param': self.cpu().state_dict()}
+        return dict_
+    
+    def load(self, dict_):
+        self.load_state_dict(dict_['autoencoder_param'])
+        return
