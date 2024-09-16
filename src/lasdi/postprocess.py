@@ -1,153 +1,50 @@
 import numpy as np
 import torch
+import matplotlib.pyplot as plt
 
-def interpolate_coef_matrix_mean(gp_dictionnary, param, n_coef, sindy_coef):
-    from .interp import eval_gp
-
-    coef_samples = []
-    coef_x, coef_y = sindy_coef[0].shape
-    if param.ndim == 1:
-        param = param.reshape(1, -1)
-
-    gp_pred = eval_gp(gp_dictionnary, param, n_coef)
-
-
-    coeff_matrix = np.zeros([coef_x, coef_y])
-    k = 1
-    for i in range(coef_x):
-        for j in range(coef_y):
-            mean = gp_pred['coef_' + str(k)]['mean']
-            coeff_matrix[i, j] = mean
-            k += 1
-
-    coef_samples.append(coeff_matrix)
-
-    return coef_samples
-
-def simulate_uncertain_sindy_mean(gp_dictionnary, param, z0, t_grid, sindy_coef, n_coef, coef_samples = None):
-    from .sindy import simulate_sindy
-
-    if coef_samples is None:
-        coef_samples = interpolate_coef_matrix_mean(gp_dictionnary, param, n_coef, sindy_coef)
-
-    Z0 = [z0]
-    Z = simulate_sindy(coef_samples, Z0, t_grid)
-
-    return Z
-
-def simulate_interpolated_sindy_mean(param_grid, Z0, t_grid, Dt, Z, param_train, fd_type):
-    from .sindy import compute_time_derivative, solve_sindy
-    from .interp import build_interpolation_data, fit_gps
-
-    dZdt = compute_time_derivative(Z, Dt, fd_type)
-    sindy_coef = solve_sindy(dZdt, Z)
-    interpolation_data = build_interpolation_data(sindy_coef, param_train)
-    gp_dictionnary = fit_gps(interpolation_data)
-    n_coef = interpolation_data['n_coef']
-
-    coef_samples = [interpolate_coef_matrix_mean(gp_dictionnary, param_grid[i, :], n_coef, sindy_coef) for i in range(param_grid.shape[0])]
-
-    Z_simulated = [simulate_uncertain_sindy_mean(gp_dictionnary, param_grid[i, 0], Z0[i], t_grid, sindy_coef, n_coef, coef_samples[i]) for i in range(param_grid.shape[0])]
-
-    return Z_simulated, gp_dictionnary, interpolation_data, sindy_coef, n_coef, coef_samples
-
-def compute_errors(n_a_grid, n_b_grid, Zis, autoencoder, X_test, Dt, Dx):
+def compute_errors(X_pred, physics, X_test):
 
     '''
 
-    Compute the maximum relative errors accross the parameter space grid
+    Compute the maximum relative errors on a parameter
 
     '''
 
-    max_e_residual = np.zeros([n_a_grid, n_b_grid])
-    max_e_relative = np.zeros([n_a_grid, n_b_grid])
-    max_e_relative_mean = np.zeros([n_a_grid, n_b_grid])
-    max_std = np.zeros([n_a_grid, n_b_grid])
-
-    m = 0
-
-    for j in range(n_b_grid):
-        for i in range(n_a_grid):
-
-            Z_m = torch.Tensor(Zis[m])
-            X_pred_m = autoencoder.decoder(Z_m).detach().numpy()
-            e_relative_m = np.linalg.norm((X_test[m:m + 1, :, :] - X_pred_m), axis = 2) / np.linalg.norm(X_test[m:m + 1, :, :], axis = 2)
-            e_relative_m_mean = np.linalg.norm((X_test[m, :, :] - X_pred_m.mean(0)), axis = 1) / np.linalg.norm(X_test[m, :, :], axis = 1)
-            max_e_relative_m = e_relative_m.max()
-            max_e_relative_m_mean = e_relative_m_mean.max()
-            max_std_m = X_pred_m.std(0).max()
-
-            X_pred_m = X_pred_m.mean(0)
-            # TODO(kevin): detach physics here.
-            # TODO(kevin): we're still using deprecated function here?
-            _, e_residual_m = residual(X_pred_m.T, Dt, Dx)
-            max_e_residual_m = e_residual_m.max()
-
-            max_e_relative[j, i] = max_e_relative_m
-            max_e_relative_mean[j, i] = max_e_relative_m_mean
-            max_e_residual[j, i] = max_e_residual_m
-            max_std[j, i] = max_std_m
-
-            m += 1
-
-    return max_e_residual, max_e_relative, max_e_relative_mean, max_std
-
-def residual(U, Dt, Dx, n_ts = None):
-
-    '''
-
-    DEPRECATED
-
-    '''
-
-    if n_ts is None:
-        dUdt = (U[:, 1:] - U[:, :-1]) / Dt
-        dUdx = (U[1:, :] - U[:-1, :]) / Dx
-
-        r = dUdt[:-1, :] - U[:-1, :-1] * dUdx[:, :-1]
-        e = np.linalg.norm(r)
-
-        return r, e
-
-    else:
-        nt = U.shape[1]
-        time_steps = np.arange(0, nt - 1, 1)
-        np.random.shuffle(time_steps)
-        time_steps = time_steps[:n_ts]
-        dUdt = (U[:, time_steps + 1] - U[:, time_steps]) / Dt
-        dUdx2 = (U[2:, time_steps] - 2 * U[1:-1, time_steps] + U[:-2, time_steps]) / Dx / Dx
-        r = dUdt[1:-1, :] - k * dUdx2
-        e = np.linalg.norm(r).mean()
-
-        return r, e 
+    assert(X_pred.shape == X_test.shape)
+    residual = physics.residual(X_pred)
     
+    X_pred = X_pred.reshape(X_pred.shape[0], -1)
+    X_test = X_test.reshape(X_test.shape[0], -1)
+    rel_error = np.linalg.norm(X_pred - X_test, axis=1) / np.linalg.norm(X_test, axis=1)
 
-def plot_prediction(param, autoencoder, gp_dictionnary, n_samples, z0, t_grid, sindy_coef, n_coef, t_mesh, x_mesh, scale, true, Dt, Dx):
+    return rel_error.max(), residual
 
-    '''
+def plot_prediction(param, autoencoder, physics, sindy, gp_dictionnary, n_samples, true, scale=1):
 
-    DEPRECATED
-
-    '''
-    from .sindy import simulate_uncertain_sindy
+    from .gplasdi import sample_roms
     import matplotlib.pyplot as plt
 
-    Z = simulate_uncertain_sindy(gp_dictionnary, param, n_samples, z0, t_grid, sindy_coef, n_coef)
+    Z = sample_roms(autoencoder, physics, sindy, gp_dictionnary, param, n_samples)
+    Z = Z[0]
 
-    n_z = Z.shape[2]
+    n_z = autoencoder.n_z
 
     pred = autoencoder.decoder(torch.Tensor(Z)).detach().numpy()
     pred_mean = pred.mean(0)
     pred_std = pred.std(0)
 
-    r, e = residual(pred_mean.T, Dt, Dx)
+    r, e = physics.residual(pred_mean)
+
+    t_mesh, x_mesh = physics.t_grid, physics.x_grid
+    if (physics.x_grid.ndim > 1):
+        raise RuntimeError('plot_prediction supports only 1D physics!')
 
     plt.figure()
 
     plt.subplot(231)
     for s in range(n_samples):
         for i in range(n_z):
-            plt.plot(t_grid, Z[s, :, i], 'C' + str(i), alpha = 0.3)
+            plt.plot(t_mesh, Z[s, :, i], 'C' + str(i), alpha = 0.3)
     plt.title('Latent Space')
 
     plt.subplot(232)
@@ -172,8 +69,136 @@ def plot_prediction(param, autoencoder, gp_dictionnary, n_samples, z0, t_grid, s
     plt.title('Absolute Error')
 
     plt.subplot(236)
-    plt.contourf(t_mesh[:-1, :-1], x_mesh[:-1, :-1], r, 100, cmap = plt.cm.jet)
+    plt.contourf(t_mesh[:-1], x_mesh[:-1], r, 100, cmap = plt.cm.jet)
     plt.colorbar()
     plt.title('Residual')
 
     plt.tight_layout()
+
+def plot_gp2d(p1_mesh, p2_mesh, gp_mean, gp_std, param_train, param_labels=['p1', 'p2'], plot_shape=[6, 5], figsize=(15, 13), refine=10, cm=plt.cm.jet, margin=0.05):
+    assert(p1_mesh.ndim == 2)
+    assert(p2_mesh.ndim == 2)
+    assert(gp_mean.ndim == 3)
+    assert(gp_std.ndim == 3)
+    assert(param_train.ndim == 2)
+    assert(gp_mean.shape == gp_std.shape)
+
+    plot_shape_ = [gp_mean.shape[-1] // plot_shape[-1], plot_shape[-1]]
+    if (gp_mean.shape[-1] % plot_shape[-1] > 0):
+        plot_shape_[0] += 1
+
+    p1_range = [p1_mesh.min() * (1. - margin), p1_mesh.max() * (1. + margin)]
+    p2_range = [p2_mesh.min() * (1. - margin), p2_mesh.max() * (1. + margin)]
+
+    fig1, axs1 = plt.subplots(plot_shape_[0], plot_shape_[1], figsize = figsize)
+    fig2, axs2 = plt.subplots(plot_shape_[0], plot_shape_[1], figsize = figsize)
+
+    for i in range(plot_shape_[0]):
+        for j in range(plot_shape_[1]):
+            k = j + i * plot_shape_[1]
+
+            if (k >= gp_mean.shape[-1]):
+                axs1[i, j].set_xlim(p1_range)
+                axs1[i, j].set_ylim(p2_range)
+                axs2[i, j].set_xlim(p1_range)
+                axs2[i, j].set_ylim(p2_range)
+                if (j == 0):
+                    axs1[i, j].set_ylabel(param_labels[1])
+                    axs1[i, j].get_yaxis().set_visible(True)
+                    axs2[i, j].set_ylabel(param_labels[1])
+                    axs2[i, j].get_yaxis().set_visible(True)
+                if (i == plot_shape_[0] - 1):
+                    axs1[i, j].set_xlabel(param_labels[0])
+                    axs1[i, j].get_xaxis().set_visible(True)
+                    axs2[i, j].set_xlabel(param_labels[0])
+                    axs2[i, j].get_xaxis().set_visible(True)
+
+                continue
+
+            std = gp_std[:, :, k]
+            p = axs1[i, j].contourf(p1_mesh, p2_mesh, std, refine, cmap = cm)
+            fig1.colorbar(p, ticks = np.array([std.min(), std.max()]), format='%2.2f', ax = axs1[i, j])
+            axs1[i, j].scatter(param_train[:, 0], param_train[:, 1], c='k', marker='+')
+            axs1[i, j].set_title(r'$\sqrt{\Sigma^*_{' + str(i + 1) + str(j + 1) + '}}$')
+            axs1[i, j].set_xlim(p1_range)
+            axs1[i, j].set_ylim(p2_range)
+            axs1[i, j].invert_yaxis()
+            axs1[i, j].get_xaxis().set_visible(False)
+            axs1[i, j].get_yaxis().set_visible(False)
+
+            mean = gp_mean[:, :, k]
+            p = axs2[i, j].contourf(p1_mesh, p2_mesh, mean, refine, cmap = cm)
+            fig2.colorbar(p, ticks = np.array([mean.min(), mean.max()]), format='%2.2f', ax = axs2[i, j])
+            axs2[i, j].scatter(param_train[:, 0], param_train[:, 1], c='k', marker='+')
+            axs2[i, j].set_title(r'$\mu^*_{' + str(i + 1) + str(j + 1) + '}$')
+            axs2[i, j].set_xlim(p1_range)
+            axs2[i, j].set_ylim(p2_range)
+            axs2[i, j].invert_yaxis()
+            axs2[i, j].get_xaxis().set_visible(False)
+            axs2[i, j].get_yaxis().set_visible(False)
+
+            if (j == 0):
+                axs1[i, j].set_ylabel(param_labels[1])
+                axs1[i, j].get_yaxis().set_visible(True)
+                axs2[i, j].set_ylabel(param_labels[1])
+                axs2[i, j].get_yaxis().set_visible(True)
+            if (i == plot_shape_[0] - 1):
+                axs1[i, j].set_xlabel(param_labels[0])
+                axs1[i, j].get_xaxis().set_visible(True)
+                axs2[i, j].set_xlabel(param_labels[0])
+                axs2[i, j].get_xaxis().set_visible(True)
+
+    return
+
+def heatmap2d(values, p1_grid, p2_grid, param_train, n_init, figsize=(10, 10), param_labels=['p1', 'p2'], title=''):
+    assert(p1_grid.ndim == 1)
+    assert(p2_grid.ndim == 1)
+    assert(values.ndim == 2)
+    assert(param_train.ndim == 2)
+
+    n_p1 = len(p1_grid)
+    n_p2 = len(p2_grid)
+    assert(values.shape[0] == n_p1)
+    assert(values.shape[1] == n_p2)
+
+    fig, ax = plt.subplots(1, 1, figsize = figsize)
+
+    from matplotlib.colors import LinearSegmentedColormap
+    cmap = LinearSegmentedColormap.from_list('rg', ['C0', 'w', 'C3'], N = 256)
+
+    im = ax.imshow(values, cmap = cmap)
+    fig.colorbar(im, ax = ax, fraction = 0.04)
+
+    ax.set_xticks(np.arange(0, n_p1, 2), labels=np.round(p1_grid[::2], 2))
+    ax.set_yticks(np.arange(0, n_p2, 2), labels=np.round(p2_grid[::2], 2))
+
+    for i in range(n_p1):
+        for j in range(n_p2):
+            ax.text(j, i, round(values[i, j], 1), ha='center', va='center', color='k')
+
+    grid_square_x = np.arange(-0.5, n_p1, 1)
+    grid_square_y = np.arange(-0.5, n_p2, 1)
+
+    n_train = param_train.shape[0]
+    for i in range(n_train):
+        p1_index = np.sum((p1_grid < param_train[i, 0]) * 1)
+        p2_index = np.sum((p2_grid < param_train[i, 1]) * 1)
+
+        if i < n_init:
+            color = 'r'
+        else:
+            color = 'k'
+
+        ax.plot([grid_square_x[p1_index], grid_square_x[p1_index]], [grid_square_y[p2_index], grid_square_y[p2_index] + 1],
+                c=color, linewidth=2)
+        ax.plot([grid_square_x[p1_index] + 1, grid_square_x[p1_index] + 1],
+                [grid_square_y[p2_index], grid_square_y[p2_index] + 1], c=color, linewidth=2)
+        ax.plot([grid_square_x[p1_index], grid_square_x[p1_index] + 1], [grid_square_y[p2_index], grid_square_y[p2_index]],
+                c=color, linewidth=2)
+        ax.plot([grid_square_x[p1_index], grid_square_x[p1_index] + 1],
+                [grid_square_y[p2_index] + 1, grid_square_y[p2_index] + 1], c=color, linewidth=2)
+
+    ax.set_xlabel(param_labels[0], fontsize=15)
+    ax.set_ylabel(param_labels[1], fontsize=15)
+    ax.set_title(title, fontsize=25)
+    return

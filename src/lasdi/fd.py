@@ -215,3 +215,8 @@ class SBP48(Stencil):
         self.interiorStencils = np.array([1./280., -4./105., 1./5., -4./5., 4./5., -1./5., 4./105., -1./280.])
         self.interiorIndexes = [-4, -3, -2, -1, 1, 2, 3, 4]
         return
+
+FDdict = {'sbp12': SBP12(),
+          'sbp24': SBP24(),
+          'sbp36': SBP36(),
+          'sbp48': SBP48()}

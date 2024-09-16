@@ -9,7 +9,6 @@ lasdi:
     max_greedy_iter: 28000
     sindy_weight: 0.1
     coef_weight: 1.e-6
-    fd_type: sbp12
     path_checkpoint: checkpoint
     path_results: results
 
@@ -36,10 +35,14 @@ parameter_space:
 latent_space:
   type: ae
   ae:
-  # we should not specify fom_dimension here. temporarily.
-    fom_dimension: 1001
     hidden_units: [100]
     latent_dimension: 5
+
+latent_dynamics:
+  type: sindy
+  sindy:
+    fd_type: sbp12
+    coef_norm_order: fro
 
 # TODO(kevin): temporary placeholder
 initial_train:

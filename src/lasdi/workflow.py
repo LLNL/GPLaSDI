@@ -6,12 +6,15 @@ import sys
 from .enums import *
 from .gplasdi import BayesianGLaSDI
 from .latent_space import Autoencoder
+from .latent_dynamics.sindy import SINDy
 from .physics.burgers1d import Burgers1D
 from .param import ParameterSpace
 
 trainer_dict = {'gplasdi': BayesianGLaSDI}
 
 latent_dict = {'ae': Autoencoder}
+
+ld_dict = {'sindy': SINDy}
 
 physics_dict = {'burgers1d': Burgers1D}
 
@@ -94,11 +97,17 @@ def initialize_trainer(config):
     physics = initialize_physics(param_space, config)
     latent_space = initialize_latent_space(physics, config)
 
+    # do we need a separate routine for latent dynamics initialization?
+    ld_type = config['latent_dynamics']['type']
+    assert(ld_type in config['latent_dynamics'])
+    assert(ld_type in ld_dict)
+    latent_dynamics = ld_dict[ld_type](latent_space.n_z, physics.nt, config['latent_dynamics'])
+
     trainer_type = config['lasdi']['type']
     assert(trainer_type in config['lasdi'])
     assert(trainer_type in trainer_dict)
 
-    trainer = trainer_dict[trainer_type](latent_space, physics, config['lasdi'][trainer_type])
+    trainer = trainer_dict[trainer_type](physics, latent_space, latent_dynamics, config['lasdi'][trainer_type])
 
     return trainer
 
