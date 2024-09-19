@@ -7,14 +7,19 @@ lasdi:
     n_iter: 28000
     n_greedy: 2000
     max_greedy_iter: 28000
-    sindy_weight: 0.1
+    ld_weight: 0.1
     coef_weight: 1.e-6
     path_checkpoint: checkpoint
     path_results: results
 
 workflow:
-  use_restart: true
+  use_restart: false
   restart_file: restarts/burgers1d.restart.npy
+  offline_greedy_sampling:
+    train_param_file: sampling/new_train.burgers1d.h5
+    test_param_file: sampling/new_test.burgers1d.h5
+    train_sol_file: sampling/new_Xtrain.burgers1d.h5
+    test_sol_file: sampling/new_Xtest.burgers1d.h5
 
 parameter_space:
   parameters:
@@ -56,6 +61,7 @@ initial_train:
 physics:
   type: burgers1d
   burgers1d:
+    offline_driver: false
     number_of_timesteps: 1001
     simulation_time: 1.
     grid_size: [1001]

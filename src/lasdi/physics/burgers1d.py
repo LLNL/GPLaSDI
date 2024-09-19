@@ -12,10 +12,11 @@ class Burgers1D(Physics):
 
         self.qdim = 1
         self.dim = 1
-        self.offline = False
 
         assert('burgers1d' in cfg)
         parser = InputParser(cfg['burgers1d'], name="burgers1d_input")
+
+        self.offline = parser.getInput(['offline_driver'], fallback=False)
 
         self.nt = parser.getInput(['number_of_timesteps'], datatype=int)
         self.grid_size = parser.getInput(['grid_size'], datatype=list)
@@ -131,3 +132,52 @@ def solver(u0, maxk, convergence_threshold, nt, nx, Dt, Dx):
                 break
 
     return u
+
+def main():
+    import argparse
+    import yaml
+    import h5py
+    import sys
+    parser = argparse.ArgumentParser(description = "",
+                                 formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument('config_file', metavar='string', type=str,
+                        help='config file to run LasDI workflow.\n')
+    args = parser.parse_args(sys.argv[1:])
+    print("config file: %s" % args.config_file)
+
+    # Read config file
+    with open(args.config_file, 'r') as f:
+        config = yaml.safe_load(f)
+        cfg_parser = InputParser(config, name='main')
+
+    # initialize parameter space and physics class
+    from ..param import ParameterSpace
+    param_space = ParameterSpace(config)
+    physics = Burgers1D(param_space, config['physics'])
+
+    # read training parameter points
+    train_param_file = cfg_parser.getInput(['workflow', 'offline_greedy_sampling', 'train_param_file'], datatype=str)
+    train_sol_file = cfg_parser.getInput(['workflow', 'offline_greedy_sampling', 'train_sol_file'], datatype=str)
+    with h5py.File(train_param_file, 'r') as f:
+        new_train_params = f['train_params'][...]
+
+    # generate and write FOM solution
+    new_X = physics.generate_solutions(new_train_params)
+    with h5py.File(train_sol_file, 'w') as f:
+        f.create_dataset("train_sol", new_X.shape, data=new_X)
+
+    # check if test parameter points exist
+    test_param_file = cfg_parser.getInput(['workflow', 'offline_greedy_sampling', 'test_param_file'], datatype=str)
+    import os.path
+    if (os.path.isfile(test_param_file)):
+        # read test parameter points
+        test_sol_file = cfg_parser.getInput(['workflow', 'offline_greedy_sampling', 'test_sol_file'], datatype=str)
+        with h5py.File(test_param_file, 'r') as f:
+            new_test_params = f['test_params'][...]
+
+        # generate and write FOM solution
+        new_X = physics.generate_solutions(new_test_params)
+        with h5py.File(test_sol_file, 'w') as f:
+            f.create_dataset("test_sol", new_X.shape, data=new_X)
+
+    return

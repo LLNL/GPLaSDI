@@ -89,7 +89,8 @@ def optimizer_to(optim, device):
                         subparam._grad.data = subparam._grad.data.to(device)
 
 class BayesianGLaSDI:
-    X_train = None
+    X_train = torch.Tensor([])
+    X_test = torch.Tensor([])
 
     def __init__(self, physics, autoencoder, latent_dynamics, model_parameters):
 
@@ -113,7 +114,7 @@ class BayesianGLaSDI:
         self.n_iter = model_parameters['n_iter']
         self.n_greedy = model_parameters['n_greedy']
         self.max_greedy_iter = model_parameters['max_greedy_iter']
-        self.sindy_weight = model_parameters['sindy_weight']
+        self.ld_weight = model_parameters['ld_weight']
         self.coef_weight = model_parameters['coef_weight']
 
         self.optimizer = torch.optim.Adam(autoencoder.parameters(), lr = self.lr)
@@ -140,11 +141,14 @@ class BayesianGLaSDI:
         self.best_loss = np.Inf
         self.restart_iter = 0
 
+        self.X_train = torch.Tensor([])
+        self.X_test = torch.Tensor([])
+
         return
 
     def train(self):
-        assert(self.X_train is not None)
-        assert(self.X_train.size(0) == self.param_space.n_train)
+        assert(self.X_train.size(0) > 0)
+        assert(self.X_train.size(0) == self.param_space.n_train())
 
         device = self.device
         autoencoder_device = self.autoencoder.to(device)
@@ -155,6 +159,7 @@ class BayesianGLaSDI:
         Path(self.path_results).mkdir(parents=True, exist_ok=True)
 
         ps = self.param_space
+        n_train = ps.n_train()
         ld = self.latent_dynamics
 
         for iter in range(self.restart_iter, self.n_iter):
@@ -166,11 +171,11 @@ class BayesianGLaSDI:
             Z = Z.cpu()
 
             loss_ae = self.MSE(X_train_device, X_pred)
-            coefs, loss_sindy, loss_coef = ld.calibrate(Z, self.physics.dt, compute_loss=True, numpy=True)
+            coefs, loss_ld, loss_coef = ld.calibrate(Z, self.physics.dt, compute_loss=True, numpy=True)
 
             max_coef = np.abs(coefs).max()
 
-            loss = loss_ae + self.sindy_weight * loss_sindy / ps.n_train + self.coef_weight * loss_coef / ps.n_train
+            loss = loss_ae + self.ld_weight * loss_ld / n_train + self.coef_weight * loss_coef / n_train
 
             loss.backward()
             self.optimizer.step()
@@ -181,14 +186,14 @@ class BayesianGLaSDI:
                 self.best_coefs = coefs
                 self.best_loss = loss.item()
 
-            print("Iter: %05d/%d, Loss: %3.10f, Loss AE: %3.10f, Loss SI: %3.10f, Loss COEF: %3.10f, max|c|: %04.1f, "
-                  % (iter + 1, self.n_iter, loss.item(), loss_ae.item(), loss_sindy.item(), loss_coef.item(), max_coef),
+            print("Iter: %05d/%d, Loss: %3.10f, Loss AE: %3.10f, Loss LD: %3.10f, Loss COEF: %3.10f, max|c|: %04.1f, "
+                  % (iter + 1, self.n_iter, loss.item(), loss_ae.item(), loss_ld.item(), loss_coef.item(), max_coef),
                   end = '')
 
-            if ps.n_train < 6:
+            if n_train < 6:
                 print('Param: ' + str(np.round(ps.train_space[0, :], 4)), end = '')
 
-                for i in range(1, ps.n_train - 1):
+                for i in range(1, n_train - 1):
                     print(', ' + str(np.round(ps.train_space[i, :], 4)), end = '')
                 print(', ' + str(np.round(ps.train_space[-1, :], 4)))
 
@@ -202,7 +207,7 @@ class BayesianGLaSDI:
 
             if ((iter > self.restart_iter) and (iter < self.max_greedy_iter) and (iter % self.n_greedy == 0)):
 
-                if (self.best_coefs.shape[0] == ps.n_train):
+                if (self.best_coefs.shape[0] == n_train):
                     coefs = self.best_coefs
 
                 new_sample = self.get_new_sample_point(coefs)
@@ -217,7 +222,7 @@ class BayesianGLaSDI:
         
         self.timer.start("finalize")
 
-        if (self.best_coefs.shape[0] == ps.n_train):
+        if (self.best_coefs.shape[0] == n_train):
             state_dict = torch.load(self.path_checkpoint + '/' + 'checkpoint.pt')
             self.autoencoder.load_state_dict(state_dict)
             coefs = self.best_coefs
@@ -230,21 +235,24 @@ class BayesianGLaSDI:
     
     def get_new_sample_point(self, coefs):
         self.timer.start("new_sample")
+        assert(self.X_test.size(0) > 0)
+        assert(self.X_test.size(0) == self.param_space.n_test())
 
         print('\n~~~~~~~ Finding New Point ~~~~~~~')
         # TODO(kevin): william, this might be the place for new sampling routine.
 
         ae = self.autoencoder.cpu()
         ps = self.param_space
+        n_test = ps.n_test()
         ae.load_state_dict(torch.load(self.path_checkpoint + '/' + 'checkpoint.pt'))
 
         Z0 = initial_condition_latent(ps.test_space, self.physics, ae)
 
         gp_dictionnary = fit_gps(ps.train_space, coefs)
 
-        coef_samples = [sample_coefs(gp_dictionnary, ps.test_space[i], self.n_samples) for i in range(ps.n_test)]
+        coef_samples = [sample_coefs(gp_dictionnary, ps.test_space[i], self.n_samples) for i in range(n_test)]
 
-        Zis = np.zeros([ps.n_test, self.n_samples, self.physics.nt, ae.n_z])
+        Zis = np.zeros([n_test, self.n_samples, self.physics.nt, ae.n_z])
         for i, Zi in enumerate(Zis):
             z_ic = Z0[i]
             for j, coef_sample in enumerate(coef_samples[i]):
@@ -254,30 +262,17 @@ class BayesianGLaSDI:
 
         self.timer.end("new_sample")
         return ps.test_space[m_index, :]
-    
-    def sample_fom(self):
-
-        new_foms = self.param_space.n_train - self.X_train.size(0)
-        assert(new_foms > 0)
-        new_params = self.param_space.train_space[-new_foms:, :]
-
-        if not self.physics.offline:
-            new_X = self.physics.generate_solutions(new_params)
-
-            self.X_train = torch.cat([self.X_train, new_X], dim = 0)
-        else:
-            # TODO(kevin): interface for offline FOM simulation
-            raise RuntimeError("Offline FOM simulation is not supported yet!")
         
     def export(self):
-        dict_ = {'X_train': self.X_train, 'lr': self.lr, 'n_iter': self.n_iter, 'n_samples' : self.n_samples,
-                 'n_greedy': self.n_greedy, 'sindy_weight': self.sindy_weight, 'coef_weight': self.coef_weight,
+        dict_ = {'X_train': self.X_train, 'X_test': self.X_test, 'lr': self.lr, 'n_iter': self.n_iter, 'n_samples' : self.n_samples,
+                 'n_greedy': self.n_greedy, 'ld_weight': self.ld_weight, 'coef_weight': self.coef_weight,
                  'restart_iter': self.restart_iter, 'timer': self.timer.export(), 'optimizer': self.optimizer.state_dict()
                  }
         return dict_
     
     def load(self, dict_):
         self.X_train = dict_['X_train']
+        self.X_test = dict_['X_test']
         self.restart_iter = dict_['restart_iter']
         self.timer.load(dict_['timer'])
         self.optimizer.load_state_dict(dict_['optimizer'])

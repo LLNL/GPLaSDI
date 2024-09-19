@@ -25,8 +25,6 @@ class ParameterSpace:
     n_param = 0
     train_space = None
     test_space = None
-    n_test = 0
-    n_train = 0
     n_init = 0
     test_grid_sizes = []
     test_meshgrid = None
@@ -44,14 +42,18 @@ class ParameterSpace:
 
         self.train_space = self.createInitialTrainSpace(self.param_list)
         self.n_init = self.train_space.shape[0]
-        self.n_train = self.n_init
 
         test_space_type = parser.getInput(['test_space', 'type'], datatype=str)
         if (test_space_type == 'grid'):
             self.test_grid_sizes, self.test_meshgrid, self.test_space = self.createTestGridSpace(self.param_list)
-            self.n_test = self.test_space.shape[0]
 
         return
+    
+    def n_train(self):
+        return self.train_space.shape[0]
+    
+    def n_test(self):
+        return self.test_space.shape[0]
     
     def createInitialTrainSpace(self, param_list):
         paramRanges = []
@@ -129,7 +131,6 @@ class ParameterSpace:
         assert(self.train_space.shape[1] == param.size)
 
         self.train_space = np.vstack((self.train_space, param))
-        self.n_train = self.train_space.shape[0]
         return
     
     def export(self):
@@ -149,7 +150,4 @@ class ParameterSpace:
         assert(self.n_init == dict_['n_init'])
         assert(self.train_space.shape[1] == self.n_param)
         assert(self.test_space.shape[1] == self.n_param)
-
-        self.n_train = self.train_space.shape[0]
-        self.n_test = self.test_space.shape[0]
         return

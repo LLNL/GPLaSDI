@@ -3,6 +3,7 @@ import yaml
 import torch
 import argparse
 import sys
+import h5py
 from .enums import *
 from .gplasdi import BayesianGLaSDI
 from .latent_space import Autoencoder
@@ -47,7 +48,7 @@ def main():
         result = restart_file['result']
     else:
         restart_file = None
-        current_step = NextStep.Initial
+        current_step = NextStep.RunSample
         result = Result.Unexecuted
     
     trainer, param_space, physics, latent_space, latent_dynamics = initialize_trainer(config, restart_file)
@@ -92,25 +93,19 @@ def main():
 
 def step(trainer, next_step, config, use_restart=False):
 
-    if (next_step is NextStep.Initial):
+    print("Running %s" % next_step)
 
-        result, next_step = initial_step(trainer, config)
-
-    elif (next_step is NextStep.Train):
+    if (next_step is NextStep.Train):
 
         result, next_step = trainer.train()
 
     elif (next_step is NextStep.RunSample):
 
-        trainer.sample_fom()
-        # TODO(kevin): currently no offline fom simulation. skip CollectSample.
-        result, next_step = Result.Success, NextStep.Train
-        # result = step(trainer, next_step, config)
+        result, next_step = run_samples(trainer, config)
 
     elif (next_step is NextStep.CollectSample):
-        import warnings
-        warnings.warn("Collecting sample from offline FOM simulation is not implemented yet")
-        result, next_step = Result.Success, NextStep.RunSample
+        
+        result, next_step = collect_samples(trainer, config)
 
     else:
         raise RuntimeError("Unknown next step!")
@@ -118,6 +113,8 @@ def step(trainer, next_step, config, use_restart=False):
     # if fail or complete, break the loop regardless of use_restart.
     if ((result is Result.Fail) or (result is Result.Complete)):
         return result, next_step
+    
+    print("Next step is: %s" % next_step)
     
     # continue the workflow if not using restart.
     if (not use_restart):
@@ -187,34 +184,105 @@ def initialize_physics(param_space, config):
 
     return physics
 
-def initial_step(trainer, config):
-    from os.path import dirname
-    from pathlib import Path
+'''
+    update trainer.X_train and trainer.X_test based on param_space.train_space and param_space.test_space.
+    if physics is offline solver, save parameter points to a hdf file that fom solver can read.
+'''
+def run_samples(trainer, config):
+    cfg_parser = InputParser(config)
 
-    print("Collecting initial training data..")
+    new_trains = trainer.param_space.n_train() - trainer.X_train.size(0)
+    assert(new_trains > 0)
+    new_train_params = trainer.param_space.train_space[-new_trains:, :]
 
-    trainer.X_train = trainer.physics.generate_solutions(trainer.param_space.train_space)
+    new_tests = trainer.param_space.n_test() - trainer.X_test.size(0)
+    if (new_tests > 0):
+        new_test_params = trainer.param_space.test_space[-new_tests:, :]
 
-    data_train = {'param_train' : trainer.param_space.train_space,
-                  'X_train' : trainer.X_train,
-                  'n_train' : trainer.param_space.n_train}
-    train_filename = config['initial_train']['train_data']
-    Path(dirname(train_filename)).mkdir(parents=True, exist_ok=True)
-    np.save(train_filename, data_train)
+    if trainer.physics.offline:
+        # Save parameter points in hdf5 format, for offline fom solver to read and run simulations.
+        from os.path import dirname, exists
+        from os import remove
+        from pathlib import Path
 
-    if (trainer.param_space.test_space is not None):
-        X_test = trainer.physics.generate_solutions(trainer.param_space.test_space)
+        train_param_file = cfg_parser.getInput(['workflow', 'offline_greedy_sampling', 'train_param_file'], fallback="new_train.h5")
+        Path(dirname(train_param_file)).mkdir(parents=True, exist_ok=True)
 
-        data_test = {'param_grid' : trainer.param_space.test_space,
-                     'X_test' : X_test,
-                     'n_test' : trainer.param_space.n_test}
-        test_filename = config['initial_train']['test_data']
-        Path(dirname(test_filename)).mkdir(parents=True, exist_ok=True)
-        np.save(test_filename, data_test)
+        with h5py.File(train_param_file, 'w') as f:
+            f.create_dataset("train_params", new_train_params.shape, data=new_train_params)
+            f.create_dataset("parameters", (len(trainer.param_space.param_name),), data=trainer.param_space.param_name)
+            f.attrs["n_params"] = trainer.param_space.n_param
+            f.attrs["new_points"] = new_train_params.shape[0]
 
-    next_step = NextStep.Train
-    result = Result.Success
+        # clean up the previous test parameter point file.
+        test_param_file = cfg_parser.getInput(['workflow', 'offline_greedy_sampling', 'test_param_file'], fallback="new_test.h5")
+        Path(dirname(test_param_file)).mkdir(parents=True, exist_ok=True)
+        if exists(test_param_file):
+            remove(test_param_file)
 
+        if (new_tests > 0):
+            with h5py.File(test_param_file, 'w') as f:
+                f.create_dataset("test_params", new_test_params.shape, data=new_test_params)
+                f.create_dataset("parameters", (len(trainer.param_space.param_name),), data=trainer.param_space.param_name)
+                f.attrs["n_params"] = trainer.param_space.n_param
+                f.attrs["new_points"] = new_test_params.shape[0]
+
+        # Next step is to collect sample from the offline FOM simulation.
+        next_step, result = NextStep.CollectSample, Result.Success
+        return result, next_step
+
+    else:
+        # We run FOM simulation directly here.
+
+        new_X = trainer.physics.generate_solutions(new_train_params)
+        trainer.X_train = torch.cat([trainer.X_train, new_X], dim = 0)
+        assert(trainer.X_train.size(0) == trainer.param_space.n_train())
+
+        if (new_tests > 0):
+            new_X = trainer.physics.generate_solutions(new_test_params)
+            trainer.X_test = torch.cat([trainer.X_test, new_X], dim = 0)
+            assert(trainer.X_test.size(0) == trainer.param_space.n_test())
+
+        # Since FOM simulations are already collected, we go to training phase directly.
+        next_step, result = NextStep.Train, Result.Success
+        return result, next_step
+    
+def collect_samples(trainer, config):
+    cfg_parser = InputParser(config)
+    assert(trainer.physics.offline)
+
+    train_param_file = cfg_parser.getInput(['workflow', 'offline_greedy_sampling', 'train_param_file'], fallback="new_train.h5")
+    train_sol_file = cfg_parser.getInput(['workflow', 'offline_greedy_sampling', 'train_sol_file'], fallback="new_Xtrain.h5")
+
+    with h5py.File(train_param_file, 'r') as f:
+        new_trains = f.attrs["new_points"]
+
+    with h5py.File(train_sol_file, 'r') as f:
+        new_X = torch.Tensor(f['train_sol'][...])
+        assert(new_X.shape[0] == new_trains)
+        assert(new_X.shape[1] == trainer.physics.nt)
+        assert(list(new_X.shape[2:]) == trainer.physics.qgrid_size)
+        trainer.X_train = torch.cat([trainer.X_train, new_X], dim = 0)
+
+    assert(trainer.X_train.size(0) == trainer.param_space.n_train())
+
+    test_param_file = cfg_parser.getInput(['workflow', 'offline_greedy_sampling', 'test_param_file'], fallback="new_test.h5")
+    test_sol_file = cfg_parser.getInput(['workflow', 'offline_greedy_sampling', 'test_sol_file'], fallback="new_Xtest.h5")
+    import os.path
+    if (os.path.isfile(test_param_file)):
+        with h5py.File(test_param_file, 'r') as f:
+            new_tests = f.attrs["new_points"]
+
+        with h5py.File(test_sol_file, 'r') as f:
+            new_X = torch.Tensor(f['test_sol'][...])
+            assert(new_X.shape[0] == new_tests)
+            assert(new_X.shape[1] == trainer.physics.nt)
+            assert(list(new_X.shape[2:]) == trainer.physics.qgrid_size)
+            trainer.X_test = torch.cat([trainer.X_test, new_X], dim = 0)
+        
+        assert(trainer.X_test.size(0) == trainer.param_space.n_test())
+
+    next_step, result = NextStep.Train, Result.Success
     return result, next_step
 
 if __name__ == "__main__":
