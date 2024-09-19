@@ -4,8 +4,8 @@ lasdi:
     # device: mps
     n_samples: 20
     lr: 0.001
-    n_iter: 28000
-    n_greedy: 2000
+    max_iter: 28000
+    n_iter: 2000
     max_greedy_iter: 28000
     ld_weight: 0.1
     coef_weight: 1.e-6
@@ -52,11 +52,6 @@ latent_dynamics:
   sindy:
     fd_type: sbp12
     coef_norm_order: fro
-
-# TODO(kevin): temporary placeholder
-initial_train:
-  train_data: data/data_train.npy
-  test_data: data/data_test.npy
 
 physics:
   type: burgers1d

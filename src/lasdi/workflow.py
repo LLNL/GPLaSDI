@@ -53,6 +53,9 @@ def main():
     
     trainer, param_space, physics, latent_space, latent_dynamics = initialize_trainer(config, restart_file)
 
+    if ((not use_restart) and physics.offline):
+        raise RuntimeError("Offline physics solver needs to use restart files!")
+
     result, next_step = step(trainer, current_step, config, use_restart)
 
     if (result is Result.Fail):
@@ -97,7 +100,20 @@ def step(trainer, next_step, config, use_restart=False):
 
     if (next_step is NextStep.Train):
 
-        result, next_step = trainer.train()
+        trainer.train()
+        if (trainer.restart_iter >= trainer.max_iter):
+            result = Result.Complete
+        else:
+            result = Result.Success
+
+        if (trainer.restart_iter <= trainer.max_greedy_iter):
+            next_step = NextStep.PickSample
+        else:
+            next_step = NextStep.Train
+
+    elif (next_step is NextStep.PickSample):
+
+        result, next_step = pick_samples(trainer, config)
 
     elif (next_step is NextStep.RunSample):
 
@@ -183,6 +199,15 @@ def initialize_physics(param_space, config):
     physics = physics_dict[physics_type](param_space, physics_cfg)
 
     return physics
+
+def pick_samples(trainer, config):
+
+    new_sample = trainer.get_new_sample_point()
+
+    trainer.param_space.appendTrainSpace(new_sample)
+
+    next_step, result = NextStep.RunSample, Result.Success
+    return result, next_step
 
 '''
     update trainer.X_train and trainer.X_test based on param_space.train_space and param_space.test_space.
