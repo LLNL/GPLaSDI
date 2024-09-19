@@ -1,0 +1,61 @@
+lasdi:
+  type: gplasdi
+  gplasdi:
+    # device: mps
+    n_samples: 20
+    lr: 0.001
+    max_iter: 2000
+    n_iter: 200
+    max_greedy_iter: 2000
+    ld_weight: 0.1
+    coef_weight: 1.e-6
+    path_checkpoint: checkpoint
+    path_results: results
+
+workflow:
+  use_restart: true
+  restart_file: restarts/burgers1d.restart.npy
+  offline_greedy_sampling:
+    train_param_file: sampling/new_train.burgers1d.h5
+    test_param_file: sampling/new_test.burgers1d.h5
+    train_sol_file: sampling/new_Xtrain.burgers1d.h5
+    test_sol_file: sampling/new_Xtest.burgers1d.h5
+
+parameter_space:
+  parameters:
+    - name: a
+      min: 0.7
+      max: 0.9
+      test_space_type: uniform
+      sample_size: 11
+      log_scale: false
+    - name: w
+      min: 0.9
+      max: 1.1
+      test_space_type: uniform
+      sample_size: 11
+      log_scale: false
+  test_space:
+    type: grid
+
+latent_space:
+  type: ae
+  ae:
+    hidden_units: [100]
+    latent_dimension: 5
+
+latent_dynamics:
+  type: sindy
+  sindy:
+    fd_type: sbp12
+    coef_norm_order: fro
+
+physics:
+  type: burgers1d
+  burgers1d:
+    offline_driver: true
+    number_of_timesteps: 1001
+    simulation_time: 1.
+    grid_size: [1001]
+    xmin: -3.
+    xmax: 3.
