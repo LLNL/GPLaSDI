@@ -53,7 +53,7 @@ def get_fom_max_std(autoencoder, Zis):
 
     '''
 
-    Computes the maximum standard deviation accross the parameter space grid and finds the corresponding parameter location
+    Computes the maximum standard deviation across the parameter space grid and finds the corresponding parameter location
 
     '''
     # TODO(kevin): currently this evaluate pointwise maximum standard deviation.
@@ -122,7 +122,7 @@ class BayesianGLaSDI:
         else:
             self.device = 'cpu'
 
-        self.best_loss = np.Inf
+        self.best_loss = np.inf
         self.restart_iter = 0
 
         return

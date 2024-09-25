@@ -1,7 +1,17 @@
+# -------------------------------------------------------------------------------------------------
+# Imports
+# -------------------------------------------------------------------------------------------------
+
 import torch
 import numpy as np
 
-def initial_condition_latent(param_grid, physics, autoencoder):
+
+
+# -------------------------------------------------------------------------------------------------
+# initial_conditions_latent function
+# -------------------------------------------------------------------------------------------------
+
+def initial_condition_latent(param_grid, physics, autoencoder : torch.nn.Module):
 
     '''
 
@@ -24,7 +34,13 @@ def initial_condition_latent(param_grid, physics, autoencoder):
         Z0.append(z0)
 
     return Z0
-    
+
+
+
+# -------------------------------------------------------------------------------------------------
+# Autoencoder class
+# -------------------------------------------------------------------------------------------------
+
 class Autoencoder(torch.nn.Module):
     # set by physics.qgrid_size
     qgrid_size = []

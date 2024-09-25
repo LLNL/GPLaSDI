@@ -1,35 +1,57 @@
-import numpy as np
-import yaml
-import torch
-import argparse
-import sys
-from .enums import *
-from .gplasdi import BayesianGLaSDI
-from .latent_space import Autoencoder
-from .latent_dynamics.sindy import SINDy
-from .physics.burgers1d import Burgers1D
-from .param import ParameterSpace
+# -------------------------------------------------------------------------------------------------
+# Imports
+# -------------------------------------------------------------------------------------------------
 
-trainer_dict = {'gplasdi': BayesianGLaSDI}
+import  yaml
+import  numpy                   as      np
+import  torch
+import  argparse
+import  sys
+from    .enums                  import  *
+from    .gplasdi                import  BayesianGLaSDI
+from    .latent_space           import  Autoencoder
+from    .latent_dynamics.sindy  import  SINDy
+from    .physics.burgers1d      import  Burgers1D
+from    .param                  import  ParameterSpace
 
-latent_dict = {'ae': Autoencoder}
 
-ld_dict = {'sindy': SINDy}
 
-physics_dict = {'burgers1d': Burgers1D}
+# -------------------------------------------------------------------------------------------------
+# Setup
+# -------------------------------------------------------------------------------------------------
 
-parser = argparse.ArgumentParser(description = "",
-                                 formatter_class=argparse.RawTextHelpFormatter)
-parser.add_argument('config_file', metavar='string', type=str,
-                    help='config file to run LasDI workflow.\n')
+# Dictionaries 
+trainer_dict    = {'gplasdi': BayesianGLaSDI}
+latent_dict     = {'ae': Autoencoder}
+ld_dict         = {'sindy': SINDy}
+physics_dict    = {'burgers1d': Burgers1D}
+
+# Set up the argument parser. We add one argument, "config_file". This should be a .yml file that 
+# specifies how to run a particular LaSDI experiment.
+parser = argparse.ArgumentParser(description        = "",
+                                 formatter_class    = argparse.RawTextHelpFormatter)
+
+parser.add_argument('config_file', 
+                    metavar     = 'string', 
+                    type        = str,
+                    help        = 'config file to run LasDI workflow.\n')
+
+
+
+# -------------------------------------------------------------------------------------------------
+# Main function
+# -------------------------------------------------------------------------------------------------
 
 def main():
+    # Fetch the arguments and report what we loaded.
     args = parser.parse_args(sys.argv[1:])
     print("config file: %s" % args.config_file)
 
+    # Now, open the configuration file
     with open(args.config_file, 'r') as f:
         config = yaml.safe_load(f)
 
+    # Use the loaded settings to initialize a trainer object.
     trainer = initialize_trainer(config)
 
     if ('restart_file' in config):
@@ -49,6 +71,8 @@ def main():
     result = step(trainer, next_step, config)
 
     return result
+
+
 
 def step(trainer, next_step, config):
     # TODO(kevin): implement save/load workflow.
@@ -85,7 +109,9 @@ def step(trainer, next_step, config):
 
     return result
 
-def initialize_trainer(config):
+
+
+def initialize_trainer(config : dict):
     '''
     Initialize a LaSDI class with a latent space model according to config file.
     Currently only 'gplasdi' is available.
@@ -94,8 +120,8 @@ def initialize_trainer(config):
     # TODO(kevin): load parameter train space from a restart file.
     param_space = ParameterSpace(config)
 
-    physics = initialize_physics(param_space, config)
-    latent_space = initialize_latent_space(physics, config)
+    physics         = initialize_physics(param_space, config)
+    latent_space    = initialize_latent_space(physics, config)
 
     # do we need a separate routine for latent dynamics initialization?
     ld_type = config['latent_dynamics']['type']
@@ -110,6 +136,8 @@ def initialize_trainer(config):
     trainer = trainer_dict[trainer_type](physics, latent_space, latent_dynamics, config['lasdi'][trainer_type])
 
     return trainer
+
+
 
 def initialize_latent_space(physics, config):
     '''
@@ -127,6 +155,8 @@ def initialize_latent_space(physics, config):
 
     return latent_space
 
+
+
 def initialize_physics(param_space, config):
     '''
     Initialize a physics FOM model according to config file.
@@ -138,6 +168,8 @@ def initialize_physics(param_space, config):
     physics = physics_dict[physics_type](param_space, physics_cfg)
 
     return physics
+
+
 
 def initial_step(trainer, config):
     from os.path import dirname
@@ -168,6 +200,8 @@ def initial_step(trainer, config):
     result = Result.Success
 
     return result, next_step
+
+
 
 if __name__ == "__main__":
     main()
