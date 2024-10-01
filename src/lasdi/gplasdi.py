@@ -92,7 +92,7 @@ class BayesianGLaSDI:
     X_train = torch.Tensor([])
     X_test = torch.Tensor([])
 
-    def __init__(self, physics, autoencoder, latent_dynamics, config):
+    def __init__(self, physics, autoencoder, latent_dynamics, param_space, config):
 
         '''
 
@@ -106,7 +106,7 @@ class BayesianGLaSDI:
         self.autoencoder = autoencoder
         self.latent_dynamics = latent_dynamics
         self.physics = physics
-        self.param_space = physics.param_space
+        self.param_space = param_space
         self.timer = Timer()
 
         self.n_samples = config['n_samples']

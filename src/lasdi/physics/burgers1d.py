@@ -7,8 +7,11 @@ from . import Physics
 from ..fd import FDdict
 
 class Burgers1D(Physics):
-    def __init__(self, param_space, cfg):
-        super().__init__(param_space, cfg)
+    a_idx = None # parameter index for a
+    w_idx = None # parameter index for w
+
+    def __init__(self, cfg, param_name=None):
+        super().__init__(cfg, param_name)
 
         self.qdim = 1
         self.dim = 1
@@ -36,12 +39,20 @@ class Burgers1D(Physics):
 
         self.maxk = parser.getInput(['maxk'], fallback=10)
         self.convergence_threshold = parser.getInput(['convergence_threshold'], fallback=1.e-8)
+
+        if (self.param_name is not None):
+            if 'a' in self.param_name:
+                self.a_idx = self.param_name.index('a')
+            if 'w' in self.param_name:
+                self.w_idx = self.param_name.index('w')
         return
     
     def initial_condition(self, param):
-        param = self.param_space.getParameter(param)
-        a = param['a'] if 'a' in param else 1.0
-        w = param['w'] if 'w' in param else 1.0
+        a, w = 1.0, 1.0
+        if 'a' in self.param_name:
+            a = param[self.a_idx]
+        if 'w' in self.param_name:
+            w = param[self.w_idx]
 
         return a * np.exp(- self.x_grid ** 2 / 2 / w / w)
     
@@ -153,7 +164,7 @@ def main():
     # initialize parameter space and physics class
     from ..param import ParameterSpace
     param_space = ParameterSpace(config)
-    physics = Burgers1D(param_space, config['physics'])
+    physics = Burgers1D(config['physics'], param_space.param_name)
 
     # read training parameter points
     train_param_file = cfg_parser.getInput(['workflow', 'offline_greedy_sampling', 'train_param_file'], datatype=str)

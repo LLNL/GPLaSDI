@@ -31,11 +31,11 @@ class Physics:
     # Set at the initialization.
     offline = False
 
-    # ParameterSpace object to parse parameters.
-    param_space = None
+    # list of parameter names to parse parameters.
+    param_name = None
 
-    def __init__(self, param_space, cfg):
-        self.param_space = param_space
+    def __init__(self, cfg, param_name=None):
+        self.param_name = param_name
         return
     
     def initial_condition(self, param):
@@ -78,8 +78,8 @@ class Physics:
         return res, res_norm
     
 class OfflineFOM(Physics):
-    def __init__(self, param_space, cfg):
-        super().__init__(param_space, cfg)
+    def __init__(self, cfg, param_name=None):
+        super().__init__(cfg, param_name)
         self.offline = True
 
         assert('offline_fom' in cfg)

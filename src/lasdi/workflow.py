@@ -149,7 +149,7 @@ def initialize_trainer(config, restart_file=None):
     if (restart_file is not None):
         param_space.load(restart_file['parameters'])
 
-    physics = initialize_physics(param_space, config)
+    physics = initialize_physics(config, param_space.param_name)
     latent_space = initialize_latent_space(physics, config)
     if (restart_file is not None):
         latent_space.load(restart_file['latent_space'])
@@ -166,7 +166,7 @@ def initialize_trainer(config, restart_file=None):
     assert(trainer_type in config['lasdi'])
     assert(trainer_type in trainer_dict)
 
-    trainer = trainer_dict[trainer_type](physics, latent_space, latent_dynamics, config['lasdi'][trainer_type])
+    trainer = trainer_dict[trainer_type](physics, latent_space, latent_dynamics, param_space, config['lasdi'][trainer_type])
     if (restart_file is not None):
         trainer.load(restart_file['trainer'])
 
@@ -188,7 +188,7 @@ def initialize_latent_space(physics, config):
 
     return latent_space
 
-def initialize_physics(param_space, config):
+def initialize_physics(config, param_name):
     '''
     Initialize a physics FOM model according to config file.
     Currently only 'burgers1d' is available.
@@ -196,7 +196,7 @@ def initialize_physics(param_space, config):
 
     physics_cfg = config['physics']
     physics_type = physics_cfg['type']
-    physics = physics_dict[physics_type](param_space, physics_cfg)
+    physics = physics_dict[physics_type](physics_cfg, param_name)
 
     return physics
 
