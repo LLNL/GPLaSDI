@@ -90,7 +90,9 @@ class OfflineFOM(Physics):
         self.qdim = parser.getInput(['solution_dimension'], datatype=int)
 
         self.grid_size = parser.getInput(['grid_size'], datatype=list)
-        self.qgrid_size = [self.qdim] + self.grid_size
+        self.qgrid_size = self.grid_size
+        if (self.qdim > 1):
+            self.qgrid_size = [self.qdim] + self.qgrid_size
         assert(self.dim == len(self.grid_size))
 
         #TODO(kevin): a general file loading for spatial grid
@@ -107,3 +109,8 @@ class OfflineFOM(Physics):
     def generate_solutions(self, params):
         raise RuntimeError("OfflineFOM does not support generate_solutions!!")
         return
+
+    def export(self):
+        dict_ = {'t_grid' : self.t_grid, 'x_grid' : self.x_grid, 'dt' : self.dt}
+        return dict_
+
