@@ -57,6 +57,7 @@ class Physics:
         params.shape[1] must match the required size of
         parameters for the specific physics.
         '''
+        assert(params.ndim == 2)
         n_param = len(params)
         print("Generating %d samples" % n_param)
 

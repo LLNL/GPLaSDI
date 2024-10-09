@@ -257,7 +257,7 @@ class BayesianGLaSDI:
 
         m_index = get_fom_max_std(ae, Zis)
 
-        new_sample = ps.test_space[m_index, :]
+        new_sample = ps.test_space[m_index, :].reshape(1, -1)
         print('New param: ' + str(np.round(new_sample, 4)) + '\n')
 
         self.timer.end("new_sample")
