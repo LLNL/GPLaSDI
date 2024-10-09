@@ -15,7 +15,6 @@ def initial_condition_latent(param_grid, physics, autoencoder):
     sol_shape = [1, 1] + physics.qgrid_size
 
     for i in range(n_param):
-        # TODO(kevin): generalize parameter class.
         u0 = physics.initial_condition(param_grid[i])
         u0 = u0.reshape(sol_shape)
         u0 = torch.Tensor(u0)
@@ -175,3 +174,11 @@ class Autoencoder(torch.nn.Module):
         x = x.squeeze(1)  # Remove sequence dimension
         
         return x
+    
+    def export(self):
+        dict_ = {'autoencoder_param': self.cpu().state_dict()}
+        return dict_
+    
+    def load(self, dict_):
+        self.load_state_dict(dict_['autoencoder_param'])
+        return
