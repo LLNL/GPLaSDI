@@ -1,8 +1,8 @@
 from enum import Enum
 
 class NextStep(Enum):
-    Initial = 1
-    Train = 2
+    Train = 1
+    PickSample = 2
     RunSample = 3
     CollectSample = 4
 

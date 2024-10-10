@@ -31,11 +31,11 @@ class Physics:
     # Set at the initialization.
     offline = False
 
-    # ParameterSpace object to parse parameters.
-    param_space = None
+    # list of parameter names to parse parameters.
+    param_name = None
 
-    def __init__(self, param_space, cfg):
-        self.param_space = param_space
+    def __init__(self, cfg, param_name=None):
+        self.param_name = param_name
         return
     
     def initial_condition(self, param):
@@ -57,12 +57,14 @@ class Physics:
         params.shape[1] must match the required size of
         parameters for the specific physics.
         '''
+        assert(params.ndim == 2)
         n_param = len(params)
         print("Generating %d samples" % n_param)
 
         X_train = None
         for k, param in enumerate(params):
             new_X = self.solve(param)
+            assert(new_X.size(0) == 1) # should contain one parameter case.
             if (X_train is None):
                 X_train = new_X
             else:
@@ -75,3 +77,41 @@ class Physics:
     def residual(self, Xhist):
         raise RuntimeError("Abstract method Physics.residual!")
         return res, res_norm
+    
+class OfflineFOM(Physics):
+    def __init__(self, cfg, param_name=None):
+        super().__init__(cfg, param_name)
+        self.offline = True
+
+        assert('offline_fom' in cfg)
+        from ..inputs import InputParser
+        parser = InputParser(cfg['offline_fom'], name="offline_fom_input")
+
+        self.dim = parser.getInput(['space_dimension'], datatype=int)
+        self.qdim = parser.getInput(['solution_dimension'], datatype=int)
+
+        self.grid_size = parser.getInput(['grid_size'], datatype=list)
+        self.qgrid_size = self.grid_size
+        if (self.qdim > 1):
+            self.qgrid_size = [self.qdim] + self.qgrid_size
+        assert(self.dim == len(self.grid_size))
+
+        #TODO(kevin): a general file loading for spatial grid
+        #             There can be unstructured grids as well.
+        self.x_grid = None
+
+        # Assume uniform time stepping for now.
+        self.nt = parser.getInput(['number_of_timesteps'], datatype=int)
+        self.dt = parser.getInput(['timestep_size'], datatype=float)
+        self.t_grid = np.linspace(0.0, (self.nt-1) * self.dt, self.nt)
+
+        return
+    
+    def generate_solutions(self, params):
+        raise RuntimeError("OfflineFOM does not support generate_solutions!!")
+        return
+
+    def export(self):
+        dict_ = {'t_grid' : self.t_grid, 'x_grid' : self.x_grid, 'dt' : self.dt}
+        return dict_
+

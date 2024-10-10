@@ -22,10 +22,9 @@ getParam1DSpace = {'list': get_1dspace_from_list,
 class ParameterSpace:
     param_list = []
     param_name = []
+    n_param = 0
     train_space = None
     test_space = None
-    n_test = 0
-    n_train = 0
     n_init = 0
     test_grid_sizes = []
     test_meshgrid = None
@@ -35,6 +34,7 @@ class ParameterSpace:
         parser = InputParser(config['parameter_space'], name="param_space_input")
 
         self.param_list = parser.getInput(['parameters'], datatype=list)
+        self.n_param = len(self.param_list)
 
         self.param_name = []
         for param in self.param_list:
@@ -42,14 +42,18 @@ class ParameterSpace:
 
         self.train_space = self.createInitialTrainSpace(self.param_list)
         self.n_init = self.train_space.shape[0]
-        self.n_train = self.n_init
 
         test_space_type = parser.getInput(['test_space', 'type'], datatype=str)
         if (test_space_type == 'grid'):
             self.test_grid_sizes, self.test_meshgrid, self.test_space = self.createTestGridSpace(self.param_list)
-            self.n_test = self.test_space.shape[0]
 
         return
+    
+    def n_train(self):
+        return self.train_space.shape[0]
+    
+    def n_test(self):
+        return self.test_space.shape[0]
     
     def createInitialTrainSpace(self, param_list):
         paramRanges = []
@@ -127,17 +131,23 @@ class ParameterSpace:
         assert(self.train_space.shape[1] == param.size)
 
         self.train_space = np.vstack((self.train_space, param))
-        self.n_train = self.train_space.shape[0]
         return
     
     def export(self):
-        dict_ = {'final_param_train': self.train_space,
-                 'param_grid': self.test_space,
+        dict_ = {'train_space': self.train_space,
+                 'test_space': self.test_space,
                  'test_grid_sizes': self.test_grid_sizes,
                  'test_meshgrid': self.test_meshgrid,
                  'n_init': self.n_init}
         return dict_
     
-    def loadTrainSpace(self):
-        raise RuntimeError("ParameterSpace.loadTrainSpace is not implemented yet!")
+    def load(self, dict_):
+        self.train_space = dict_['train_space']
+        self.test_space = dict_['test_space']
+        self.test_grid_sizes = dict_['test_grid_sizes']
+        self.test_meshgrid = dict_['test_meshgrid']
+
+        assert(self.n_init == dict_['n_init'])
+        assert(self.train_space.shape[1] == self.n_param)
+        assert(self.test_space.shape[1] == self.n_param)
         return
