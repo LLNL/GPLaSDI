@@ -66,6 +66,7 @@ class MultiLayerPerceptron(torch.nn.Module):
         for k in range(self.n_layers-1):
             self.fcs += [torch.nn.Linear(layer_sizes[k], layer_sizes[k + 1])]
         self.fcs = torch.nn.ModuleList(self.fcs)
+        self.init_weight()
 
         # Reshape input or output layer
         assert((reshape_index is None) or (reshape_index in [0, -1]))
