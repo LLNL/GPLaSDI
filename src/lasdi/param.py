@@ -117,7 +117,7 @@ getParam1DSpace : dict[str, callable]    = {'list'       : get_1dspace_from_list
 class ParameterSpace:
     # Initialize class variables
     param_list      : list[dict]        = []    # A list housing the parameter dictionaries (from the yml file)
-    param_name      : list[str]         = []    # A list housing the names of the parameters.
+    param_name      : list[str]         = []    # A list housing the parameter names.
     train_space     : np.ndarray        = None  # A 2D array whose i,j element is the j'th parameter value in the i'th combination of training parameters.
     test_space      : np.ndarray        = None  # A 2D array whose i,j element is the j'th parameter value in the i'th combination of testing parameters.
     n_test          : int               = 0     # The number of parameter instances (combinations we train on) in the testing set
@@ -151,12 +151,12 @@ class ParameterSpace:
 
         # Make sure the configuration dictionary has a "parameter_space" setting. This should house 
         # information about which variables are present in the code, as well as how we want to test
-        # the various possible parameter values.
+        # the various possible parameter values. 
         assert('parameter_space' in config);
 
         # Load the parameter_space settings into an InputParser object (which makes it easy to 
         # fetch setting values). We then fetch the list of parameters. Each parameters has a name, 
-        # min and max, and information on how many instances we want.
+        # min and max, and information on how many instances we want. 
         parser                          = InputParser(config['parameter_space'],    name        = "param_space_input")
         self.param_list : list[dict]    = parser.getInput(['parameters'],           datatype    = list)
 
@@ -172,20 +172,22 @@ class ParameterSpace:
         self.n_init         = self.train_space.shape[0]
         self.n_train        = self.n_init
 
+        # Next, let's make a set of possible parameter values to test at.
         test_space_type = parser.getInput(['test_space', 'type'], datatype = str)
         if (test_space_type == 'grid'):
-            # 
+            # Generate the set possible parameter combinations. See the docstring for 
+            # "createTestGridSpace" for details.
             self.test_grid_sizes, self.test_meshgrid, self.test_space = self.createTestGridSpace(self.param_list)
             self.n_test = self.test_space.shape[0]
 
-        # All done.
+        # All done!
         return
     
 
 
     def createInitialTrainSpace(self, param_list : list[dict]) -> np.ndarray:
         """
-        Sets up a grid of parameter values to test. Note that we only use the min and max value
+        Sets up a grid of parameter values to train at. Note that we only use the min and max value
         of each parameter when setting up this grid.
 
 
@@ -235,21 +237,55 @@ class ParameterSpace:
 
     def createTestGridSpace(self, param_list : list[dict]) -> tuple[list[int], tuple[np.ndarray], np.ndarray]:
         """
+        This function sets up a grid of parameter values to test at. 
+
+
+        -------------------------------------------------------------------------------------------
+        Arguments
+        -------------------------------------------------------------------------------------------
+
+        param_list: A list of parameter dictionaries. Each dictionary should either use the 
+        "uniform" or "list" format. See create_uniform_1dspace and get_1dspace_from_list, 
+        respectively.
+
+
+        -------------------------------------------------------------------------------------------
+        Returns
+        -------------------------------------------------------------------------------------------
+
+        A three element tuple. 
         
+        The first is a list whose i'th element specifies the number of distinct values of the i'th 
+        parameter we consider (this is the length of the i'th element of "paramRanges" below).
+
+        The second is a a tuple of k numpy ndarrays (where k = len(param_list)), the i'th one of 
+        which is a k-dimensional array with shape [N0, ... , N{k - 1}], where Ni = 
+        param_list[i].size whose i(0), ... , i(k - 1) element specifies the value of the i'th 
+        parameter in the i(0), ... , i(k - 1)'th unique combination of parameter values.
+
+        The third one is a 2d array of parameter values. It has shape M x k, where 
+        M = \prod_{i = 0}^{k - 1} param_list[i].size. 
         """
 
-
-
+        # Set up arrays to hold the parameter values + number of parameter values for each 
+        # parameter.
         paramRanges : np.ndarray    = []
         gridSizes   : list[int]     = []
 
+        # Cycle through the parameters        
         for param in param_list:
+            # Fetch the set of possible parameter values (paramRange) + the size of this set (Nx)
             Nx, paramRange  = getParam1DSpace[param['test_space_type']](param)
+
+            # Add Nx, ParamRange to their corresponding lists
             gridSizes      += [Nx]
             paramRanges    += [paramRange]
 
+        # Now that we have the set of parameter values for each parameter, turn it into a grid.
         mesh_grids : tuple[np.ndarray] = self.createHyperMeshGrid(paramRanges)
 
+        # All done. Return a list specifying the number of possible values for each parameter, the
+        # grids of parameter values, and the flattened/2d version of it. 
         return gridSizes, mesh_grids, self.createHyperGridSpace(mesh_grids)
     
 
@@ -271,6 +307,10 @@ class ParameterSpace:
 
     def createHyperMeshGrid(self, param_ranges : list[np.ndarray]) -> tuple[np.ndarray]:
         '''
+        This function generates arrays of parameter values. Specifically, if there are k 
+        parameters (param_ranges has k elements), then we return k k-d arrays, the i'th one of 
+        which is a k-dimensional array whose i(0), ... , i(k - 1) element specifies the value of 
+        the i'th variable in the i(0), ... , i(k - 1)'th unique combination of parameter values.
 
 
         -------------------------------------------------------------------------------------------
@@ -288,12 +328,12 @@ class ParameterSpace:
 
         the "paramSpaces" tuple. This is a tuple of numpy ndarray objects, the i'th one of which 
         gives the grid of parameter values for the i'th parameter. Specifically, if there are 
-        k parameters and if the i'th parameter range object has Ni values, then the j'th return 
-        array has shape (N1, ... , Nk) and the i(1), ... , i(k) element of this array houses the 
-        i(j)'th value of the j'th parameter.
+        k parameters and if param_range[i].size = Ni, then the j'th return array has shape 
+        (N0, ... , N{k - 1}) and the i(0), ... , i(k - 1) element of this array houses the i(j)'th 
+        value of the j'th parameter.
 
         Thus, if there are k parameters, the returned tuple has k elements, each one of 
-        which is an array of shape N1, ... , Nk.
+        which is an array of shape N0, ... , N{k - 1}.
         '''
 
         # Fetch the ranges, add them to a tuple (this is what the meshgrid function needs).

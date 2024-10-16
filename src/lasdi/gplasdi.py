@@ -6,6 +6,8 @@ import torch
 import time
 import numpy as np
 
+
+
 def average_rom(autoencoder, physics, latent_dynamics, gp_dictionary, param_grid):
 
     if (param_grid.ndim == 1):
@@ -21,6 +23,8 @@ def average_rom(autoencoder, physics, latent_dynamics, gp_dictionary, param_grid
         Zis[i] = latent_dynamics.simulate(pred_mean[i], Z0[i], physics.t_grid)
 
     return Zis
+
+
 
 def sample_roms(autoencoder, physics, latent_dynamics, gp_dictionary, param_grid, n_samples):
     '''
@@ -49,6 +53,8 @@ def sample_roms(autoencoder, physics, latent_dynamics, gp_dictionary, param_grid
 
     return Zis
 
+
+
 def get_fom_max_std(autoencoder, Zis):
 
     '''
@@ -73,6 +79,9 @@ def get_fom_max_std(autoencoder, Zis):
 
     return m_index
 
+
+
+
 class BayesianGLaSDI:
     X_train = None
 
@@ -87,11 +96,11 @@ class BayesianGLaSDI:
 
         '''
 
-        self.autoencoder = autoencoder
-        self.latent_dynamics = latent_dynamics
-        self.physics = physics
-        self.param_space = physics.param_space
-        self.timer = Timer()
+        self.autoencoder        = autoencoder
+        self.latent_dynamics    = latent_dynamics
+        self.physics            = physics
+        self.param_space        = physics.param_space
+        self.timer              = Timer()
 
         self.n_samples = model_parameters['n_samples']
         self.lr = model_parameters['lr']
@@ -126,6 +135,8 @@ class BayesianGLaSDI:
         self.restart_iter = 0
 
         return
+
+
 
     def train(self):
         assert(self.X_train is not None)
@@ -228,6 +239,8 @@ class BayesianGLaSDI:
         next_step, result = None, Result.Complete
         return result, next_step
     
+
+
     def get_new_sample_point(self, coefs):
         self.timer.start("new_sample")
 
@@ -255,6 +268,8 @@ class BayesianGLaSDI:
         self.timer.end("new_sample")
         return ps.test_space[m_index, :]
     
+
+
     def sample_fom(self):
 
         new_foms = self.param_space.n_train - self.X_train.size(0)

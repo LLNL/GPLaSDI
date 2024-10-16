@@ -6,6 +6,8 @@ from ..inputs import InputParser
 from . import Physics
 from ..fd import FDdict
 
+
+
 class Burgers1D(Physics):
     def __init__(self, param_space, cfg):
         super().__init__(param_space, cfg)
@@ -37,6 +39,8 @@ class Burgers1D(Physics):
         self.convergence_threshold = parser.getInput(['convergence_threshold'], fallback=1.e-8)
         return
     
+
+
     def initial_condition(self, param):
         param = self.param_space.getParameter(param)
         a = param['a'] if 'a' in param else 1.0
@@ -44,6 +48,8 @@ class Burgers1D(Physics):
 
         return a * np.exp(- self.x_grid ** 2 / 2 / w / w)
     
+
+
     def solve(self, param):
         u0 = self.initial_condition(param)
 
@@ -51,10 +57,14 @@ class Burgers1D(Physics):
         new_X = new_X.reshape(1, self.nt, self.grid_size[0])
         return torch.Tensor(new_X)
     
+
+
     def export(self):
         dict_ = {'t_grid' : self.t_grid, 'x_grid' : self.x_grid, 'dt' : self.dt, 'dx' : self.dx}
         return dict_
     
+
+
     def residual(self, Xhist):
         # first axis is time index, and second index is spatial index.
         dUdx = (Xhist[:, 1:] - Xhist[:, :-1]) / self.dx
@@ -64,6 +74,8 @@ class Burgers1D(Physics):
         e = np.linalg.norm(r)
 
         return r, e
+
+
 
 def residual_burgers(un, uw, c, idxn1):
 
@@ -78,6 +90,8 @@ def residual_burgers(un, uw, c, idxn1):
     r = -un + uw + f
 
     return r
+
+
 
 def jacobian(u, c, idxn1, nx):
 
@@ -96,6 +110,8 @@ def jacobian(u, c, idxn1, nx):
     J[0, -1] = -c * u[0]
 
     return J
+
+
 
 def solver(u0, maxk, convergence_threshold, nt, nx, Dt, Dx):
     '''
