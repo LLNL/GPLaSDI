@@ -24,7 +24,10 @@ jobs:
       run: |
           python -m autoapi.extension
     - name: Build HTML
-      uses: ammaraskar/sphinx-action@master
+      # uses: ammaraskar/sphinx-action@master
+      run: |
+          sphinx-build --version
+          sphinx-build -b html source/ build/
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
