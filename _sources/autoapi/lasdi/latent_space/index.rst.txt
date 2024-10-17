@@ -1,0 +1,128 @@
+lasdi.latent_space
+==================
+
+.. py:module:: lasdi.latent_space
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   lasdi.latent_space.act_dict
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   lasdi.latent_space.MultiLayerPerceptron
+   lasdi.latent_space.Autoencoder
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   lasdi.latent_space.initial_condition_latent
+
+
+Module Contents
+---------------
+
+.. py:data:: act_dict
+
+.. py:function:: initial_condition_latent(param_grid, physics, autoencoder)
+
+   Outputs the initial condition in the latent space: Z0 = encoder(U0)
+
+
+
+.. py:class:: MultiLayerPerceptron(layer_sizes, act_type='sigmoid', reshape_index=None, reshape_shape=None, threshold=0.1, value=0.0, num_heads=1)
+
+   Bases: :py:obj:`torch.nn.Module`
+
+
+   .. py:attribute:: n_layers
+
+
+   .. py:attribute:: layer_sizes
+
+
+   .. py:attribute:: fcs
+      :value: []
+
+
+
+   .. py:attribute:: reshape_index
+
+
+   .. py:attribute:: reshape_shape
+
+
+   .. py:attribute:: act_type
+
+
+   .. py:attribute:: use_multihead
+      :value: False
+
+
+
+   .. py:method:: forward(x)
+
+
+   .. py:method:: apply_attention(x, act_idx)
+
+
+   .. py:method:: init_weight()
+
+
+.. py:class:: Autoencoder(physics, config)
+
+   Bases: :py:obj:`torch.nn.Module`
+
+
+   .. py:attribute:: qgrid_size
+
+
+   .. py:attribute:: space_dim
+
+
+   .. py:attribute:: hidden_units
+
+
+   .. py:attribute:: n_z
+
+
+   .. py:attribute:: layer_sizes
+
+
+   .. py:attribute:: act_type
+
+
+   .. py:attribute:: threshold
+
+
+   .. py:attribute:: value
+
+
+   .. py:attribute:: num_heads
+
+
+   .. py:attribute:: encoder
+
+
+   .. py:attribute:: decoder
+
+
+   .. py:method:: forward(x)
+
+
+   .. py:method:: export()
+
+
+   .. py:method:: load(dict_)
+
+

@@ -1,0 +1,139 @@
+lasdi.param
+===========
+
+.. py:module:: lasdi.param
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   lasdi.param.getParam1DSpace
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   lasdi.param.ParameterSpace
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   lasdi.param.get_1dspace_from_list
+   lasdi.param.create_uniform_1dspace
+
+
+Module Contents
+---------------
+
+.. py:function:: get_1dspace_from_list(config)
+
+.. py:function:: create_uniform_1dspace(config)
+
+.. py:data:: getParam1DSpace
+
+.. py:class:: ParameterSpace(config)
+
+   .. py:attribute:: param_list
+      :value: []
+
+
+
+   .. py:attribute:: param_name
+      :value: []
+
+
+
+   .. py:attribute:: n_param
+      :value: 0
+
+
+
+   .. py:attribute:: train_space
+      :value: None
+
+
+
+   .. py:attribute:: test_space
+      :value: None
+
+
+
+   .. py:attribute:: n_init
+      :value: 0
+
+
+
+   .. py:attribute:: test_grid_sizes
+      :value: []
+
+
+
+   .. py:attribute:: test_meshgrid
+      :value: None
+
+
+
+   .. py:attribute:: parser
+
+
+   .. py:attribute:: test_space_type
+
+
+   .. py:method:: n_train()
+
+
+   .. py:method:: n_test()
+
+
+   .. py:method:: createInitialTrainSpace(param_list)
+
+
+   .. py:method:: createTestGridSpace(param_list)
+
+
+   .. py:method:: getParameter(param_vector)
+
+      convert numpy array parameter vector to a dict.
+      Physics class takes the dict for solve/initial_condition.
+
+
+
+   .. py:method:: createHyperMeshGrid(param_ranges)
+
+      param_ranges: list of numpy 1d arrays, each corresponding to 1d parameter grid space.
+                    The list size is equal to the number of parameters.
+
+      Output: paramSpaces
+          - tuple of numpy nd arrays, corresponding to each parameter.
+            Dimension of the array equals to the number of parameters
+
+
+
+   .. py:method:: createHyperGridSpace(mesh_grids)
+
+      mesh_grids: tuple of numpy nd arrays, corresponding to each parameter.
+                  Dimension of the array equals to the number of parameters
+
+      Output: param_grid
+          - numpy 2d array of size (grid size x number of parameters).
+
+          grid size is the size of a numpy nd array.
+
+
+
+   .. py:method:: appendTrainSpace(param)
+
+
+   .. py:method:: export()
+
+
+   .. py:method:: load(dict_)
+
+

@@ -1,0 +1,80 @@
+lasdi.enums
+===========
+
+.. py:module:: lasdi.enums
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   lasdi.enums.NextStep
+   lasdi.enums.Result
+
+
+Module Contents
+---------------
+
+.. py:class:: NextStep
+
+   Bases: :py:obj:`enum.Enum`
+
+
+   Generic enumeration.
+
+   Derive from this class to define new enumerations.
+
+
+
+   .. py:attribute:: Train
+      :value: 1
+
+
+
+   .. py:attribute:: PickSample
+      :value: 2
+
+
+
+   .. py:attribute:: RunSample
+      :value: 3
+
+
+
+   .. py:attribute:: CollectSample
+      :value: 4
+
+
+
+.. py:class:: Result
+
+   Bases: :py:obj:`enum.Enum`
+
+
+   Generic enumeration.
+
+   Derive from this class to define new enumerations.
+
+
+
+   .. py:attribute:: Unexecuted
+      :value: 1
+
+
+
+   .. py:attribute:: Success
+      :value: 2
+
+
+
+   .. py:attribute:: Fail
+      :value: 3
+
+
+
+   .. py:attribute:: Complete
+      :value: 4
+
+
+

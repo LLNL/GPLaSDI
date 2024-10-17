@@ -1,0 +1,32 @@
+lasdi.postprocess
+=================
+
+.. py:module:: lasdi.postprocess
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   lasdi.postprocess.compute_errors
+   lasdi.postprocess.plot_prediction
+   lasdi.postprocess.plot_gp2d
+   lasdi.postprocess.heatmap2d
+
+
+Module Contents
+---------------
+
+.. py:function:: compute_errors(X_pred, physics, X_test)
+
+   Compute the maximum relative errors on a parameter
+
+
+
+.. py:function:: plot_prediction(param, autoencoder, physics, sindy, gp_dictionnary, n_samples, true, scale=1)
+
+.. py:function:: plot_gp2d(p1_mesh, p2_mesh, gp_mean, gp_std, param_train, param_labels=['p1', 'p2'], plot_shape=[6, 5], figsize=(15, 13), refine=10, cm=plt.cm.jet, margin=0.05)
+
+.. py:function:: heatmap2d(values, p1_grid, p2_grid, param_train, n_init, figsize=(10, 10), param_labels=['p1', 'p2'], title='')
+

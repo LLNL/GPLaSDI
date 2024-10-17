@@ -1,0 +1,43 @@
+lasdi.gp
+========
+
+.. py:module:: lasdi.gp
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   lasdi.gp.fit_gps
+   lasdi.gp.eval_gp
+   lasdi.gp.sample_coefs
+
+
+Module Contents
+---------------
+
+.. py:function:: fit_gps(X, Y)
+
+   Trains each GP given the interpolation dataset.
+   X: (n_train, n_param) numpy 2d array
+   Y: (n_train, n_coef) numpy 2d array
+   We assume each target coefficient is independent with each other.
+   gp_dictionnary is a dataset containing the trained GPs (as sklearn objects)
+
+
+
+.. py:function:: eval_gp(gp_dictionnary, param_grid)
+
+   Computes the GPs predictive mean and standard deviation for points of the parameter space grid
+
+
+
+.. py:function:: sample_coefs(gp_dictionnary, param, n_samples)
+
+   Generates sample sets of ODEs for one given parameter.
+   coef_samples is a list of length n_samples, where each terms is a matrix of SINDy coefficients sampled from the GP predictive
+   distributions
+
+
+

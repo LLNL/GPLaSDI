@@ -1,0 +1,52 @@
+lasdi.timing
+============
+
+.. py:module:: lasdi.timing
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   lasdi.timing.Timer
+
+
+Module Contents
+---------------
+
+.. py:class:: Timer
+
+   .. py:attribute:: names
+
+
+   .. py:attribute:: calls
+      :value: []
+
+
+
+   .. py:attribute:: times
+      :value: []
+
+
+
+   .. py:attribute:: starts
+      :value: []
+
+
+
+   .. py:method:: start(name)
+
+
+   .. py:method:: end(name)
+
+
+   .. py:method:: print()
+
+
+   .. py:method:: export()
+
+
+   .. py:method:: load(dict_)
+
+

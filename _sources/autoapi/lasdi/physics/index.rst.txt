@@ -1,0 +1,151 @@
+lasdi.physics
+=============
+
+.. py:module:: lasdi.physics
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/lasdi/physics/burgers1d/index
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   lasdi.physics.Physics
+   lasdi.physics.OfflineFOM
+
+
+Package Contents
+----------------
+
+.. py:class:: Physics(cfg, param_name=None)
+
+   .. py:attribute:: dim
+
+
+   .. py:attribute:: qdim
+
+
+   .. py:attribute:: grid_size
+      :value: []
+
+
+
+   .. py:attribute:: qgrid_size
+      :value: []
+
+
+      numpy nd-array, assuming the shape of:
+      - 1d: (space_dim[0],)
+      - 2d: (2, space_dim[0], space_dim[1])
+      - 3d: (3, space_dim[0], space_dim[1], space_dim[2])
+      - higher dimension...
+
+
+   .. py:attribute:: x_grid
+
+
+   .. py:attribute:: nt
+
+
+   .. py:attribute:: dt
+
+
+   .. py:attribute:: t_grid
+
+
+   .. py:attribute:: offline
+      :value: False
+
+
+
+   .. py:attribute:: param_name
+      :value: None
+
+
+
+   .. py:method:: initial_condition(param)
+
+
+   .. py:method:: solve(param)
+
+
+   .. py:method:: export()
+
+
+   .. py:method:: generate_solutions(params)
+
+      Given 2d-array of params,
+      generate solutions of size params.shape[0].
+      params.shape[1] must match the required size of
+      parameters for the specific physics.
+
+
+
+   .. py:method:: residual(Xhist)
+
+
+.. py:class:: OfflineFOM(cfg, param_name=None)
+
+   Bases: :py:obj:`Physics`
+
+
+   .. py:attribute:: offline
+      :value: True
+
+
+
+   .. py:attribute:: parser
+
+
+   .. py:attribute:: dim
+
+
+   .. py:attribute:: qdim
+
+
+   .. py:attribute:: grid_size
+
+
+   .. py:attribute:: qgrid_size
+
+      numpy nd-array, assuming the shape of:
+      - 1d: (space_dim[0],)
+      - 2d: (2, space_dim[0], space_dim[1])
+      - 3d: (3, space_dim[0], space_dim[1], space_dim[2])
+      - higher dimension...
+
+
+   .. py:attribute:: x_grid
+      :value: None
+
+
+
+   .. py:attribute:: nt
+
+
+   .. py:attribute:: dt
+
+
+   .. py:attribute:: t_grid
+
+
+   .. py:method:: generate_solutions(params)
+
+      Given 2d-array of params,
+      generate solutions of size params.shape[0].
+      params.shape[1] must match the required size of
+      parameters for the specific physics.
+
+
+
+   .. py:method:: export()
+
+

@@ -1,0 +1,65 @@
+lasdi.inputs
+============
+
+.. py:module:: lasdi.inputs
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   lasdi.inputs.verbose
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   lasdi.inputs.InputParser
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   lasdi.inputs.getDictFromList
+
+
+Module Contents
+---------------
+
+.. py:data:: verbose
+   :value: False
+
+
+.. py:class:: InputParser(dict, name='')
+
+   .. py:attribute:: dict_
+      :value: None
+
+
+
+   .. py:attribute:: name
+      :value: ''
+
+
+
+   .. py:method:: getInput(keys, fallback=None, datatype=None)
+
+      Find the value corresponding to the list of keys.
+      If the specified keys do not exist, use the fallback value.
+      If the fallback value does not exist, returns an error.
+      If the datatype is specified, enforce the output value has the right datatype.
+
+
+
+.. py:function:: getDictFromList(list_, inputDict)
+
+   get a dict with {key: val} from a list of dicts
+   NOTE: it returns only the first item in the list,
+   even if the list has more than one dict with {key: val}.
+
+

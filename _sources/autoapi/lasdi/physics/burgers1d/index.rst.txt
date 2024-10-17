@@ -1,0 +1,136 @@
+lasdi.physics.burgers1d
+=======================
+
+.. py:module:: lasdi.physics.burgers1d
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   lasdi.physics.burgers1d.Burgers1D
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   lasdi.physics.burgers1d.residual_burgers
+   lasdi.physics.burgers1d.jacobian
+   lasdi.physics.burgers1d.solver
+   lasdi.physics.burgers1d.main
+
+
+Module Contents
+---------------
+
+.. py:class:: Burgers1D(cfg, param_name=None)
+
+   Bases: :py:obj:`lasdi.physics.Physics`
+
+
+   .. py:attribute:: a_idx
+      :value: None
+
+
+
+   .. py:attribute:: w_idx
+      :value: None
+
+
+
+   .. py:attribute:: qdim
+      :value: 1
+
+
+
+   .. py:attribute:: dim
+      :value: 1
+
+
+
+   .. py:attribute:: parser
+
+
+   .. py:attribute:: offline
+
+
+   .. py:attribute:: nt
+
+
+   .. py:attribute:: grid_size
+
+
+   .. py:attribute:: qgrid_size
+
+      numpy nd-array, assuming the shape of:
+      - 1d: (space_dim[0],)
+      - 2d: (2, space_dim[0], space_dim[1])
+      - 3d: (3, space_dim[0], space_dim[1], space_dim[2])
+      - higher dimension...
+
+
+   .. py:attribute:: xmin
+
+
+   .. py:attribute:: xmax
+
+
+   .. py:attribute:: dx
+
+
+   .. py:attribute:: tmax
+
+
+   .. py:attribute:: dt
+
+
+   .. py:attribute:: x_grid
+
+
+   .. py:attribute:: t_grid
+
+
+   .. py:attribute:: maxk
+
+
+   .. py:attribute:: convergence_threshold
+
+
+   .. py:method:: initial_condition(param)
+
+
+   .. py:method:: solve(param)
+
+
+   .. py:method:: export()
+
+
+   .. py:method:: residual(Xhist)
+
+
+.. py:function:: residual_burgers(un, uw, c, idxn1)
+
+   Compute 1D Burgers equation residual for generating the data
+   from https://github.com/LLNL/gLaSDI and https://github.com/LLNL/LaSDI
+
+
+
+.. py:function:: jacobian(u, c, idxn1, nx)
+
+   Compute 1D Burgers equation jacobian for generating the data
+   from https://github.com/LLNL/gLaSDI and https://github.com/LLNL/LaSDI
+
+
+
+.. py:function:: solver(u0, maxk, convergence_threshold, nt, nx, Dt, Dx)
+
+   Solves 1D Burgers equation for generating the data
+   from https://github.com/LLNL/gLaSDI and https://github.com/LLNL/LaSDI
+
+
+
+.. py:function:: main()
+

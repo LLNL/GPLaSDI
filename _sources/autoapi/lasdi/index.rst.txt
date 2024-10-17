@@ -1,0 +1,34 @@
+lasdi
+=====
+
+.. py:module:: lasdi
+
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/lasdi/latent_dynamics/index
+   /autoapi/lasdi/physics/index
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/lasdi/enums/index
+   /autoapi/lasdi/fd/index
+   /autoapi/lasdi/gp/index
+   /autoapi/lasdi/gplasdi/index
+   /autoapi/lasdi/inputs/index
+   /autoapi/lasdi/latent_space/index
+   /autoapi/lasdi/param/index
+   /autoapi/lasdi/postprocess/index
+   /autoapi/lasdi/timing/index
+   /autoapi/lasdi/workflow/index
+
+

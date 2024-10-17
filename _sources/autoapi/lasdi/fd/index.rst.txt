@@ -1,0 +1,186 @@
+lasdi.fd
+========
+
+.. py:module:: lasdi.fd
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   lasdi.fd.FDdict
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   lasdi.fd.Stencil
+   lasdi.fd.SBP12
+   lasdi.fd.SBP24
+   lasdi.fd.SBP36
+   lasdi.fd.SBP48
+
+
+Module Contents
+---------------
+
+.. py:class:: Stencil
+
+   .. py:attribute:: leftBdrDepth
+      :value: 0
+
+
+
+   .. py:attribute:: leftBdrWidth
+      :value: []
+
+
+
+   .. py:attribute:: leftBdrStencils
+      :value: [[]]
+
+
+
+   .. py:attribute:: leftBdrNorm
+      :value: []
+
+
+
+   .. py:attribute:: interiorStencils
+
+
+   .. py:attribute:: interiorIndexes
+      :value: []
+
+
+
+   .. py:method:: getOperators(Nx, periodic=False)
+
+
+   .. py:method:: convert(scipy_coo)
+
+
+.. py:class:: SBP12
+
+   Bases: :py:obj:`Stencil`
+
+
+   .. py:attribute:: leftBdrDepth
+      :value: 1
+
+
+
+   .. py:attribute:: leftBdrWidth
+      :value: [2]
+
+
+
+   .. py:attribute:: leftBdrStencils
+
+
+   .. py:attribute:: leftBdrNorm
+      :value: [0.5]
+
+
+
+   .. py:attribute:: interiorStencils
+
+
+   .. py:attribute:: interiorIndexes
+
+
+.. py:class:: SBP24
+
+   Bases: :py:obj:`Stencil`
+
+
+   .. py:attribute:: leftBdrDepth
+      :value: 4
+
+
+
+   .. py:attribute:: leftBdrWidth
+      :value: [4, 3, 5, 6]
+
+
+
+   .. py:attribute:: leftBdrStencils
+
+
+   .. py:attribute:: leftBdrNorm
+
+
+   .. py:attribute:: interiorStencils
+
+
+   .. py:attribute:: interiorIndexes
+
+
+.. py:class:: SBP36
+
+   Bases: :py:obj:`Stencil`
+
+
+   .. py:attribute:: leftBdrDepth
+      :value: 6
+
+
+
+   .. py:attribute:: leftBdrWidth
+      :value: [6, 6, 6, 7, 8, 9]
+
+
+
+   .. py:attribute:: leftBdrStencils
+
+
+   .. py:attribute:: leftBdrNorm
+
+
+   .. py:attribute:: interiorStencils
+
+
+   .. py:attribute:: interiorIndexes
+
+
+.. py:class:: SBP48
+
+   Bases: :py:obj:`Stencil`
+
+
+   .. py:attribute:: leftBdrDepth
+      :value: 8
+
+
+
+   .. py:attribute:: leftBdrWidth
+      :value: [8, 8, 8, 8, 9, 10, 11, 12]
+
+
+
+   .. py:attribute:: leftBdrNorm
+
+
+   .. py:attribute:: x1
+
+
+   .. py:attribute:: x2
+
+
+   .. py:attribute:: x3
+
+
+   .. py:attribute:: leftBdrStencils
+
+
+   .. py:attribute:: interiorStencils
+
+
+   .. py:attribute:: interiorIndexes
+
+
+.. py:data:: FDdict
+

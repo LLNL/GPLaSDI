@@ -1,0 +1,84 @@
+lasdi.latent_dynamics.sindy
+===========================
+
+.. py:module:: lasdi.latent_dynamics.sindy
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   lasdi.latent_dynamics.sindy.SINDy
+
+
+Module Contents
+---------------
+
+.. py:class:: SINDy(dim, nt, config)
+
+   Bases: :py:obj:`lasdi.latent_dynamics.LatentDynamics`
+
+
+   .. py:attribute:: fd_type
+      :value: ''
+
+
+
+   .. py:attribute:: fd
+      :value: None
+
+
+
+   .. py:attribute:: fd_oper
+      :value: None
+
+
+
+   .. py:attribute:: ncoefs
+
+
+   .. py:attribute:: parser
+
+      fd_type is the string that specifies finite-difference scheme for time derivative:
+      - 'sbp12': summation-by-parts 1st/2nd (boundary/interior) order operator
+      - 'sbp24': summation-by-parts 2nd/4th order operator
+      - 'sbp36': summation-by-parts 3rd/6th order operator
+      - 'sbp48': summation-by-parts 4th/8th order operator
+
+
+   .. py:attribute:: coef_norm_order
+
+
+   .. py:attribute:: MSE
+
+
+   .. py:method:: calibrate(Z, dt, compute_loss=True, numpy=False)
+
+      loop over all train cases, if Z dimension is 3
+
+
+
+   .. py:method:: compute_time_derivative(Z, Dt)
+
+      Builds the SINDy dataset, assuming only linear terms in the SINDy dataset. The time derivatives are computed through
+      finite difference.
+
+      Z is the encoder output (2D tensor), with shape [time_dim, space_dim]
+      Dt is the size of timestep (assumed to be a uniform scalar)
+
+      The output dZdt is a 2D tensor with the same shape of Z.
+
+
+
+
+   .. py:method:: simulate(coefs, z0, t_grid)
+
+      Integrates each system of ODEs corresponding to each training points, given the initial condition Z0 = encoder(U0)
+
+
+
+
+   .. py:method:: export()
+
+

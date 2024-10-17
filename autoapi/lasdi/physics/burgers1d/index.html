@@ -1,0 +1,303 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lasdi.physics.burgers1d &mdash; LaSDI 2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=eafc0fe6" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=a7e3f902"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="lasdi.enums" href="../../enums/index.html" />
+    <link rel="prev" title="lasdi.physics" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            LaSDI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html">lasdi</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../index.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../latent_dynamics/index.html">lasdi.latent_dynamics</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html">lasdi.physics</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../index.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">LaSDI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">lasdi</a></li>
+          <li class="breadcrumb-item"><a href="../index.html">lasdi.physics</a></li>
+      <li class="breadcrumb-item active">lasdi.physics.burgers1d</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/autoapi/lasdi/physics/burgers1d/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-lasdi.physics.burgers1d">
+<span id="lasdi-physics-burgers1d"></span><h1>lasdi.physics.burgers1d<a class="headerlink" href="#module-lasdi.physics.burgers1d" title="Permalink to this heading"></a></h1>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lasdi.physics.burgers1d.Burgers1D" title="lasdi.physics.burgers1d.Burgers1D"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Burgers1D</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lasdi.physics.burgers1d.residual_burgers" title="lasdi.physics.burgers1d.residual_burgers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">residual_burgers</span></code></a>(un, uw, c, idxn1)</p></td>
+<td><p>Compute 1D Burgers equation residual for generating the data</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#lasdi.physics.burgers1d.jacobian" title="lasdi.physics.burgers1d.jacobian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jacobian</span></code></a>(u, c, idxn1, nx)</p></td>
+<td><p>Compute 1D Burgers equation jacobian for generating the data</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lasdi.physics.burgers1d.solver" title="lasdi.physics.burgers1d.solver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solver</span></code></a>(u0, maxk, convergence_threshold, nt, nx, Dt, Dx)</p></td>
+<td><p>Solves 1D Burgers equation for generating the data</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#lasdi.physics.burgers1d.main" title="lasdi.physics.burgers1d.main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.Burgers1D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lasdi.physics.burgers1d.</span></span><span class="sig-name descname"><span class="pre">Burgers1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.physics.burgers1d.Burgers1D" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="../index.html#lasdi.physics.Physics" title="lasdi.physics.Physics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lasdi.physics.Physics</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.Burgers1D.a_idx">
+<span class="sig-name descname"><span class="pre">a_idx</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#lasdi.physics.burgers1d.Burgers1D.a_idx" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.Burgers1D.w_idx">
+<span class="sig-name descname"><span class="pre">w_idx</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#lasdi.physics.burgers1d.Burgers1D.w_idx" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.Burgers1D.qdim">
+<span class="sig-name descname"><span class="pre">qdim</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#lasdi.physics.burgers1d.Burgers1D.qdim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.Burgers1D.dim">
+<span class="sig-name descname"><span class="pre">dim</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#lasdi.physics.burgers1d.Burgers1D.dim" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.Burgers1D.parser">
+<span class="sig-name descname"><span class="pre">parser</span></span><a class="headerlink" href="#lasdi.physics.burgers1d.Burgers1D.parser" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.Burgers1D.offline">
+<span class="sig-name descname"><span class="pre">offline</span></span><a class="headerlink" href="#lasdi.physics.burgers1d.Burgers1D.offline" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.Burgers1D.nt">
+<span class="sig-name descname"><span class="pre">nt</span></span><a class="headerlink" href="#lasdi.physics.burgers1d.Burgers1D.nt" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.Burgers1D.grid_size">
+<span class="sig-name descname"><span class="pre">grid_size</span></span><a class="headerlink" href="#lasdi.physics.burgers1d.Burgers1D.grid_size" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.Burgers1D.qgrid_size">
+<span class="sig-name descname"><span class="pre">qgrid_size</span></span><a class="headerlink" href="#lasdi.physics.burgers1d.Burgers1D.qgrid_size" title="Permalink to this definition"></a></dt>
+<dd><p>numpy nd-array, assuming the shape of:
+- 1d: (space_dim[0],)
+- 2d: (2, space_dim[0], space_dim[1])
+- 3d: (3, space_dim[0], space_dim[1], space_dim[2])
+- higher dimension…</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.Burgers1D.xmin">
+<span class="sig-name descname"><span class="pre">xmin</span></span><a class="headerlink" href="#lasdi.physics.burgers1d.Burgers1D.xmin" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.Burgers1D.xmax">
+<span class="sig-name descname"><span class="pre">xmax</span></span><a class="headerlink" href="#lasdi.physics.burgers1d.Burgers1D.xmax" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.Burgers1D.dx">
+<span class="sig-name descname"><span class="pre">dx</span></span><a class="headerlink" href="#lasdi.physics.burgers1d.Burgers1D.dx" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.Burgers1D.tmax">
+<span class="sig-name descname"><span class="pre">tmax</span></span><a class="headerlink" href="#lasdi.physics.burgers1d.Burgers1D.tmax" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.Burgers1D.dt">
+<span class="sig-name descname"><span class="pre">dt</span></span><a class="headerlink" href="#lasdi.physics.burgers1d.Burgers1D.dt" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.Burgers1D.x_grid">
+<span class="sig-name descname"><span class="pre">x_grid</span></span><a class="headerlink" href="#lasdi.physics.burgers1d.Burgers1D.x_grid" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.Burgers1D.t_grid">
+<span class="sig-name descname"><span class="pre">t_grid</span></span><a class="headerlink" href="#lasdi.physics.burgers1d.Burgers1D.t_grid" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.Burgers1D.maxk">
+<span class="sig-name descname"><span class="pre">maxk</span></span><a class="headerlink" href="#lasdi.physics.burgers1d.Burgers1D.maxk" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.Burgers1D.convergence_threshold">
+<span class="sig-name descname"><span class="pre">convergence_threshold</span></span><a class="headerlink" href="#lasdi.physics.burgers1d.Burgers1D.convergence_threshold" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.Burgers1D.initial_condition">
+<span class="sig-name descname"><span class="pre">initial_condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.physics.burgers1d.Burgers1D.initial_condition" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.Burgers1D.solve">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.physics.burgers1d.Burgers1D.solve" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.Burgers1D.export">
+<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.physics.burgers1d.Burgers1D.export" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.Burgers1D.residual">
+<span class="sig-name descname"><span class="pre">residual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Xhist</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.physics.burgers1d.Burgers1D.residual" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.residual_burgers">
+<span class="sig-prename descclassname"><span class="pre">lasdi.physics.burgers1d.</span></span><span class="sig-name descname"><span class="pre">residual_burgers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">un</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idxn1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.physics.burgers1d.residual_burgers" title="Permalink to this definition"></a></dt>
+<dd><p>Compute 1D Burgers equation residual for generating the data
+from <a class="reference external" href="https://github.com/LLNL/gLaSDI">https://github.com/LLNL/gLaSDI</a> and <a class="reference external" href="https://github.com/LLNL/LaSDI">https://github.com/LLNL/LaSDI</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.jacobian">
+<span class="sig-prename descclassname"><span class="pre">lasdi.physics.burgers1d.</span></span><span class="sig-name descname"><span class="pre">jacobian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idxn1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.physics.burgers1d.jacobian" title="Permalink to this definition"></a></dt>
+<dd><p>Compute 1D Burgers equation jacobian for generating the data
+from <a class="reference external" href="https://github.com/LLNL/gLaSDI">https://github.com/LLNL/gLaSDI</a> and <a class="reference external" href="https://github.com/LLNL/LaSDI">https://github.com/LLNL/LaSDI</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.solver">
+<span class="sig-prename descclassname"><span class="pre">lasdi.physics.burgers1d.</span></span><span class="sig-name descname"><span class="pre">solver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convergence_threshold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.physics.burgers1d.solver" title="Permalink to this definition"></a></dt>
+<dd><p>Solves 1D Burgers equation for generating the data
+from <a class="reference external" href="https://github.com/LLNL/gLaSDI">https://github.com/LLNL/gLaSDI</a> and <a class="reference external" href="https://github.com/LLNL/LaSDI">https://github.com/LLNL/LaSDI</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lasdi.physics.burgers1d.main">
+<span class="sig-prename descclassname"><span class="pre">lasdi.physics.burgers1d.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.physics.burgers1d.main" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="lasdi.physics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../enums/index.html" class="btn btn-neutral float-right" title="lasdi.enums" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Kevin Chung.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

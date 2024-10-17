@@ -1,0 +1,74 @@
+lasdi.workflow
+==============
+
+.. py:module:: lasdi.workflow
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   lasdi.workflow.trainer_dict
+   lasdi.workflow.latent_dict
+   lasdi.workflow.ld_dict
+   lasdi.workflow.physics_dict
+   lasdi.workflow.parser
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   lasdi.workflow.main
+   lasdi.workflow.step
+   lasdi.workflow.initialize_trainer
+   lasdi.workflow.initialize_latent_space
+   lasdi.workflow.initialize_physics
+   lasdi.workflow.pick_samples
+   lasdi.workflow.run_samples
+   lasdi.workflow.collect_samples
+
+
+Module Contents
+---------------
+
+.. py:data:: trainer_dict
+
+.. py:data:: latent_dict
+
+.. py:data:: ld_dict
+
+.. py:data:: physics_dict
+
+.. py:data:: parser
+
+.. py:function:: main()
+
+.. py:function:: step(trainer, next_step, config, use_restart=False)
+
+.. py:function:: initialize_trainer(config, restart_file=None)
+
+   Initialize a LaSDI class with a latent space model according to config file.
+   Currently only 'gplasdi' is available.
+
+
+.. py:function:: initialize_latent_space(physics, config)
+
+   Initialize a latent space model according to config file.
+   Currently only 'ae' (autoencoder) is available.
+
+
+.. py:function:: initialize_physics(config, param_name)
+
+   Initialize a physics FOM model according to config file.
+   Currently only 'burgers1d' is available.
+
+
+.. py:function:: pick_samples(trainer, config)
+
+.. py:function:: run_samples(trainer, config)
+
+.. py:function:: collect_samples(trainer, config)
+

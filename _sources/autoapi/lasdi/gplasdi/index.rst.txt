@@ -1,0 +1,133 @@
+lasdi.gplasdi
+=============
+
+.. py:module:: lasdi.gplasdi
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   lasdi.gplasdi.BayesianGLaSDI
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   lasdi.gplasdi.average_rom
+   lasdi.gplasdi.sample_roms
+   lasdi.gplasdi.get_fom_max_std
+   lasdi.gplasdi.optimizer_to
+
+
+Module Contents
+---------------
+
+.. py:function:: average_rom(autoencoder, physics, latent_dynamics, gp_dictionary, param_grid)
+
+.. py:function:: sample_roms(autoencoder, physics, latent_dynamics, gp_dictionary, param_grid, n_samples)
+
+   Collect n_samples of ROM trajectories on param_grid.
+   gp_dictionary: list of Gaussian process regressors (size of n_test)
+   param_grid: numpy 2d array
+   n_samples: integer
+   assert(len(gp_dictionnary) == param_grid.shape[0])
+
+   output: np.array of size [n_test, n_samples, physics.nt, autoencoder.n_z]
+
+
+.. py:function:: get_fom_max_std(autoencoder, Zis)
+
+   Computes the maximum standard deviation accross the parameter space grid and finds the corresponding parameter location
+
+
+
+.. py:function:: optimizer_to(optim, device)
+
+.. py:class:: BayesianGLaSDI(physics, autoencoder, latent_dynamics, param_space, config)
+
+   .. py:attribute:: X_train
+
+
+   .. py:attribute:: X_test
+
+
+   .. py:attribute:: autoencoder
+
+
+   .. py:attribute:: latent_dynamics
+
+
+   .. py:attribute:: physics
+
+
+   .. py:attribute:: param_space
+
+
+   .. py:attribute:: timer
+
+
+   .. py:attribute:: n_samples
+
+
+   .. py:attribute:: lr
+
+
+   .. py:attribute:: n_iter
+
+
+   .. py:attribute:: max_iter
+
+
+   .. py:attribute:: max_greedy_iter
+
+
+   .. py:attribute:: ld_weight
+
+
+   .. py:attribute:: coef_weight
+
+
+   .. py:attribute:: optimizer
+
+
+   .. py:attribute:: MSE
+
+
+   .. py:attribute:: path_checkpoint
+
+
+   .. py:attribute:: path_results
+
+
+   .. py:attribute:: device
+
+
+   .. py:attribute:: best_loss
+
+
+   .. py:attribute:: best_coefs
+      :value: None
+
+
+
+   .. py:attribute:: restart_iter
+      :value: 0
+
+
+
+   .. py:method:: train()
+
+
+   .. py:method:: get_new_sample_point()
+
+
+   .. py:method:: export()
+
+
+   .. py:method:: load(dict_)
+
+
