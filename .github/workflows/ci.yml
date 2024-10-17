@@ -10,8 +10,8 @@ on:
       - main
 
 jobs:
-  docker-image:
-    uses: ./.github/workflows/docker.yml
+  # docker-image:
+  #   uses: ./.github/workflows/docker.yml
   api-doc:
-    needs: [docker-image]
+    # needs: [docker-image]
     uses: ./.github/workflows/sphinx.yml
