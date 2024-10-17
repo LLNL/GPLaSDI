@@ -34,6 +34,11 @@ jobs:
       #     cd ${GITHUB_WORKSPACE}/docs
       #     mkdir build
       #     sphinx-build -b html source/ build/
+    - name: check resulting files
+      run: |
+          ls ${GITHUB_WORKSPACE}/docs/
+          ls ${GITHUB_WORKSPACE}/docs/build
+          ls ${GITHUB_WORKSPACE}/docs/build/html
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
