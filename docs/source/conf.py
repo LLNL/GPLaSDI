@@ -12,8 +12,8 @@ sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('../../src'))
 
 project = 'LaSDI'
-copyright = '2024, Kevin Chung'
-author = 'Kevin Chung'
+copyright = '2023-2024, Lawrence Livermore National Security, LLC and other LaSDI project developers.'
+author = 'Christophe Bonneville, Kevin Chung, Youngsoo Choi'
 release = '2.0'
 
 # -- General configuration ---------------------------------------------------
