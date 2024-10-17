@@ -7,11 +7,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/llnl/gplasdi/lasdi_env:latest
-      options: --user 1001 --privileged
-      volumes:
-        - /mnt:/mnt
+    # container:
+    #   image: ghcr.io/llnl/gplasdi/lasdi_env:latest
+    #   options: --user 1001 --privileged
+    #   volumes:
+    #     - /mnt:/mnt
     permissions:
       contents: write
     steps:
@@ -20,15 +20,15 @@ jobs:
       with:
         access_token: ${{ github.token }}
     - uses: actions/checkout@v4
-    - name: check autoapi.extension
-      run: |
-          python -m autoapi.extension
+    # - name: check autoapi.extension
+    #   run: |
+    #       python -m autoapi.extension
     - name: Build HTML
       uses: ammaraskar/sphinx-action@master
       with:
         docs-folder: "docs/"
-        build-command: "sphinx-build -b html . build"
-        pre-build-command: "pip install sphinx-autoapi sphinx_rtd_theme"
+        build-command: "sphinx-build -b html source build"
+        pre-build-command: "pip install --upgrade pip && pip install sphinx-autoapi sphinx_rtd_theme"
       # run: |
       #     sphinx-build --version
       #     cd ${GITHUB_WORKSPACE}/docs
