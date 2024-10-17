@@ -23,7 +23,7 @@ RUN sudo apt-get install -yq python3-dev
 RUN sudo apt-get install -yq python3-pip
 RUN sudo apt-get install python-is-python3
 RUN sudo python -m pip install --upgrade pip
-RUN sudo python -m pip install sphinx-autoapi sphinx_rtd_theme
+RUN sudo python -m pip install sphinx sphinx-autoapi sphinx_rtd_theme
 #RUN sudo pip3 install numpy scipy argparse tables PyYAML h5py pybind11 pytest mpi4py merlin
 #
 RUN sudo apt-get clean -q

@@ -24,10 +24,16 @@ jobs:
       run: |
           python -m autoapi.extension
     - name: Build HTML
-      # uses: ammaraskar/sphinx-action@master
-      run: |
-          sphinx-build --version
-          sphinx-build -b html source/ build/
+      uses: ammaraskar/sphinx-action@master
+      with:
+        docs-folder: "docs/"
+        build-command: "sphinx-build -b html . build"
+        pre-build-command: "pip install sphinx-autoapi sphinx_rtd_theme"
+      # run: |
+      #     sphinx-build --version
+      #     cd ${GITHUB_WORKSPACE}/docs
+      #     mkdir build
+      #     sphinx-build -b html source/ build/
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
