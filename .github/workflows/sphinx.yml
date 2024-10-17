@@ -1,13 +1,24 @@
 name: "Sphinx: Render docs"
 
-on: push
+# on: push
+on:
+  workflow_call:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/llnl/gplasdi/lasdi_env:latest
+      options: --user 1001 --privileged
+      volumes:
+        - /mnt:/mnt
     permissions:
       contents: write
     steps:
+    - name: Cancel previous runs
+      uses: styfle/cancel-workflow-action@0.11.0
+      with:
+        access_token: ${{ github.token }}
     - uses: actions/checkout@v4
     - name: Build HTML
       uses: ammaraskar/sphinx-action@master
