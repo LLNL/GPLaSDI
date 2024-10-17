@@ -11,18 +11,19 @@ WORKDIR /$ENVDIR
 RUN sudo apt-get install -yq git
 RUN sudo apt-get install --no-install-recommends -yq make gcc gfortran libssl-dev cmake
 RUN sudo apt-get install -yq libopenblas-dev libmpich-dev libblas-dev liblapack-dev libscalapack-mpi-dev libhdf5-mpi-dev hdf5-tools
-RUN sudo apt-get install -yq vim
+# RUN sudo apt-get install -yq vim
 RUN sudo apt-get install -yq git-lfs
-RUN sudo apt-get install -yq valgrind
+# RUN sudo apt-get install -yq valgrind
 RUN sudo apt-get install -yq wget
-RUN sudo apt-get install -yq astyle
+# RUN sudo apt-get install -yq astyle
 
 # install python
 RUN sudo apt-get install -yq python3
 RUN sudo apt-get install -yq python3-dev
 RUN sudo apt-get install -yq python3-pip
-RUN sudo pip3 install --upgrade pip
-RUN sudo pip3 install sphinx-autoapi sphinx_rtd_theme
+RUN sudo apt-get install python-is-python3
+RUN sudo python -m pip install --upgrade pip
+RUN sudo python -m pip install sphinx-autoapi sphinx_rtd_theme
 #RUN sudo pip3 install numpy scipy argparse tables PyYAML h5py pybind11 pytest mpi4py merlin
 #
 RUN sudo apt-get clean -q
