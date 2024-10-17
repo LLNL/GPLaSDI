@@ -73,9 +73,10 @@
              
   <section id="lasdi-documentation">
 <h1>LaSDI documentation<a class="headerlink" href="#lasdi-documentation" title="Permalink to this heading"></a></h1>
-<p>Add your content using <code class="docutils literal notranslate"><span class="pre">reStructuredText</span></code> syntax. See the
-<a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html">reStructuredText</a>
-documentation for details.</p>
+<p>LaSDI is a light-weight python package for Latent Space Dynamics Identification.
+LaSDI maps full-order PDE solutions to a latent space using autoencoders and learns the system of ODEs governing the latent space dynamics.
+By interpolating and solving the ODE system in the reduced latent space, fast and accurate ROM predictions can be made by feeding the predicted latent space dynamics into the decoder.
+It also supports parametric interpolation of latent dynamics according to uncertainties evaluated via Gaussian process.</p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
@@ -97,7 +98,7 @@ documentation for details.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Kevin Chung.</p>
+    <p>&#169; Copyright 2023-2024, Lawrence Livermore National Security, LLC and other LaSDI project developers..</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
