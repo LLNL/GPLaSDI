@@ -20,9 +20,6 @@ jobs:
       with:
         access_token: ${{ github.token }}
     - uses: actions/checkout@v4
-    # - name: check autoapi.extension
-    #   run: |
-    #       python -m autoapi.extension
     - name: Build HTML
       uses: ammaraskar/sphinx-action@master
       with:
@@ -44,7 +41,7 @@ jobs:
         path: docs/build/
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
-      # if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/main'
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: docs/build
