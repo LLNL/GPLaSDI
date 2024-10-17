@@ -47,7 +47,7 @@ def getDictFromList(list_, inputDict):
     '''
         get a dict with {key: val} from a list of dicts
         NOTE: it returns only the first item in the list,
-            even if the list has more than one dict with {key: val}.
+        even if the list has more than one dict with {key: val}.
     '''
     dict_ = None
     for item in list_:
