@@ -390,11 +390,38 @@ class ParameterSpace:
     
 
 
-    def appendTrainSpace(self, param):
+    def appendTrainSpace(self, param : np.ndarray) -> None:
+        """
+        Adds a new parameter to self's train space attribute.
+
+
+        -------------------------------------------------------------------------------------------
+        Arguments
+        -------------------------------------------------------------------------------------------
+
+        param: A 1d numpy ndarray object. It should have shape (n_param) and should hold a 
+        parameter value that we want to add to the training set.
+
+
+
+        -------------------------------------------------------------------------------------------
+        Returns
+        -------------------------------------------------------------------------------------------
+
+        Nothing!
+        """
+
+        # Make sure param has n_param components/can be appended to the set of training parameters.
         assert(self.train_space.shape[1] == param.size)
 
-        self.train_space = np.vstack((self.train_space, param))
-        self.n_train = self.train_space.shape[0]
+        # Add the new parameter to the training space by appending it as a new row to 
+        # self.train_space
+        self.train_space    : np.ndarray    = np.vstack((self.train_space, param))
+        
+        # Increment the number of training examples.
+        self.n_train        : int           = self.train_space.shape[0]
+
+        # All done!
         return
     
 

@@ -1,14 +1,31 @@
-from .gp import *
-from .latent_space import *
-from .enums import *
-from .timing import Timer
-import torch
-import time
-import numpy as np
+# -------------------------------------------------------------------------------------------------
+# Imports
+# -------------------------------------------------------------------------------------------------
+
+import  time
+
+import  torch
+import  numpy               as      np
+
+from    .gp                 import  eval_gp, sample_coefs, fit_gps
+from    .latent_space       import  initial_condition_latent
+from    .enums              import  NextStep, Result
+from    .physics            import  Physics
+from    .latent_dynamics    import  LatentDynamics     
+from    .timing             import  Timer
+from    .param              import  ParameterSpace
 
 
 
-def average_rom(autoencoder, physics, latent_dynamics, gp_dictionary, param_grid):
+# -------------------------------------------------------------------------------------------------
+# Helper function
+# -------------------------------------------------------------------------------------------------
+
+def average_rom(autoencoder     : torch.nn.Module, 
+                physics         : Physics, 
+                latent_dynamics : LatentDynamics, 
+                gp_list, 
+                param_grid) -> np.ndarray:
 
     if (param_grid.ndim == 1):
         param_grid = param_grid.reshape(1, -1)
@@ -16,7 +33,7 @@ def average_rom(autoencoder, physics, latent_dynamics, gp_dictionary, param_grid
 
     Z0 = initial_condition_latent(param_grid, physics, autoencoder)
 
-    pred_mean, _ = eval_gp(gp_dictionary, param_grid)
+    pred_mean, _ = eval_gp(gp_list, param_grid)
 
     Zis = np.zeros([n_test, physics.nt, autoencoder.n_z])
     for i in range(n_test):
@@ -26,13 +43,18 @@ def average_rom(autoencoder, physics, latent_dynamics, gp_dictionary, param_grid
 
 
 
-def sample_roms(autoencoder, physics, latent_dynamics, gp_dictionary, param_grid, n_samples):
+def sample_roms(autoencoder     : torch.nn.Module, 
+                physics         : Physics, 
+                latent_dynamics : LatentDynamics, 
+                gp_list, 
+                param_grid, 
+                n_samples) -> np.ndarray:
     '''
         Collect n_samples of ROM trajectories on param_grid.
-        gp_dictionary: list of Gaussian process regressors (size of n_test)
+        gp_list: list of Gaussian process regressors (size of n_test)
         param_grid: numpy 2d array
         n_samples: integer
-        assert(len(gp_dictionnary) == param_grid.shape[0])
+        assert(len(gp_list) == param_grid.shape[0])
 
         output: np.array of size [n_test, n_samples, physics.nt, autoencoder.n_z]
     '''
@@ -43,7 +65,7 @@ def sample_roms(autoencoder, physics, latent_dynamics, gp_dictionary, param_grid
 
     Z0 = initial_condition_latent(param_grid, physics, autoencoder)
 
-    coef_samples = [sample_coefs(gp_dictionary, param_grid[i], n_samples) for i in range(n_test)]
+    coef_samples = [sample_coefs(gp_list, param_grid[i], n_samples) for i in range(n_test)]
 
     Zis = np.zeros([n_test, n_samples, physics.nt, autoencoder.n_z])
     for i, Zi in enumerate(Zis):
@@ -55,73 +77,155 @@ def sample_roms(autoencoder, physics, latent_dynamics, gp_dictionary, param_grid
 
 
 
-def get_fom_max_std(autoencoder, Zis):
+def get_fom_max_std(autoencoder : torch.nn.Module, Zis : np.ndarray) -> int:
+    """
+    Computes the maximum standard deviation across the parameter space grid and finds the
+    corresponding parameter index.
 
-    '''
+    
 
-    Computes the maximum standard deviation across the parameter space grid and finds the corresponding parameter location
+    -----------------------------------------------------------------------------------------------
+    Arguments
+    -----------------------------------------------------------------------------------------------
 
-    '''
-    # TODO(kevin): currently this evaluate pointwise maximum standard deviation.
+    autoencoder: The autoencoder. We assume the solved dynamics (whose frames are stored in Zis) 
+    take place in the autoencoder's latent space. We use this to decode the solution frames.
+
+    Zis: A 4d numpy array of shape (n_test, n_samples, n_t, n_z) whose i, j, k, l element holds 
+    the l'th component of the k'th frame of the solution to the latent dynamics when we use the 
+    j'th sample of latent coefficients drawn from the posterior distribution for the i'th testing 
+    parameter.
+
+    
+
+    -----------------------------------------------------------------------------------------------
+    Returns:
+    -----------------------------------------------------------------------------------------------
+
+    An integer. The index of the testing parameter that gives the largest standard deviation. 
+    Specifically, for each testing parameter, we compute the STD of each component of the fom 
+    solution at each frame generated by samples from the posterior coefficient distribution for 
+    that parameter. We compute the maximum of these STDs and pair that number with the parameter. 
+    We then return the index of the parameter whose corresponding maximum std (the number we pair
+    with it) is greatest.
+    """
+    # TODO(kevin): currently this evaluate point-wise maximum standard deviation.
     #              is this a proper metric? we might want to consider an average, or L2 norm of std.
 
-    max_std = 0
 
+    max_std : float = 0.0
+
+    # Cycle through the testing parameters.
     for m, Zi in enumerate(Zis):
-        Z_m = torch.Tensor(Zi)
-        X_pred_m = autoencoder.decoder(Z_m).detach().numpy()
-        X_pred_m_std = X_pred_m.std(0)
-        max_std_m = X_pred_m_std.max()
+        # Zi is a 3d tensor of shape (n_samples, n_t, n_z), where n_samples is the number of 
+        # samples of the posterior distribution per parameter, n_t is the number of time steps in
+        # the latent dynamics solution, and n_z is the dimension of the latent space. The i,j,k
+        # element of Zi is the k'th component of the j'th frame of the solution to the latent 
+        # dynamics when the latent dynamics uses the i'th set of sampled parameter values.
+        Z_m             : torch.Tensor  = torch.Tensor(Zi)
 
+        # Now decode the frames.
+        X_pred_m        : np.ndarray    = autoencoder.decoder(Z_m).detach().numpy()
+
+        # Compute the standard deviation across the sample axis. This gives us an array of shape 
+        # (n_t, n_fom) whose i,j element holds the (sample) standard deviation of the j'th component 
+        # of the i'th frame of the fom solution. In this case, the sample distribution consists of 
+        # the set of j'th components of i'th frames of fom solutions (one for each sample of the 
+        # posterior coefficients).
+        X_pred_m_std    : np.ndarray    = X_pred_m.std(0)
+
+        # Now compute the maximum standard deviation across frames/fom components.
+        max_std_m       : np.float32    = X_pred_m_std.max()
+
+        # If this is bigger than the biggest std we have seen so far, update the maximum.
         if max_std_m > max_std:
-            m_index = m
-            max_std = max_std_m
+            m_index : int   = m
+            max_std : float = max_std_m
 
+    # Report the index of the testing parameter that gave the largest maximum std.
     return m_index
 
 
 
+# -------------------------------------------------------------------------------------------------
+# BayesianGLaSDI class
+# -------------------------------------------------------------------------------------------------
 
 class BayesianGLaSDI:
     X_train = None
 
-    def __init__(self, physics, autoencoder, latent_dynamics, model_parameters):
+    def __init__(self, 
+                 physics            : Physics, 
+                 autoencoder        : torch.nn.Module, 
+                 latent_dynamics    : LatentDynamics, 
+                 trainer_parameters : dict) -> None:
 
         '''
+        This class runs a full GPLaSDI training. As input, it takes the autoencoder defined as a 
+        torch.nn.Module object and a dictionary containing all the training parameters.
 
-        This class runs a full GPLaSDI training. It takes into input the autoencoder defined as a PyTorch object and the
-        dictionnary containing all the training parameters.
-        The "train" method with run the active learning training loop, compute the reconstruction and SINDy loss, train the GPs,
-        and sample a new FOM data point.
+        The "train" method runs the active learning training loop, computes the reconstruction and 
+        SINDy loss, trains the GPs, and samples a new FOM data point.
 
+
+        -------------------------------------------------------------------------------------------
+        Arguments
+        -------------------------------------------------------------------------------------------
+
+        physics: A "Physics" object that allows us to generate the dataset. Each Physics object has
+        a corresponding PDE with parameters, and a way to generate a solution to that equation 
+        given a particular set of parameter values (and an IC, BCs). We use this object to generate
+        fom solutions which we then use to train the autoencoder/latent dynamics.
+         
+        Autoencoder: An autoencoder object that we use to compress the fom state to a reduced, 
+        latent state.
+
+        latent_dynamics: A LatentDynamics object which describes how we specify the dynamics in the
+        Autoencoder's latent space.
+
+        trainer_parameters: A dictionary housing the settings we wna to use to train the model on 
+        the data generated by physics. 
+
+
+        
+        -------------------------------------------------------------------------------------------
+        Returns
+        -------------------------------------------------------------------------------------------
+
+        Nothing!
         '''
 
-        self.autoencoder        = autoencoder
-        self.latent_dynamics    = latent_dynamics
-        self.physics            = physics
-        self.param_space        = physics.param_space
-        self.timer              = Timer()
+        # Set the instance variables.
+        self.autoencoder        : torch.nn.Module   = autoencoder
+        self.latent_dynamics    : LatentDynamics    = latent_dynamics
+        self.physics            : Physics           = physics
+        self.param_space        : ParameterSpace    = physics.param_space
+        self.timer              : Timer             = Timer()
 
-        self.n_samples = model_parameters['n_samples']
-        self.lr = model_parameters['lr']
-        self.n_iter = model_parameters['n_iter']
-        self.n_greedy = model_parameters['n_greedy']
-        self.max_greedy_iter = model_parameters['max_greedy_iter']
-        self.sindy_weight = model_parameters['sindy_weight']
-        self.coef_weight = model_parameters['coef_weight']
+        # Fetch relevant settings. 
+        self.n_samples          : int       = trainer_parameters['n_samples']       # Number of samples of the predicted latent dynamics used to build ensemble of fom predictions. N_s in the paper. 
+        self.lr                 : float     = trainer_parameters['lr']              # Learning rate for the optimizer. \alpha in the paper. 
+        self.n_iter             : int       = trainer_parameters['n_iter']          # Number of training iterations. N_{epoch} in the paper.
+        self.n_greedy           : int       = trainer_parameters['n_greedy']        # Number of iterations between sampling a new training point. N_{up} in the paper.
+        self.max_greedy_iter    : int       = trainer_parameters['max_greedy_iter'] # The maximum iteration number at which we are willing to sample new training points.
+        self.sindy_weight       : float     = trainer_parameters['sindy_weight']    # Weight of the SINDy loss in the loss function. \beta_2 in the paper.
+        self.coef_weight        : float     = trainer_parameters['coef_weight']     # Weight of the norm of matrix of latent dynamics coefficients. \beta_3 in the paper.
 
-        self.optimizer = torch.optim.Adam(autoencoder.parameters(), lr = self.lr)
-        self.MSE = torch.nn.MSELoss()
+        # Set the optimizer and loss function.
+        self.optimizer                      = torch.optim.Adam(autoencoder.parameters(), lr = self.lr)
+        self.MSE                            = torch.nn.MSELoss()
 
-        self.path_checkpoint = model_parameters['path_checkpoint']
-        self.path_results = model_parameters['path_results']
+        # Setup where to save checkpoints and results.
+        self.path_checkpoint    : str       = trainer_parameters['path_checkpoint']
+        self.path_results       : str       = trainer_parameters['path_results']
 
-        from os.path import dirname
-        from pathlib import Path
-        Path(dirname(self.path_checkpoint)).mkdir(parents=True, exist_ok=True)
-        Path(dirname(self.path_results)).mkdir(parents=True, exist_ok=True)
+        #from os.path import dirname
+        #from pathlib import Path
+        #Path(dirname(self.path_checkpoint)).mkdir(  parents = True, exist_ok = True)
+        #Path(dirname(self.path_results)).mkdir(     parents = True, exist_ok = True)
 
-        device = model_parameters['device'] if 'device' in model_parameters else 'cpu'
+        # Set the device to train on.
+        device : str = trainer_parameters['device'] if 'device' in trainer_parameters else 'cpu'
         if (device == 'cuda'):
             assert(torch.cuda.is_available())
             self.device = device
@@ -131,55 +235,110 @@ class BayesianGLaSDI:
         else:
             self.device = 'cpu'
 
-        self.best_loss = np.inf
-        self.restart_iter = 0
+        # Initialize the loss
+        self.best_loss              = np.inf        # The best loss we have gotten so far.
+        self.restart_iter   : int   = 0             # 
 
+        # All done!
         return
 
 
 
-    def train(self):
-        assert(self.X_train is not None)
-        assert(self.X_train.size(0) == self.param_space.n_train)
+    def train(self) -> tuple[Result, NextStep]:
+        """
+        
+        -------------------------------------------------------------------------------------------
+        Arguments
+        -------------------------------------------------------------------------------------------
 
-        device = self.device
-        autoencoder_device = self.autoencoder.to(device)
-        X_train_device = self.X_train.to(device)
+        None!
 
+
+        -------------------------------------------------------------------------------------------
+        Returns
+        -------------------------------------------------------------------------------------------
+
+        A two element tuple. The first is a Results type enumeration which specifies if training 
+        was successful or not. The second is a NextStep type enumeration which specifies the next 
+        step after training. 
+        """
+
+        # Make sure that we have data to train on (and that there is the right amount of it). Note 
+        # that the "initial_step" function in "workflow.py" should set this attribute. Thus, as 
+        # long as we ran the initial step, we should be good to go.
+        assert(self.X_train is not None)                            # Check that we have data.
+        assert(self.X_train.size(0) == self.param_space.n_train)    # Check that we have enough of it.
+
+        # Determine what device we are training to, then map the autoencoder and the dataset to 
+        # that device.
+        device              = self.device
+        autoencoder_device  = self.autoencoder.to(device)
+        X_train_device      = self.X_train.to(device)
+
+        # Make sure the checkpoints and results directories exist.
         from pathlib import Path
-        Path(self.path_checkpoint).mkdir(parents=True, exist_ok=True)
-        Path(self.path_results).mkdir(parents=True, exist_ok=True)
+        Path(self.path_checkpoint).mkdir(   parents = True, exist_ok = True)
+        Path(self.path_results).mkdir(      parents = True, exist_ok = True)
 
-        ps = self.param_space
-        ld = self.latent_dynamics
+        ps  : ParameterSpace    = self.param_space
+        ld  : LatentDynamics    = self.latent_dynamics
 
+        # Cycle through the iterations!
         for iter in range(self.restart_iter, self.n_iter):
+            # Begin timing the current training step.
             self.timer.start("train_step")
 
+            # Zero out the gradients. Why is this here and not after the forward pass?
             self.optimizer.zero_grad()
-            Z = autoencoder_device.encoder(X_train_device)
-            X_pred = autoencoder_device.decoder(Z)
-            Z = Z.cpu()
 
-            loss_ae = self.MSE(X_train_device, X_pred)
-            coefs, loss_sindy, loss_coef = ld.calibrate(Z, self.physics.dt, compute_loss=True, numpy=True)
 
-            max_coef = np.abs(coefs).max()
+            # -------------------------------------------------------------------------------------
+            # Forward pass
 
-            loss = loss_ae + self.sindy_weight * loss_sindy / ps.n_train + self.coef_weight * loss_coef / ps.n_train
+            # Run the forward pass
+            Z           : torch.Tensor      = autoencoder_device.encoder(X_train_device)
+            X_pred      : torch.Tensor      = autoencoder_device.decoder(Z)
+            Z           : torch.Tensor      = Z.cpu()
 
+            # Compute the autoencoder loss. 
+            loss_ae                         = self.MSE(X_train_device, X_pred)
+
+            # Compute the SINDy and coefficient losses. Also fetch the current SINDy coefficients 
+            # for each training point. The latter is stored in a 3d array called "coefs" of shape
+            # (n_train, N_z, N_l), where N_{\mu} = n_train = number of training parameter 
+            # combinations, N_z = latent space dimension, and N_l = number of terms in the SINDy 
+            # library.
+            coefs, loss_sindy, loss_coef    = ld.calibrate(Z, self.physics.dt, compute_loss = True, numpy = True)
+            max_coef    : np.float32        = np.abs(coefs).max()
+            
+            # Compute the final loss.
+            loss        : torch.Tensor      = loss_ae + self.sindy_weight * loss_sindy / ps.n_train + self.coef_weight * loss_coef / ps.n_train
+
+
+            # -------------------------------------------------------------------------------------
+            # Backward Pass
+
+            # Now run back propagation and update the model parameters. 
             loss.backward()
             self.optimizer.step()
 
+            # Check if we hit a new minimum loss. If so, make a checkpoint, record the loss and 
+            # the iteration number. 
             if loss.item() < self.best_loss:
                 torch.save(autoencoder_device.state_dict(), self.path_checkpoint + '/' + 'checkpoint.pt')
                 self.best_coefs = coefs
-                self.best_loss = loss.item()
+                self.best_loss  = loss.item()
 
+
+            # -------------------------------------------------------------------------------------
+            # Report Results from this iteration 
+
+            # Report the current iteration number abd losses
             print("Iter: %05d/%d, Loss: %3.10f, Loss AE: %3.10f, Loss SI: %3.10f, Loss COEF: %3.10f, max|c|: %04.1f, "
                   % (iter + 1, self.n_iter, loss.item(), loss_ae.item(), loss_sindy.item(), loss_coef.item(), max_coef),
                   end = '')
 
+            # If there are fewer than 6 training examples, report the set of parameter combinations.
             if ps.n_train < 6:
                 print('Param: ' + str(np.round(ps.train_space[0, :], 4)), end = '')
 
@@ -187,95 +346,196 @@ class BayesianGLaSDI:
                     print(', ' + str(np.round(ps.train_space[i, :], 4)), end = '')
                 print(', ' + str(np.round(ps.train_space[-1, :], 4)))
 
+            # Otherwise, report the final 6 parameter combinations.
             else:
                 print('Param: ...', end = '')
                 for i in range(5):
                     print(', ' + str(np.round(ps.train_space[-6 + i, :], 4)), end = '')
                 print(', ' + str(np.round(ps.train_space[-1, :], 4)))
-
+            
+            # We have finished a training step, stop the timer.
             self.timer.end("train_step")
 
+            # Check if it's time to sample a new training point. I.e., if n_greedy iterations have
+            # passed since we last sampled a new training point and we have not passed the last
+            # iteration at which we are willing to sample new training points (max_greedy_iter)
             if ((iter > self.restart_iter) and (iter < self.max_greedy_iter) and (iter % self.n_greedy == 0)):
-
+                # Recover the coefficients from the iteration that attained the lowest loss and used the 
+                # current set of training parameters.
                 if (self.best_coefs.shape[0] == ps.n_train):
-                    coefs = self.best_coefs
+                    coefs : np.ndarray = self.best_coefs
 
-                new_sample = self.get_new_sample_point(coefs)
+               # Find the testing parameter whose posterior distribution generates fom solutions
+               # with the greatest variance.
+                new_sample : np.ndarray = self.get_new_sample_point(coefs)
 
                 # TODO(kevin): implement save/load the new parameter
+
+                # Add the new parameter to the train space. 
                 ps.appendTrainSpace(new_sample)
-                self.restart_iter = iter
+
+                # Rebase the restart iteration. The training set has changed size.
+                self.restart_iter : int = iter
+
+                # We have finished this training step, the next step is to generate new data
+                # with this sample. We update next_step to indicate that. 
                 next_step, result = NextStep.RunSample, Result.Success
+
+                # Report the new parameter value.
                 print('New param: ' + str(np.round(new_sample, 4)) + '\n')
                 # self.timer.end("new_sample")
+
+                # All done!
                 return result, next_step
         
+        # Otherwise, we are ready to wrap up the training procedure.
         self.timer.start("finalize")
 
+        # Recover the coefficients from the iteration that attained the lowest loss and used the 
+        # current set of training parameters.
         if (self.best_coefs.shape[0] == ps.n_train):
             coefs = self.best_coefs
 
-        gp_dictionnary = fit_gps(ps.train_space, coefs)
+        # Train the GPs on the training data, get one GP per latent space coefficient.
+        gp_list : list = fit_gps(ps.train_space, coefs)
 
-        bglasdi_results = {'autoencoder_param': self.autoencoder.state_dict(), 'final_X_train': self.X_train,
-                           'coefs': coefs, 'gp_dictionnary': gp_dictionnary, 'lr': self.lr, 'n_iter': self.n_iter,
-                           'n_greedy': self.n_greedy, 'sindy_weight': self.sindy_weight, 'coef_weight': self.coef_weight,
-                           'n_samples' : self.n_samples,
-                           }
-        bglasdi_results['physics'] = self.physics.export()
-        bglasdi_results['parameters'] = self.param_space.export()
+        # Serialize the results of training in a dictionary, then save that dictionary.
+        bglasdi_results : dict = {
+                            'autoencoder_param' : self.autoencoder.state_dict(), 
+                            'final_X_train'     : self.X_train,
+                            'coefs'             : coefs, 
+                            'gp_list'           : gp_list, 
+                            'lr'                : self.lr, 
+                            'n_iter'            : self.n_iter,
+                            'n_greedy'          : self.n_greedy, 
+                            'sindy_weight'      : self.sindy_weight, 
+                            'coef_weight'       : self.coef_weight,
+                            'n_samples'         : self.n_samples,}
+        bglasdi_results['physics']          = self.physics.export()
+        bglasdi_results['parameters']       = self.param_space.export()
         # TODO(kevin): restart capability for timer.
-        bglasdi_results['timer'] = self.timer.export()
-        bglasdi_results['latent_dynamics'] = self.latent_dynamics.export()
+        bglasdi_results['timer']            = self.timer.export()
+        bglasdi_results['latent_dynamics']  = self.latent_dynamics.export()
 
-        date = time.localtime()
-        date_str = "{month:02d}_{day:02d}_{year:04d}_{hour:02d}_{minute:02d}"
-        date_str = date_str.format(month = date.tm_mon, day = date.tm_mday, year = date.tm_year, hour = date.tm_hour + 3, minute = date.tm_min)
+        date        = time.localtime()
+        date_str    = "{month:02d}_{day:02d}_{year:04d}_{hour:02d}_{minute:02d}"
+        date_str    = date_str.format(month = date.tm_mon, day = date.tm_mday, year = date.tm_year, hour = date.tm_hour + 3, minute = date.tm_min)
         np.save(self.path_results + '/' + 'bglasdi_' + date_str + '.npy', bglasdi_results)
 
         self.timer.end("finalize")
         self.timer.print()
 
+        # All done!
         next_step, result = None, Result.Complete
         return result, next_step
     
 
 
-    def get_new_sample_point(self, coefs):
+    def get_new_sample_point(self, coefs : np.ndarray):
+        """
+        
+        -------------------------------------------------------------------------------------------
+        Arguments
+        -------------------------------------------------------------------------------------------
+
+        coefs: A 3d numpy ndarray housing the best SINDy coefficients. By "best", we mean that they
+        are the coefficients from the iteration when the model attained the lowest overall loss. 
+        This array has shape (n_{train}, N_z, N_l), where N_{\mu} = n_train = number of training 
+        parameter combinations, N_z = latent space dimension, and N_l = number of terms in the 
+        SINDy library. It's i, j, k element should specify the coefficient of the k'th library term 
+        in ODE for the j'th component of the latent dynamics for the i'th set of parameter values.
+
+        
+        -------------------------------------------------------------------------------------------
+        Returns
+        -------------------------------------------------------------------------------------------
+
+        """
+
+        # Start timing how long it takes to sample a new point.
         self.timer.start("new_sample")
 
         print('\n~~~~~~~ Finding New Point ~~~~~~~')
         # TODO(kevin): william, this might be the place for new sampling routine.
 
-        ae = self.autoencoder.cpu()
-        ps = self.param_space
+        # Extract the autoencoder, but move it to the CPU.
+        ae  : torch.nn.Module   = self.autoencoder.cpu()
+        ps  : ParameterSpace    = self.param_space
+
+        # Load the model from the last checkpoint. This should be the one that obtained the best 
+        # loss so far. Remember that coefs should specify the coefficients from this iteration. 
         ae.load_state_dict(torch.load(self.path_checkpoint + '/' + 'checkpoint.pt'))
 
-        Z0 = initial_condition_latent(ps.test_space, self.physics, ae)
+        # Encode each testing fom IC. This give us a list of latent space ICs, one for each 
+        # testing parameter combination.
+        Z0 : list[np.ndarray] = initial_condition_latent(ps.test_space, self.physics, ae)
 
-        gp_dictionnary = fit_gps(ps.train_space, coefs)
+        # Train the GPs on the training data, get one GP per latent space coefficient.
+        gp_list     : list = fit_gps(ps.train_space, coefs)
 
-        coef_samples = [sample_coefs(gp_dictionnary, ps.test_space[i], self.n_samples) for i in range(ps.n_test)]
+        # Now, for each testing coefficient, draw a set of samples for each coefficient from the
+        # posterior distributions. We store these samples in a list of numpy arrays. The k'th list
+        # element is a (n_sample, n_coef) array whose i,j element stores the i'th sample of the 
+        # j'th coefficient from the posterior distribution for the j'th coefficient at the k'th 
+        # combination of testing parameter values.
+        coef_samples : list[np.ndarray] = [sample_coefs(gp_list, ps.test_space[i], self.n_samples) for i in range(ps.n_test)]
 
-        Zis = np.zeros([ps.n_test, self.n_samples, self.physics.nt, ae.n_z])
+        # For each testing parameter, cycle through the set of samples of the coefficients from
+        # the corresponding posterior distributions. For each set of coefficients, solve the 
+        # corresponding latent dynamics forward in time and store the resulting frames in Zis. 
+        # This is a 4d array whose i, j, k, l element holds the l'th component of the k'th frame
+        # of the solution to the latent dynamics when we use the j'th sample of latent coefficients
+        # drawn from the posterior distribution for the i'th testing parameter.
+        Zis : np.ndarray = np.zeros([ps.n_test, self.n_samples, self.physics.nt, ae.n_z])
         for i, Zi in enumerate(Zis):
             z_ic = Z0[i]
             for j, coef_sample in enumerate(coef_samples[i]):
                 Zi[j] = self.latent_dynamics.simulate(coef_sample, z_ic, self.physics.t_grid)
 
-        m_index = get_fom_max_std(ae, Zis)
+        # Find the index of the parameter with the largest std.
+        m_index : int = get_fom_max_std(ae, Zis)
 
+        # We have found the testing parameter we want to add to the training set. We can stop the 
+        # timer and return the parameter!
         self.timer.end("new_sample")
         return ps.test_space[m_index, :]
     
 
 
-    def sample_fom(self):
+    def sample_fom(self) -> None:
+        """
+        This function generates fom solutions for new parameter values. Specifically, if we have
+        added new training parameters to the training set but have not generated the corresponding
+        fom solutions, then this function will do that (and store the resulting fom solutions in 
+        self.X_train).
 
-        new_foms = self.param_space.n_train - self.X_train.size(0)
+        
+        -------------------------------------------------------------------------------------------
+        Arguments
+        -------------------------------------------------------------------------------------------
+
+        None!
+
+
+        -------------------------------------------------------------------------------------------
+        Returns
+        -------------------------------------------------------------------------------------------
+
+        Nothing!
+        """
+
+        # Determine how many parameter combinations we need to generate solutions for. Note that
+        # when we add new parameter values, we append them as new rows on the bottom of 
+        # param_space.train_space. Thus, the difference between the number of rows in X_Train and 
+        # param_space.n_train tells us how many new parameters there are. 
+        new_foms : int = self.param_space.n_train - self.X_train.size(0)
         assert(new_foms > 0)
+
+        # Extract the new training parameters. If there are k new parameters, then they are stored 
+        # in the last k rows of param_space.train_space.
         new_params = self.param_space.train_space[-new_foms:, :]
 
+        # Generate the new fom solutions and append them as new rows on the bottom of X_train.
         if not self.physics.offline:
             new_X = self.physics.generate_solutions(new_params)
 
