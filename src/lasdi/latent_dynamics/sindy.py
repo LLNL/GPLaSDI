@@ -5,10 +5,14 @@ from . import LatentDynamics
 from ..inputs import InputParser
 from ..fd import FDdict
 
+
+
 class SINDy(LatentDynamics):
     fd_type = ''
     fd = None
     fd_oper = None
+
+
 
     def __init__(self, dim, nt, config):
         super().__init__(dim, nt)
@@ -38,6 +42,8 @@ class SINDy(LatentDynamics):
 
         return
     
+
+
     def calibrate(self, Z, dt, compute_loss=True, numpy=False):
         ''' loop over all train cases, if Z dimension is 3 '''
         if (Z.dim() == 3):
@@ -86,6 +92,8 @@ class SINDy(LatentDynamics):
         else:
             return coefs
 
+
+
     def compute_time_derivative(self, Z, Dt):
 
         '''
@@ -100,6 +108,8 @@ class SINDy(LatentDynamics):
 
         '''
         return 1. / Dt * torch.sparse.mm(self.fd_oper, Z)
+
+
 
     def simulate(self, coefs, z0, t_grid):
 
@@ -116,6 +126,8 @@ class SINDy(LatentDynamics):
 
         return Z_i
     
+
+
     def export(self):
         param_dict = super().export()
         param_dict['fd_type'] = self.fd_type

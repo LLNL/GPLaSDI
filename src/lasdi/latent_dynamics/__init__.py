@@ -1,12 +1,16 @@
 import numpy as np
 import torch
 
+
+
 class LatentDynamics:
     dim = -1
     nt = -1
     ncoefs = -1
     # TODO(kevin): do we want to store coefficients as a member variable?
     coefs = torch.Tensor([])
+
+
 
     def __init__(self, dim_, nt_):
         self.dim = dim_
@@ -15,6 +19,8 @@ class LatentDynamics:
         assert(self.nt > 0)
         return
     
+
+
     def calibrate(self, Z, dt, compute_loss=True, numpy=False):
         '''
             calibrate coefficients of the latent dynamics and compute loss
@@ -28,6 +34,8 @@ class LatentDynamics:
         else:
             return coefs
     
+
+
     def simulate(self, coefs, z0, t_grid):
         '''
             time-integrate with one initial condition z0 at time points t_grid,
@@ -35,7 +43,9 @@ class LatentDynamics:
         '''
         raise RuntimeError('Abstract function LatentDynamics.simulate!')
         return zhist
-    
+
+
+
     def sample(self, coefs_sample, z0_sample, t_grid):
         '''
             Sample time series for given sample initial conditions and coefficients.
@@ -52,6 +62,8 @@ class LatentDynamics:
                 Z_simulated = np.concatenate((Z_simulated, Z_i), axis = 0)
 
         return Z_simulated
+    
+
     
     def export(self):
         param_dict = {'dim': self.dim, 'ncoefs': self.ncoefs}

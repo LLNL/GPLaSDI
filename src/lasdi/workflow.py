@@ -3,10 +3,12 @@
 # -------------------------------------------------------------------------------------------------
 
 import  yaml
-import  numpy                   as      np
-import  torch
 import  argparse
 import  sys
+
+import  numpy                   as      np
+import  torch
+
 from    .enums                  import  NextStep, Result
 from    .gplasdi                import  BayesianGLaSDI
 from    .latent_space           import  Autoencoder
@@ -84,7 +86,8 @@ def main() -> Result:
 
 def step(trainer : BayesianGLaSDI, next_step : NextStep, config : dict) -> Result:
     """
-    
+    This function runs the next step of the training procedure. Depending on what we have done, 
+    that next step could be initialization, training, generating new samples, or something else. 
 
     
     -----------------------------------------------------------------------------------------------
@@ -122,6 +125,8 @@ def step(trainer : BayesianGLaSDI, next_step : NextStep, config : dict) -> Resul
         if (continue_workflow):
             result = step(trainer, next_step, config)
     
+
+
     elif (next_step is NextStep.Train):
         # If our next step is to train, then let's train!
         result, next_step = trainer.train()
@@ -135,6 +140,8 @@ def step(trainer : BayesianGLaSDI, next_step : NextStep, config : dict) -> Resul
             assert(next_step is NextStep.RunSample)
             result = step(trainer, next_step, config)
 
+
+
     elif (next_step is NextStep.RunSample):
         # If we have trained but generated new parameter values to train at, then we need to 
         # generate the fom solutions for these new parameter values. We do this using the 
@@ -147,10 +154,14 @@ def step(trainer : BayesianGLaSDI, next_step : NextStep, config : dict) -> Resul
         # need to train at the new parameter values.
         result, next_step = Result.Success, NextStep.Train
         result = step(trainer, next_step, config)
-    
+
+
+
     elif (next_step is NextStep.CollectSample):
         import warnings
         warnings.warn("Collecting sample from offline FOM simulation is not implemented yet")
+
+
 
     else:
         raise RuntimeError("Unknown next step!")
@@ -177,7 +188,7 @@ def initialize_trainer(config : dict) -> BayesianGLaSDI:
     key, then we tab the sub-key relative to the dictionary key): 
         - physics           (used by "initialize_physics")
             - type
-        - latent_dynamics   (how we parameterize the latent dynamics; e.g. sindy)
+        - latent_dynamics   (how we parameterize the latent dynamics; e.g. SINDy)
             - type
         - lasdi
             - type
@@ -235,8 +246,9 @@ def initialize_latent_space(physics : Physics, config : dict) -> torch.nn.Module
     Arguments
     -----------------------------------------------------------------------------------------------
 
-    physics: A "Physics" object that allows us to generate the dataset. It corresponds to a 
-    specific equation that we then solve. 
+    physics: A "Physics" object that allows us to generate the dataset. Each Physics object has a 
+    corresponding PDE with parameters, and a way to generate a solution to that equation given
+    a particular set of parameter values (and an IC, BCs).
 
     config: This should be a dictionary that we loaded from a .yml file. It should house all the 
     settings we expect to use to generate the data and train the models. We expect this dictionary 
@@ -281,7 +293,7 @@ def initialize_physics(param_space : ParameterSpace, config: dict) -> Physics:
     Arguments
     -----------------------------------------------------------------------------------------------
 
-    param_space: The "ParameterSpace" object we loaded using the settings in "config"
+    param_space: The "ParameterSpace" object we loaded using the settings in "config". 
 
     config: This should be a dictionary that we loaded from a .yml file. It should house all the 
     settings we expect to use to generate the data and train the models. We expect this dictionary 
@@ -355,7 +367,7 @@ def initial_step(trainer : BayesianGLaSDI, config : dict) -> tuple[Result, NextS
     # Use the physics object to generate the training dataset. To do this, we use a numerical
     # solver to solve the underlying equation. This function returns a Nd + 2 dimensional 
     # array, where Nd is the number of spatial dimensions in the problem domain to the equation 
-    # that trainer.physics represents. It should have shape [Np, Nt, Nx[0], ... , Nx[Nd - 1]], 
+    # that trainer.physics represents. It should have shape (Np, Nt, Nx[0], ... , Nx[Nd - 1]), 
     # where Np is the number of distinct parameter combinations in the training set, Nt is the 
     # number of time steps per fom solution, and Nx[0], ... , Nx[Nd - 1] represent the number of 
     # steps along the spatial axes. 
@@ -374,7 +386,7 @@ def initial_step(trainer : BayesianGLaSDI, config : dict) -> tuple[Result, NextS
     # solve the underlying physics for each one of those sets of parameter values.
     if (trainer.param_space.test_space is not None):
         # Generate the training fom solutions. As with the training set, this returns a Nd + 2 
-        # dimensional array of shape [Np, Nt,  Nx[0], ... , Nx[Nd - 1]], except here Np represents
+        # dimensional array of shape (Np, Nt,  Nx[0], ... , Nx[Nd - 1]), except here Np represents
         # the number of distinct parameter combinations in the testing set.
         X_test = trainer.physics.generate_solutions(trainer.param_space.test_space)
 

@@ -41,7 +41,7 @@ class Burgers1D(Physics):
     
 
 
-    def initial_condition(self, param):
+    def initial_condition(self, param) -> np.ndarray:
         param = self.param_space.getParameter(param)
         a = param['a'] if 'a' in param else 1.0
         w = param['w'] if 'w' in param else 1.0

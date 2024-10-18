@@ -2,6 +2,8 @@ import numpy as np
 import torch
 import matplotlib.pyplot as plt
 
+
+
 def compute_errors(X_pred, physics, X_test):
 
     '''
@@ -19,12 +21,14 @@ def compute_errors(X_pred, physics, X_test):
 
     return rel_error.max(), residual
 
-def plot_prediction(param, autoencoder, physics, sindy, gp_dictionnary, n_samples, true, scale=1):
+
+
+def plot_prediction(param, autoencoder, physics, sindy, gp_list, n_samples, true, scale=1):
 
     from .gplasdi import sample_roms
     import matplotlib.pyplot as plt
 
-    Z = sample_roms(autoencoder, physics, sindy, gp_dictionnary, param, n_samples)
+    Z = sample_roms(autoencoder, physics, sindy, gp_list, param, n_samples)
     Z = Z[0]
 
     n_z = autoencoder.n_z
@@ -74,6 +78,8 @@ def plot_prediction(param, autoencoder, physics, sindy, gp_dictionnary, n_sample
     plt.title('Residual')
 
     plt.tight_layout()
+
+
 
 def plot_gp2d(p1_mesh, p2_mesh, gp_mean, gp_std, param_train, param_labels=['p1', 'p2'], plot_shape=[6, 5], figsize=(15, 13), refine=10, cm=plt.cm.jet, margin=0.05):
     assert(p1_mesh.ndim == 2)
@@ -149,6 +155,8 @@ def plot_gp2d(p1_mesh, p2_mesh, gp_mean, gp_std, param_train, param_labels=['p1'
                 axs2[i, j].get_xaxis().set_visible(True)
 
     return
+
+
 
 def heatmap2d(values, p1_grid, p2_grid, param_train, n_init, figsize=(10, 10), param_labels=['p1', 'p2'], title=''):
     assert(p1_grid.ndim == 1)

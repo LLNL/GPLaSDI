@@ -118,10 +118,10 @@ class ParameterSpace:
     # Initialize class variables
     param_list      : list[dict]        = []    # A list housing the parameter dictionaries (from the yml file)
     param_name      : list[str]         = []    # A list housing the parameter names.
-    train_space     : np.ndarray        = None  # A 2D array whose i,j element is the j'th parameter value in the i'th combination of training parameters.
-    test_space      : np.ndarray        = None  # A 2D array whose i,j element is the j'th parameter value in the i'th combination of testing parameters.
-    n_test          : int               = 0     # The number of parameter instances (combinations we train on) in the testing set
-    n_train         : int               = 0     # The number of parameter instances in the training set
+    train_space     : np.ndarray        = None  # A 2D array of shape (n_train, n_param) whose i,j element is the j'th parameter value in the i'th combination of training parameters.
+    test_space      : np.ndarray        = None  # A 2D array of shape (n_test, n_param) whose i,j element is the j'th parameter value in the i'th combination of testing parameters.
+    n_test          : int               = 0     # The number of combinations of parameters in the testing set
+    n_train         : int               = 0     # The number of combinations of parameters in the training set
     n_init          : int               = 0     # An alias for n_train???
     test_grid_sizes : list[int]         = []    # A list whose i'th element is the number of different values of the i'th parameter in the test instances.
     test_meshgrid   : tuple[np.ndarray] = None
@@ -206,7 +206,7 @@ class ParameterSpace:
         Returns
         -------------------------------------------------------------------------------------------
 
-        A 2d array of shape (2)^k x k, where k is the number of parameters (k == len(param_list)).
+        A 2d array of shape ((2)^k, k), where k is the number of parameters (k == len(param_list)).
         The i'th column is the flattened i'th mesh_grid array we when we create a mesh grid using 
         the min and max value of each parameter as the argument. See "createHyperMeshGrid" for 
         details. 
@@ -259,11 +259,11 @@ class ParameterSpace:
         parameter we consider (this is the length of the i'th element of "paramRanges" below).
 
         The second is a a tuple of k numpy ndarrays (where k = len(param_list)), the i'th one of 
-        which is a k-dimensional array with shape [N0, ... , N{k - 1}], where Ni = 
+        which is a k-dimensional array with shape (N0, ... , N{k - 1}), where Ni = 
         param_list[i].size whose i(0), ... , i(k - 1) element specifies the value of the i'th 
         parameter in the i(0), ... , i(k - 1)'th unique combination of parameter values.
 
-        The third one is a 2d array of parameter values. It has shape M x k, where 
+        The third one is a 2d array of parameter values. It has shape (M, k), where 
         M = \prod_{i = 0}^{k - 1} param_list[i].size. 
         """
 
@@ -333,7 +333,7 @@ class ParameterSpace:
         value of the j'th parameter.
 
         Thus, if there are k parameters, the returned tuple has k elements, each one of 
-        which is an array of shape N0, ... , N{k - 1}.
+        which is an array of shape (N0, ... , N{k - 1}).
         '''
 
         # Fetch the ranges, add them to a tuple (this is what the meshgrid function needs).
@@ -352,7 +352,7 @@ class ParameterSpace:
     def createHyperGridSpace(self, mesh_grids : tuple[np.ndarray]) -> np.ndarray:
         '''
         Flattens the mesh_grid numpy.ndarray objects returned by createHyperMeshGrid and combines 
-        them into a single 2d array of shape (grid size) x (number of parameters) (see below).
+        them into a single 2d array of shape (grid size, number of parameters) (see below).
 
 
         -------------------------------------------------------------------------------------------
@@ -368,9 +368,9 @@ class ParameterSpace:
         Returns
         -------------------------------------------------------------------------------------------
         
-        The param_grid. This is a 2d numpy.ndarray object of shape (grid size) x (number of 
-        parameters). If each element of mesh_grids is a numpy.ndarray object of shape N(1), ... , 
-        N(k) (k parameters), then (grid size) = N(1)*N(2)*...*N(k) and (number of parameters) = k.
+        The param_grid. This is a 2d numpy.ndarray object of shape (grid size, number of 
+        parameters). If each element of mesh_grids is a numpy.ndarray object of shape (N(1), ... , 
+        N(k)) (k parameters), then (grid size) = N(1)*N(2)*...*N(k) and (number of parameters) = k.
         '''
 
         # For each parameter, we flatten its mesh_grid into a 1d array (of length (grid size)). We
@@ -399,12 +399,49 @@ class ParameterSpace:
     
 
 
-    def export(self):
+    def export(self) -> dict:
+        """
+        This function packages the testing/training examples into a dictionary, which it returns.
+
+        
+        -------------------------------------------------------------------------------------------
+        Arguments
+        -------------------------------------------------------------------------------------------
+
+        None!
+
+        -------------------------------------------------------------------------------------------
+        Returns
+        -------------------------------------------------------------------------------------------
+
+        A dictionary with 4 keys. Below is a list of the keys with a short description of each 
+        corresponding value. 
+            final_param_train: self.train_space, a 2d array of shape (n_train, n_param) whose i,j 
+            element holds the value of the j'th parameter in the i'th training case.
+
+            test_grid_sizes: self.test_space, a 2d array of shape (n_test, n_param) whose i,j 
+            element holds the value of the j'th parameter in the i'th testing case.
+
+            test_grid_sizes: A list whose i'th element specifies how many distinct parameter values
+            we use for the i'th parameter. 
+
+            test_meshgrid: a tuple of n_param numpy.ndarray array objects whose i'th element is a
+            n_param-dimensional array whose i(1), i(2), ... , i(n_param) element holds the value of 
+            the i'th parameter in the i(1), ... , i(n_param) combination of parameter values in the 
+            testing test. 
+
+            n_init: An alias for self.n_train/the number of combinations of training parameters in
+            the training set.     
+        """
+
+        # Build the dictionary
         dict_ = {'final_param_train': self.train_space,
                  'param_grid'       : self.test_space,
                  'test_grid_sizes'  : self.test_grid_sizes,
                  'test_meshgrid'    : self.test_meshgrid,
                  'n_init'           : self.n_init}
+        
+        # All done!
         return dict_
     
 

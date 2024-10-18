@@ -1,6 +1,8 @@
 import numpy as np
 import torch
 
+
+
 class Physics:
     # Physical space dimension
     dim = -1
@@ -34,22 +36,32 @@ class Physics:
     # ParameterSpace object to parse parameters.
     param_space = None
 
+
+
     def __init__(self, param_space, cfg):
         self.param_space = param_space
         return
     
+
+
     def initial_condition(self, param):
         raise RuntimeError("Abstract method Physics.initial_condition!")
         return np.array
     
+
+
     def solve(self, param):
         raise RuntimeError("Abstract method Physics.solve!")
         return torch.Tensor
     
+
+
     def export(self):
         raise RuntimeError("Abstract method Physics.export!")
         return dict
     
+
+
     def generate_solutions(self, params):
         '''
         Given 2d-array of params,
@@ -71,6 +83,8 @@ class Physics:
             print("%d/%d complete" % (k+1, n_param))
         
         return X_train
+
+
 
     def residual(self, Xhist):
         raise RuntimeError("Abstract method Physics.residual!")
