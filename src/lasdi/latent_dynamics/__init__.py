@@ -57,3 +57,10 @@ class LatentDynamics:
         param_dict = {'dim': self.dim, 'ncoefs': self.ncoefs}
         return param_dict
     
+    # SINDy does not need to load parameters.
+    # Other latent dynamics might need to.
+    def load(self, dict_):
+        assert(self.dim == dict_['dim'])
+        assert(self.ncoefs == dict_['ncoefs'])
+        return
+    

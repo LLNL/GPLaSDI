@@ -39,7 +39,8 @@ This python package requires updated prerequistes:
 "scipy>=1.13.1",
 "pyyaml>=6.0",
 "matplotlib>=3.8.4",
-"argparse>=1.4.0"
+"argparse>=1.4.0",
+"h5py"
 ```
 
 ### For LLNL LC Lassen users

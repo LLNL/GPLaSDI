@@ -4,16 +4,16 @@ lasdi:
     # device: mps
     n_samples: 20
     lr: 0.001
-    max_iter: 28000
-    n_iter: 2000
-    max_greedy_iter: 28000
+    max_iter: 2000
+    n_iter: 200
+    max_greedy_iter: 2000
     ld_weight: 0.1
     coef_weight: 1.e-6
     path_checkpoint: checkpoint
     path_results: results
 
 workflow:
-  use_restart: false
+  use_restart: true
   restart_file: restarts/burgers1d.restart.npy
   offline_greedy_sampling:
     train_param_file: sampling/new_train.burgers1d.h5
@@ -27,17 +27,14 @@ parameter_space:
       min: 0.7
       max: 0.9
       test_space_type: uniform
-      sample_size: 21
+      sample_size: 11
       log_scale: false
     - name: w
       min: 0.9
       max: 1.1
-      # another way of specifying test space.
-      test_space_type: list
-      list: [0.9, 0.91, 0.92, 0.93, 0.94,
-             0.95, 0.96, 0.97, 0.98, 0.99,
-             1.0, 1.01, 1.02, 1.03, 1.04,
-             1.05, 1.06, 1.07, 1.08, 1.09, 1.1]
+      test_space_type: uniform
+      sample_size: 11
+      log_scale: false
   test_space:
     type: grid
 
@@ -56,7 +53,7 @@ latent_dynamics:
 physics:
   type: burgers1d
   burgers1d:
-    offline_driver: false
+    offline_driver: true
     number_of_timesteps: 1001
     simulation_time: 1.
     grid_size: [1001]

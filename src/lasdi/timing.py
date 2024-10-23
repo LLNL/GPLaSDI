@@ -40,8 +40,22 @@ class Timer:
         return
     
     def export(self):
+        for start in self.starts:
+            if (start is not None):
+                raise RuntimeError('Timer.export: cannot export while Timer is still ticking!')
+
         param_dict = {}
         param_dict["names"] = self.names
         param_dict["calls"] = self.calls
         param_dict["times"] = self.times
         return param_dict
+    
+    def load(self, dict_):
+        self.names = dict_['names']
+        self.calls = dict_['calls']
+        self.times = dict_['times']
+
+        assert(len(self.names) == len(self.calls))
+        assert(len(self.names) == len(self.times))
+        self.starts = [None] * len(self.names)
+        return

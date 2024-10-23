@@ -21,7 +21,8 @@ dependencies = [
   "scipy>=1.10",
   "pyyaml>=6.0",
   "matplotlib>=3.8.0",
-  "argparse>=1.1"
+  "argparse>=1.1",
+  "h5py"
 ]
 
 [project.urls]
@@ -34,3 +35,4 @@ build-backend = "setuptools.build_meta"
 
 [project.scripts]
 lasdi = "lasdi.workflow:main [config_file]"
+burgers1d = "lasdi.physics.burgers1d:main [config_file]"
