@@ -387,7 +387,7 @@ class Autoencoder(torch.nn.Module):
                             value               = value);
 
         self.decoder = MultiLayerPerceptron(
-                            latent_sizes        = layer_sizes[::-1],    # Reverses the order of the the list.
+                            layer_sizes         = layer_sizes[::-1],    # Reverses the order of the the list.
                             act_type            = act_type,
                             reshape_index       = -1,               
                             reshape_shape       = self.qgrid_size,      # We need to reshape the network output to a fom frame.
