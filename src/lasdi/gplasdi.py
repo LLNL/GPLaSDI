@@ -138,7 +138,7 @@ class BayesianGLaSDI:
         else:
             self.device = 'cpu'
 
-        self.best_loss = np.Inf
+        self.best_loss = np.inf
         self.best_coefs = None
         self.restart_iter = 0
 
