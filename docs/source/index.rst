@@ -18,6 +18,7 @@ It also supports parametric interpolation of latent dynamics according to uncert
 References
 ===================
 
+* Bonneville, Christophe, Xiaolong He, April Tran, Jun Sur Park, William Fries, Daniel A. Messenger, Siu Wun Cheung et al. "A Comprehensive Review of Latent Space Dynamics Identification Algorithms for Intrusive and Non-Intrusive Reduced-Order-Modeling." arXiv preprint arXiv:2403.10748 (2024).
 * Fries, William D., Xiaolong He, and Youngsoo Choi. "LaSDI: Parametric latent space dynamics identification." Computer Methods in Applied Mechanics and Engineering 399 (2022): 115436.
 * He, Xiaolong, Youngsoo Choi, William D. Fries, Jonathan L. Belof, and Jiun-Shyan Chen. "gLaSDI: Parametric physics-informed greedy latent space dynamics identification." Journal of Computational Physics 489 (2023): 112267.
 * Tran, April, Xiaolong He, Daniel A. Messenger, Youngsoo Choi, and David M. Bortz. "Weak-form latent space dynamics identification." Computer Methods in Applied Mechanics and Engineering 427 (2024): 116998.
