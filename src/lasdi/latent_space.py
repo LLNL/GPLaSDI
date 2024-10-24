@@ -53,7 +53,8 @@ def initial_condition_latent(param_grid     : np.ndarray,
     -----------------------------------------------------------------------------------------------
 
     param_grid: A 2d numpy.ndarray object of shape (number of parameter combination) x (number of 
-    parameters).
+    parameters). The i,j element of this array holds the value of the j'th parameter in the i'th 
+    combination of parameters.
 
     physics: A "Physics" object that stores the datasets for each parameter combination. 
 
