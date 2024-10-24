@@ -487,7 +487,7 @@ class ParameterSpace:
     def load(self, dict_ : dict) -> None:
         """
         This function builds a parameter space object from a dictionary. This dictionary should 
-        be one that was returned by th export method, or a loaded copy of a dictionary that was 
+        be one that was returned by the export method, or a loaded copy of a dictionary that was 
         returned by the export method. 
 
 
