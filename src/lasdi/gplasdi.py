@@ -6,6 +6,7 @@ import  time
 
 import  torch
 import  numpy                       as      np
+from    torch.optim                 import  Optimizer
 from    sklearn.gaussian_process    import  GaussianProcessRegressor
 
 from    .gp                         import  eval_gp, sample_coefs, fit_gps
@@ -278,7 +279,28 @@ def get_fom_max_std(autoencoder : Autoencoder, Zis : np.ndarray) -> int:
 # -------------------------------------------------------------------------------------------------
 
 # move optimizer parameters to device
-def optimizer_to(optim, device):
+def optimizer_to(optim : Optimizer, device : str) -> None:
+    """
+    This function moves an optimizer object to a specific device. 
+
+
+    -----------------------------------------------------------------------------------------------
+    Arguments
+    -----------------------------------------------------------------------------------------------
+
+    optim: The optimizer whose device we want to change.
+
+    device: The device we want to move optim onto. 
+
+
+    -----------------------------------------------------------------------------------------------
+    Returns
+    -----------------------------------------------------------------------------------------------
+
+    Nothing.
+    """
+
+    # Cycle through the optimizer's parameters.
     for param in optim.state.values():
         # Not sure there are any global tensors in the state dict
         if isinstance(param, torch.Tensor):
@@ -291,6 +313,8 @@ def optimizer_to(optim, device):
                     subparam.data = subparam.data.to(device)
                     if subparam._grad is not None:
                         subparam._grad.data = subparam._grad.data.to(device)
+
+
 
 class BayesianGLaSDI:
     X_train = torch.Tensor([])
@@ -350,6 +374,8 @@ class BayesianGLaSDI:
         self.X_test = torch.Tensor([])
 
         return
+
+
 
     def train(self):
         assert(self.X_train.size(0) > 0)
@@ -431,7 +457,9 @@ class BayesianGLaSDI:
         self.timer.print()
 
         return
-    
+
+
+
     def get_new_sample_point(self):
         self.timer.start("new_sample")
         assert(self.X_test.size(0) > 0)
@@ -466,7 +494,9 @@ class BayesianGLaSDI:
 
         self.timer.end("new_sample")
         return new_sample
-        
+
+
+
     def export(self):
         dict_ = {'X_train': self.X_train, 'X_test': self.X_test, 'lr': self.lr, 'n_iter': self.n_iter,
                  'n_samples' : self.n_samples, 'best_coefs': self.best_coefs, 'max_iter': self.max_iter,
@@ -474,7 +504,9 @@ class BayesianGLaSDI:
                  'restart_iter': self.restart_iter, 'timer': self.timer.export(), 'optimizer': self.optimizer.state_dict()
                  }
         return dict_
-    
+
+
+
     def load(self, dict_):
         self.X_train = dict_['X_train']
         self.X_test = dict_['X_test']
