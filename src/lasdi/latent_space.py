@@ -56,7 +56,8 @@ def initial_condition_latent(param_grid     : np.ndarray,
     parameters). The i,j element of this array holds the value of the j'th parameter in the i'th 
     combination of parameters.
 
-    physics: A "Physics" object that stores the datasets for each parameter combination. 
+    physics: A "Physics" object that, among other things, stores the IC for each combination of 
+    parameters. 
 
     autoencoder: The actual autoencoder object that we use to map the ICs into the latent space.
 
@@ -274,21 +275,8 @@ class MultiLayerPerceptron(torch.nn.Module):
 
     def init_weight(self) -> None:
         """
-        This function initializes the weight matrices and bias vectors in self's layers.
-
-
-        -------------------------------------------------------------------------------------------
-        Arguments
-        -------------------------------------------------------------------------------------------
-
-        None!
-
-        
-        -------------------------------------------------------------------------------------------
-        Returns
-        -------------------------------------------------------------------------------------------
-
-        Nothing!
+        This function initializes the weight matrices and bias vectors in self's layers. It takes 
+        no arguments and returns nothing!
         """
 
         # TODO(kevin): support other initializations?
@@ -432,21 +420,14 @@ class Autoencoder(torch.nn.Module):
 
     def export(self) -> dict:
         """
-        This function extracts self's parameters and returns them in a dictionary.
-
-
-        -------------------------------------------------------------------------------------------
-        Arguments
-        -------------------------------------------------------------------------------------------
-
-        None!
-
-        
         -------------------------------------------------------------------------------------------
         Returns
         -------------------------------------------------------------------------------------------
 
-        The A dictionary housing self's state dictionary.
+        This function extracts self's parameters and returns them in a dictionary. You can pass 
+        the dictionary returned by this function to the load method of another Autoencoder object 
+        (that you initialized to have the same architecture as self) to make the other autoencoder
+        identical to self.
         """
 
         # TO DO: deep export which includes all information needed to re-initialize self from 
