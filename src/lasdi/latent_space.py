@@ -81,12 +81,12 @@ def initial_condition_latent(param_grid     : np.ndarray,
 
         # Fetch the IC for the i'th set of parameters. Then map it to a tensor.
         u0 : np.ndarray = physics.initial_condition(param_grid[i])
-        u0 = u0.reshape(sol_shape)
+        u0              = u0.reshape(sol_shape)
         u0 = torch.Tensor(u0)
 
         # Encode the IC, then map the encoding to a numpy array.
-        z0 = autoencoder.encoder(u0)
-        z0 = z0[0, 0, :].detach().numpy()
+        z0 : np.ndarray = autoencoder.encoder(u0)
+        z0              = z0[0, 0, :].detach().numpy()
 
         # Append the new IC to the list of latent ICs
         Z0.append(z0)

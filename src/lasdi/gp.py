@@ -20,7 +20,6 @@ def fit_gps(X : np.ndarray, Y : np.ndarray) -> list[GaussianProcessRegressor]:
     We assume each target coefficient is independent with each other.
 
 
-
     -----------------------------------------------------------------------------------------------
     Arguments
     -----------------------------------------------------------------------------------------------
@@ -33,7 +32,6 @@ def fit_gps(X : np.ndarray, Y : np.ndarray) -> list[GaussianProcessRegressor]:
     examples and n_coef is the number of coefficients in the latent dynamics. 
 
     
-
     -----------------------------------------------------------------------------------------------
     Returns
     -----------------------------------------------------------------------------------------------
@@ -78,12 +76,11 @@ def fit_gps(X : np.ndarray, Y : np.ndarray) -> list[GaussianProcessRegressor]:
 
 
 
-def eval_gp(gp_list : list[GaussianProcessRegressor], param_grid : np.ndarray) -> tuple:
+def eval_gp(gp_list : list[GaussianProcessRegressor], param_grid : np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """
     Computes the GPs predictive mean and standard deviation for points of the parameter space grid
 
 
-    
     -----------------------------------------------------------------------------------------------
     Arguments
     -----------------------------------------------------------------------------------------------
@@ -97,7 +94,6 @@ def eval_gp(gp_list : list[GaussianProcessRegressor], param_grid : np.ndarray) -
     i'th combination of parameters. We use this as the testing set for the GP evaluation.
 
 
-    
     -----------------------------------------------------------------------------------------------
     Returns
     -----------------------------------------------------------------------------------------------  
@@ -143,7 +139,6 @@ def sample_coefs(   gp_list     : list[GaussianProcessRegressor],
     coefficient, we draw n_samples samples of the predictive distribution for the k'th coefficient
     when param is the parameter. 
     
-    
 
     -----------------------------------------------------------------------------------------------
     Arguments
@@ -158,7 +153,6 @@ def sample_coefs(   gp_list     : list[GaussianProcessRegressor],
 
     n_samples: Number of samples of the predicted latent dynamics used to build ensemble of fom 
     predictions. N_s in the paper. 
-
     
 
     -----------------------------------------------------------------------------------------------
