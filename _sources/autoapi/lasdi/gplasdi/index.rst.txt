@@ -103,9 +103,6 @@ Module Contents
    .. py:attribute:: path_results
 
 
-   .. py:attribute:: device
-
-
    .. py:attribute:: best_loss
 
 

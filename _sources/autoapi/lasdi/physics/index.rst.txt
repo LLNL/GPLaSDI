@@ -102,9 +102,6 @@ Package Contents
 
 
 
-   .. py:attribute:: parser
-
-
    .. py:attribute:: dim
 
 

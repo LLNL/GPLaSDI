@@ -90,25 +90,7 @@ Module Contents
    .. py:attribute:: space_dim
 
 
-   .. py:attribute:: hidden_units
-
-
    .. py:attribute:: n_z
-
-
-   .. py:attribute:: layer_sizes
-
-
-   .. py:attribute:: act_type
-
-
-   .. py:attribute:: threshold
-
-
-   .. py:attribute:: value
-
-
-   .. py:attribute:: num_heads
 
 
    .. py:attribute:: encoder

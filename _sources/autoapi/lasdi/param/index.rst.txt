@@ -80,12 +80,6 @@ Module Contents
 
 
 
-   .. py:attribute:: parser
-
-
-   .. py:attribute:: test_space_type
-
-
    .. py:method:: n_train()
 
 

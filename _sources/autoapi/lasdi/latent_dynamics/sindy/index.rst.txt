@@ -38,15 +38,6 @@ Module Contents
    .. py:attribute:: ncoefs
 
 
-   .. py:attribute:: parser
-
-      fd_type is the string that specifies finite-difference scheme for time derivative:
-      - 'sbp12': summation-by-parts 1st/2nd (boundary/interior) order operator
-      - 'sbp24': summation-by-parts 2nd/4th order operator
-      - 'sbp36': summation-by-parts 3rd/6th order operator
-      - 'sbp48': summation-by-parts 4th/8th order operator
-
-
    .. py:attribute:: coef_norm_order
 
 

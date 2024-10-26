@@ -4,16 +4,6 @@ lasdi
 .. py:module:: lasdi
 
 
-Subpackages
------------
-
-.. toctree::
-   :maxdepth: 1
-
-   /autoapi/lasdi/latent_dynamics/index
-   /autoapi/lasdi/physics/index
-
-
 Submodules
 ----------
 
@@ -25,8 +15,10 @@ Submodules
    /autoapi/lasdi/gp/index
    /autoapi/lasdi/gplasdi/index
    /autoapi/lasdi/inputs/index
+   /autoapi/lasdi/latent_dynamics/index
    /autoapi/lasdi/latent_space/index
    /autoapi/lasdi/param/index
+   /autoapi/lasdi/physics/index
    /autoapi/lasdi/postprocess/index
    /autoapi/lasdi/timing/index
    /autoapi/lasdi/workflow/index

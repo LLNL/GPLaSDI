@@ -164,15 +164,6 @@ Module Contents
    .. py:attribute:: leftBdrNorm
 
 
-   .. py:attribute:: x1
-
-
-   .. py:attribute:: x2
-
-
-   .. py:attribute:: x3
-
-
    .. py:attribute:: leftBdrStencils
 
 
