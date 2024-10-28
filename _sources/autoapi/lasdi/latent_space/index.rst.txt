@@ -34,63 +34,103 @@ Module Contents
 
 .. py:data:: act_dict
 
-.. py:function:: initial_condition_latent(param_grid, physics, autoencoder)
+.. py:function:: initial_condition_latent(param_grid: numpy.ndarray, physics: lasdi.physics.Physics, autoencoder: torch.nn.Module) -> list[numpy.ndarray]
 
-   Outputs the initial condition in the latent space: Z0 = encoder(U0)
+   This function maps a set of initial conditions for the fom to initial conditions for the
+   latent space dynamics. Specifically, we take in a set of possible parameter values. For each
+   set of parameter values, we recover the fom IC (from physics), then map this fom IC to a
+   latent space IC (by encoding it using the autoencoder). We do this for each parameter
+   combination and then return a list housing the latent space ICs.
 
 
+   -----------------------------------------------------------------------------------------------
+   :Parameters: * **param_grid** (*A 2d numpy.ndarray object of shape (number of parameter combination) x (number of*)
+                * **parameters).**
+                * **physics** (*A "Physics" object that stores the datasets for each parameter combination.*)
+                * **autoencoder** (*The actual autoencoder object that we use to map the ICs into the latent space.*)
 
-.. py:class:: MultiLayerPerceptron(layer_sizes, act_type='sigmoid', reshape_index=None, reshape_shape=None, threshold=0.1, value=0.0, num_heads=1)
+   -----------------------------------------------------------------------------------------------
+   :returns: * *A list of numpy ndarray objects whose i'th element holds the latent space initial condition*
+             * *for the i'th set of parameters in the param_grid. That is, if we let U0_i denote the fom IC for*
+             * *the i'th set of parameters, then the i'th element of the returned list is Z0_i = encoder(U0_i).*
+
+
+.. py:class:: MultiLayerPerceptron(layer_sizes: list[int], act_type: str = 'sigmoid', reshape_index: int = None, reshape_shape: tuple[int] = None, threshold: float = 0.1, value: float = 0.0)
 
    Bases: :py:obj:`torch.nn.Module`
 
 
    .. py:attribute:: n_layers
+      :type:  int
 
 
    .. py:attribute:: layer_sizes
+      :type:  list[int]
 
 
-   .. py:attribute:: fcs
+   .. py:attribute:: layers
+      :type:  list[torch.nn.Module]
       :value: []
 
 
 
    .. py:attribute:: reshape_index
+      :type:  int
 
 
    .. py:attribute:: reshape_shape
+      :type:  list[int]
 
 
    .. py:attribute:: act_type
+      :type:  str
 
 
-   .. py:attribute:: use_multihead
-      :value: False
+   .. py:method:: forward(x: torch.Tensor) -> torch.Tensor
+
+      This function defines the forward pass through self.
+
+
+      -------------------------------------------------------------------------------------------
+      :Parameters: * **x** (*A tensor holding a batch of inputs. We pass this tensor through the network's layers*)
+                   * **and then return the result. If self.reshape_index == 0 and self.reshape_shape has k**
+                   * **elements, then the final k elements of x's shape must match self.reshape_shape.**
+
+      -------------------------------------------------------------------------------------------
+      :returns: * *The image of x under the network's layers. If self.reshape_index == -1 and*
+                * *self.reshape_shape has k elements, then we reshape the output so that the final k elements*
+                * *of its shape match those of self.reshape_shape.*
 
 
 
-   .. py:method:: forward(x)
+   .. py:method:: init_weight() -> None
+
+      This function initializes the weight matrices and bias vectors in self's layers.
 
 
-   .. py:method:: apply_attention(x, act_idx)
+      -------------------------------------------------------------------------------------------
+      :Parameters: **None!**
+
+      -------------------------------------------------------------------------------------------
+      :rtype: Nothing!
 
 
-   .. py:method:: init_weight()
 
-
-.. py:class:: Autoencoder(physics, config)
+.. py:class:: Autoencoder(physics: lasdi.physics.Physics, config: dict)
 
    Bases: :py:obj:`torch.nn.Module`
 
 
    .. py:attribute:: qgrid_size
+      :type:  list[int]
 
 
    .. py:attribute:: space_dim
+      :type:  numpy.ndarray
 
 
    .. py:attribute:: n_z
+      :type:  int
 
 
    .. py:attribute:: encoder
@@ -99,12 +139,45 @@ Module Contents
    .. py:attribute:: decoder
 
 
-   .. py:method:: forward(x)
+   .. py:method:: forward(x: torch.Tensor) -> torch.Tensor
+
+      This function defines the forward pass through self.
 
 
-   .. py:method:: export()
+      -------------------------------------------------------------------------------------------
+      :Parameters: * **x** (*A tensor holding a batch of inputs. We pass this tensor through the encoder + decoder*)
+                   * **and then return the result.**
+
+      -------------------------------------------------------------------------------------------
+      :rtype: The image of x under the encoder + decoder.
 
 
-   .. py:method:: load(dict_)
+
+   .. py:method:: export() -> dict
+
+      This function extracts self's parameters and returns them in a dictionary.
+
+
+      -------------------------------------------------------------------------------------------
+      :Parameters: **None!**
+
+      -------------------------------------------------------------------------------------------
+      :rtype: The A dictionary housing self's state dictionary.
+
+
+
+   .. py:method:: load(dict_: dict) -> None
+
+      This function loads self's state dictionary.
+
+
+      -------------------------------------------------------------------------------------------
+      :Parameters: * **dict_** (*This should be a dictionary with the key "autoencoder_param" whose corresponding*)
+                   * **value is the state dictionary of an autoencoder which has the same architecture (i.e.,**
+                   * **layer sizes) as self.**
+
+      -------------------------------------------------------------------------------------------
+      :rtype: Nothing!
+
 
 
