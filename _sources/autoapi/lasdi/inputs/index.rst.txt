@@ -20,71 +20,46 @@ Classes
    lasdi.inputs.InputParser
 
 
+Functions
+---------
+
+.. autoapisummary::
+
+   lasdi.inputs.getDictFromList
+
+
 Module Contents
 ---------------
 
 .. py:data:: verbose
-   :type:  bool
    :value: False
 
 
-.. py:class:: InputParser(dict: InputParser.__init__.dict, name: str = '')
-
-   A InputParser objects acts as a wrapper around a dictionary of settings. Thus, each setting is
-   a key and the corresponding value is the setting's value. Because one setting may itself be
-   a dictionary (we often group settings; each group has a name but several constituent settings),
-   the underlying dictionary is structured as a sequence of nested dictionaries. This class allows
-   the user to select a specific setting from that structure by specifying (via a list of strings)
-   where in that nested structure the desired setting lives.
-
+.. py:class:: InputParser(dict, name='')
 
    .. py:attribute:: dict_
-      :type:  dict
       :value: None
 
 
 
    .. py:attribute:: name
-      :type:  str
       :value: ''
 
 
 
-   .. py:method:: getInput(keys: list, fallback=None, datatype=None)
+   .. py:method:: getInput(keys, fallback=None, datatype=None)
 
-      A InputParser object acts as a wrapper around a dictionary of settings. That is, self.dict_
-      is structured as a nested family of dictionaries. Each setting corresponds to a key in
-      self.dict_. The setting's value is the corresponding value in self.dict_. In many cases,
-      a particular setting may be nested within others. That is, a setting's value may itself be
-      another dictionary housing various sub-settings. This function allows us to fetch a
-      specific setting from this nested structure.
-
-      Specifically, we specify a list of strings. keys[0] should be a key in self.dict_
-      If so, we set val = self.dict_[keys[0]]. If there are more keys, then val should be a
-      dictionary and keys[1] should be a key in this dictionary. In this case, we replace val
-      with val[key[1]] and so on. This continues until we have exhausted all keys. There is one
-      important exception:
-
-          If at some point in the process, there are more keys but val is not a dictionary, or if
-          there are more keys and val is a dictionary but the next key is not a key in that
-          dictionary, then we return the fallback value. If the fallback value does not exist,
-          returns an error.
+      Find the value corresponding to the list of keys.
+      If the specified keys do not exist, use the fallback value.
+      If the fallback value does not exist, returns an error.
+      If the datatype is specified, enforce the output value has the right datatype.
 
 
 
-      -------------------------------------------------------------------------------------------
-      :Parameters: * **keys** (*A list of keys we want to fetch from self.dict. keys[0] should be a key in self.dict_*)
-                   * **If so, we set val = self.dict_[keys[0]]. If there are more keys, then val should be a**
-                   * **dictionary and keys[1] should be a key in this dictionary. In this case, we replace val**
-                   * **with val[key[1]] and so on. This continues until we have exhausted all keys.**
-                   * **fallback** (*A sort of default value. If at some point, val is not a dictionary (and there are*)
-                   * **more keys) or val is a dictionary but the next key is not a valid key in that dictionary,**
-                   * **then we return the fallback value.**
-                   * **datatype** (*If not None, then we require that the final val has this datatype. If the final*)
-                   * **val does not have the desired datatype, we raise an exception.**
+.. py:function:: getDictFromList(list_, inputDict)
 
-      -------------------------------------------------------------------------------------------
-      :rtype: The final val value as outlined by the process described above.
-
+   get a dict with {key: val} from a list of dicts
+   NOTE: it returns only the first item in the list,
+   even if the list has more than one dict with {key: val}.
 
 
