@@ -107,7 +107,30 @@ Module Contents
 
    .. py:method:: export()
 
+      Export the list of jobs and their number of calls and total time
+      into a dictionary.
+
+      Note:
+          All jobs must be ended before calling this method.
+
+      Returns:
+          :obj:`dict` that contains "names", "calls", and "times" as keys
+
+
 
    .. py:method:: load(dict_)
+
+      Load the list of jobs and their number of calls and total time
+      from a dictionary.
+
+      Args:
+          `dict_` (:obj:`dict`): Dictionary that contains the list of jobs and their calls and times.
+
+      Note:
+          :obj:`dict_['names']`, :obj:`dict_['calls']` and :obj:`dict_['times']` must have the same size.
+
+      Returns:
+          Does not return a value
+
 
 

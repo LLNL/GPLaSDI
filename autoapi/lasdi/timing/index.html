@@ -200,12 +200,30 @@ Increase the number of calls and the runtime for the job.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.timing.Timer.export">
 <span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.timing.Timer.export" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Export the list of jobs and their number of calls and total time
+into a dictionary.</p>
+<dl class="simple">
+<dt>Note:</dt><dd><p>All jobs must be ended before calling this method.</p>
+</dd>
+<dt>Returns:</dt><dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code> that contains “names”, “calls”, and “times” as keys</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.timing.Timer.load">
 <span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.timing.Timer.load" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Load the list of jobs and their number of calls and total time
+from a dictionary.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p><cite>dict_</cite> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>): Dictionary that contains the list of jobs and their calls and times.</p>
+</dd>
+<dt>Note:</dt><dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict_['names']</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">dict_['calls']</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">dict_['times']</span></code> must have the same size.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Does not return a value</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
