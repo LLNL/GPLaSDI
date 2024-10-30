@@ -25,25 +25,29 @@ class InputParser:
 
 
 
-    def __init__(self, dict : dict, name : str = "") -> None:
+    def __init__(self, dict_ : dict, name : str = "") -> None:
         """"
         Initializes an InputParser object by setting the underlying dictionary of settings as an 
         attribute.
 
-        -------------------------------------------------------------------------------------------
+        
+        -------------------gi------------------------------------------------------------------------
         Arguments
         -------------------------------------------------------------------------------------------
         
-        dict: The dictionary of settings. To avoid the risk of the user accidentally changing one 
+        dict_: The dictionary of settings. To avoid the risk of the user accidentally changing one 
         of the settings after wrapping it, we store a deep copy of dict in self.
+
+        name: A string that we use toe name the InputParser object. We use this name when 
+        reporting errors (it is purely for debugging purposes).
         """
 
         # A shallow copy could cause issues if the user changes dict's keys/values after 
         # initializing this object. We store a deep copy to avoid this risk.
         from copy import deepcopy
-        self.dict_ = deepcopy(dict)
+        self.dict_  : dict  = deepcopy(dict_)
 
-        self.name = name
+        self.name   : str   = name
 
 
 
