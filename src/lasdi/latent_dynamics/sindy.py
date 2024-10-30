@@ -1,34 +1,116 @@
-import numpy as np
-import torch
-from scipy.integrate import odeint
-from . import LatentDynamics
-from ..inputs import InputParser
-from ..fd import FDdict
+# -------------------------------------------------------------------------------------------------
+# Imports and Setup
+# -------------------------------------------------------------------------------------------------
+
+import  numpy               as      np
+import  torch
+from    scipy.integrate     import  odeint
+
+from    .                   import  LatentDynamics
+from    ..inputs            import  InputParser
+from    ..fd                import  FDdict
+
+
+
+# -------------------------------------------------------------------------------------------------
+# SINDy class
+# -------------------------------------------------------------------------------------------------
 
 class SINDy(LatentDynamics):
-    fd_type = ''
-    fd = None
-    fd_oper = None
+    fd_type     = ''
+    fd          = None
+    fd_oper     = None
 
-    def __init__(self, dim, nt, config):
-        super().__init__(dim, nt)
 
-        #TODO(kevin): generalize for high-order dynamics
-        self.ncoefs = self.dim * (self.dim + 1)
 
-        assert('sindy' in config)
-        parser = InputParser(config['sindy'], name='sindy_input')
+    def __init__(self, 
+                 dim        : int, 
+                 nt         : int, 
+                 config     : dict) -> None:
+        """
+        Initializes a SINDy object. This is a subclass of the LatentDynamics class which uses the 
+        SINDy algorithm as its model for the ODE governing the latent state. Specifically, we 
+        assume there is a library of functions, f_1(z), ... , f_N(z), each one of which is a 
+        monomial of the components of the latent space, z, and a set of coefficients c_{i,j}, 
+        i = 1, 2, ... , dim and j = 1, 2, ... , N such that
+            z_i'(t) = \sum_{j = 1}^{N} c_{i,j} f_j(z)
+        In this case, we assume that f_1, ... , f_N consists of the set of order <= 1 monomials. 
+        That is, f_1(z), ... , f_N(z) = 1, z_1, ... , z_{dim}.
+            
 
-        '''
-            fd_type is the string that specifies finite-difference scheme for time derivative:
+        -------------------------------------------------------------------------------------------
+        Arguments
+        -------------------------------------------------------------------------------------------
+
+        dim: The number of dimensions in the latent space, where the latent dynamics takes place.
+
+        nt: The number of time steps we want to generate when solving (numerically) the latent 
+        space dynamics.
+
+        config: A dictionary housing the settings we need to set up a SINDy object. Specifically, 
+        this dictionary should have a key called "sindy" whose corresponding value is another 
+        dictionary with the following two keys:
+            - fd_type: A string specifying which finite-difference scheme we should use when
+            approximating the time derivative of the solution to the latent dynamics at a 
+            specific time. Currently, the following options are allowed:
                 - 'sbp12': summation-by-parts 1st/2nd (boundary/interior) order operator
                 - 'sbp24': summation-by-parts 2nd/4th order operator
                 - 'sbp36': summation-by-parts 3rd/6th order operator
                 - 'sbp48': summation-by-parts 4th/8th order operator
-        '''
-        self.fd_type = parser.getInput(['fd_type'], fallback='sbp12')
-        self.fd = FDdict[self.fd_type]
-        self.fd_oper, _, _ = self.fd.getOperators(self.nt)
+            - coef_norm_order: A string specifying which norm we want to use when computing
+            the coefficient loss.
+        """
+
+        # Run the base class initializer. The only thing this does is set the dim and nt 
+        # attributes.
+        super().__init__(dim, nt)
+
+        # We only allow library terms of order <= 1. If we let z(t) \in \mathbb{R}^{dim} denote the 
+        # latent state at some time, t, then the possible library terms are 1, z_1(t), ... , 
+        # z_{dim}(t). Since each component function gets its own set of coefficients, there must 
+        # be dim*(dim + 1) total coefficients.
+        #TODO(kevin): generalize for high-order dynamics
+        self.ncoefs = self.dim * (self.dim + 1)
+
+        # Now, set up an Input parser to process the contents of the config['sindy'] dictionary. 
+        assert('sindy' in config)
+        parser = InputParser(config['sindy'], name = 'sindy_input')
+
+        """
+        Determine which finite difference scheme we should use to approximate the time derivative
+        of the latent space dynamics. Currently, we allow the following values for "fd_type":
+            - 'sbp12': summation-by-parts 1st/2nd (boundary/interior) order operator
+            - 'sbp24': summation-by-parts 2nd/4th order operator
+            - 'sbp36': summation-by-parts 3rd/6th order operator
+            - 'sbp48': summation-by-parts 4th/8th order operator
+        """
+        self.fd_type    : str       = parser.getInput(['fd_type'], fallback = 'sbp12')
+        self.fd         : callable  = FDdict[self.fd_type]
+
+        # RESUME HERE 
+        # RESUME HERE 
+        # RESUME HERE 
+        # RESUME HERE 
+        # RESUME HERE 
+        # RESUME HERE 
+        # RESUME HERE 
+        # RESUME HERE 
+        # RESUME HERE 
+        # RESUME HERE 
+        # RESUME HERE 
+        # RESUME HERE 
+        # RESUME HERE 
+        # RESUME HERE 
+        # RESUME HERE 
+        # RESUME HERE 
+        # RESUME HERE 
+        # RESUME HERE 
+        # RESUME HERE 
+        # RESUME HERE 
+        # RESUME HERE 
+        # RESUME HERE 
+        # RESUME HERE 
+        self.fd_oper, _, _          = self.fd.getOperators(self.nt)
 
         # NOTE(kevin): by default, this will be L1 norm.
         self.coef_norm_order = parser.getInput(['coef_norm_order'], fallback=1)
@@ -36,8 +118,11 @@ class SINDy(LatentDynamics):
         # TODO(kevin): other loss functions
         self.MSE = torch.nn.MSELoss()
 
+        # All done!
         return
     
+
+
     def calibrate(self, Z, dt, compute_loss=True, numpy=False):
         ''' loop over all train cases, if Z dimension is 3 '''
         if (Z.dim() == 3):
@@ -86,6 +171,8 @@ class SINDy(LatentDynamics):
         else:
             return coefs
 
+
+
     def compute_time_derivative(self, Z, Dt):
 
         '''
@@ -100,6 +187,8 @@ class SINDy(LatentDynamics):
 
         '''
         return 1. / Dt * torch.sparse.mm(self.fd_oper, Z)
+
+
 
     def simulate(self, coefs, z0, t_grid):
 
@@ -116,6 +205,8 @@ class SINDy(LatentDynamics):
 
         return Z_i
     
+
+
     def export(self):
         param_dict = super().export()
         param_dict['fd_type'] = self.fd_type
