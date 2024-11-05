@@ -132,11 +132,13 @@ class SINDy(LatentDynamics):
         Arguments
         -------------------------------------------------------------------------------------------
 
-        Z: A 2 or 3d tensor. If Z is a 2d tensor, then it has shape (Nt, Nz) and it's i,j entry 
-        holds the j'th component of the latent state at the time t_0 + i*dt. If it is a 3d tensor,
-        then it has shape (Np, Nt, Nz). In this case, we assume there at Np different combinations
-        of parameter values. The i, j, k entry of Z in this case holds the k'th component of the 
-        latent encoding at time t_0 + j*dt when we use the i'th combination of parameter values. 
+        Z: A 2d or 3d tensor. If Z is a 2d tensor, then it has shape (Nt, Nz), where Nt specifies 
+        the number of time steps in each sequence of latent states and Nz is the dimension of the 
+        latent space. In this case, the i,j entry of Z holds the j'th component of the latent state 
+        at the time t_0 + i*dt. If it is a 3d tensor, then it has shape (Np, Nt, Nz). In this case, 
+        we assume there at Np different combinations of parameter values. The i, j, k entry of Z in 
+        this case holds the k'th component of the latent encoding at time t_0 + j*dt when we use 
+        he i'th combination of parameter values. 
 
         dt: The time step between time steps. See the description of the "Z" argument. 
 
@@ -273,8 +275,8 @@ class SINDy(LatentDynamics):
 
     def simulate(self, coefs : np.ndarray, z0 : np.ndarray, t_grid : np.ndarray):
         """
-        For each combination of training parameters, this function integrates the corresponding 
-        system of ODEs given the initial condition Z0 = encoder(U0)
+        Time integrates the latent dynamics when it uses the coefficients specified in coefs and 
+        starts from the (single) initial condition in z0.
 
 
         -------------------------------------------------------------------------------------------
@@ -298,7 +300,8 @@ class SINDy(LatentDynamics):
         -------------------------------------------------------------------------------------------        
         
         A 2d numpy.ndarray object holding the solution to the latent dynamics at the time values 
-        specified in t_grid. Specifically, this is a 2d array of shape (nt, nz), where nt is the 
+        specified in t_grid when we use the coefficients in coefs to characterize the latent 
+        dynamics model. Specifically, this is a 2d array of shape (nt, nz), where nt is the 
         number of time steps (size of t_grid) and nz is the latent space dimension (self.dim). 
         Thus, the i,j element of this matrix holds the j'th component of the latent solution at 
         the time stored in the i'th element of t_grid. 
