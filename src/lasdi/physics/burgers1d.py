@@ -1,16 +1,30 @@
-import numpy as np
-from scipy.sparse.linalg import spsolve
-from scipy.sparse import spdiags
-import torch
-from ..inputs import InputParser
-from . import Physics
-from ..fd import FDdict
+# -------------------------------------------------------------------------------------------------
+# Inputs
+# -------------------------------------------------------------------------------------------------
+
+import  numpy               as      np
+from    scipy.sparse.linalg import  spsolve
+from    scipy.sparse        import  spdiags
+import  torch
+
+from    ..inputs            import  InputParser
+from    .                   import  Physics
+from    ..fd                import  FDdict
+
+
+
+# -------------------------------------------------------------------------------------------------
+# Burgers 1D class
+# -------------------------------------------------------------------------------------------------
 
 class Burgers1D(Physics):
+    # Class variables
     a_idx = None # parameter index for a
     w_idx = None # parameter index for w
 
-    def __init__(self, cfg, param_name=None):
+
+    
+    def __init__(self, cfg, param_name = None):
         super().__init__(cfg, param_name)
 
         self.qdim = 1
@@ -48,6 +62,8 @@ class Burgers1D(Physics):
                 self.w_idx = self.param_name.index('w')
         return
     
+
+
     def initial_condition(self, param):
         a, w = 1.0, 1.0
         if 'a' in self.param_name:
@@ -57,6 +73,8 @@ class Burgers1D(Physics):
 
         return a * np.exp(- self.x_grid ** 2 / 2 / w / w)
     
+
+
     def solve(self, param):
         u0 = self.initial_condition(param)
 
@@ -64,9 +82,13 @@ class Burgers1D(Physics):
         new_X = new_X.reshape(1, self.nt, self.grid_size[0])
         return torch.Tensor(new_X)
     
+
+
     def export(self):
         dict_ = {'t_grid' : self.t_grid, 'x_grid' : self.x_grid, 'dt' : self.dt, 'dx' : self.dx}
         return dict_
+    
+
     
     def residual(self, Xhist):
         # first axis is time index, and second index is spatial index.
@@ -77,6 +99,12 @@ class Burgers1D(Physics):
         e = np.linalg.norm(r)
 
         return r, e
+
+
+
+# -------------------------------------------------------------------------------------------------
+# Helper functions
+# -------------------------------------------------------------------------------------------------
 
 def residual_burgers(un, uw, c, idxn1):
 
@@ -91,6 +119,8 @@ def residual_burgers(un, uw, c, idxn1):
     r = -un + uw + f
 
     return r
+
+
 
 def jacobian(u, c, idxn1, nx):
 
@@ -109,6 +139,8 @@ def jacobian(u, c, idxn1, nx):
     J[0, -1] = -c * u[0]
 
     return J
+
+
 
 def solver(u0, maxk, convergence_threshold, nt, nx, Dt, Dx):
     '''
@@ -144,6 +176,12 @@ def solver(u0, maxk, convergence_threshold, nt, nx, Dt, Dx):
                 break
 
     return u
+
+
+
+# -------------------------------------------------------------------------------------------------
+# Main function (if running this file as a script).
+# -------------------------------------------------------------------------------------------------
 
 def main():
     import argparse

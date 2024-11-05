@@ -1,16 +1,31 @@
-import numpy as np
-import torch
+# -------------------------------------------------------------------------------------------------
+# Imports  
+# -------------------------------------------------------------------------------------------------
+
+import  numpy   as np
+import  torch
+
+
+
+# -------------------------------------------------------------------------------------------------
+# Physics class 
+# -------------------------------------------------------------------------------------------------
 
 class Physics:
     # Physical space dimension
     dim = -1
-    # solution (denoted as q) dimension
+
+    # The fom solution can be vector valued. If it is, then qdim specifies the dimensionality of 
+    # the fom solution at each point. If the solution is scalar valued, then qdim = -1. 
     qdim = -1
+    
     # grid_size is the shape of the grid nd-array.
     grid_size = []
-    # the shape of the solution nd-array.
+    
+    # the shape of the solution nd-array. This is just the qgrid_size with the qdim prepended onto 
+    # it.
     qgrid_size = []
-
+    
     '''
         numpy nd-array, assuming the shape of:
         - 1d: (space_dim[0],)
@@ -34,22 +49,32 @@ class Physics:
     # list of parameter names to parse parameters.
     param_name = None
 
+
+
     def __init__(self, cfg, param_name=None):
         self.param_name = param_name
         return
     
+
+
     def initial_condition(self, param):
         raise RuntimeError("Abstract method Physics.initial_condition!")
         return np.array
     
+
+
     def solve(self, param):
         raise RuntimeError("Abstract method Physics.solve!")
         return torch.Tensor
     
+
+
     def export(self):
         raise RuntimeError("Abstract method Physics.export!")
         return dict
     
+
+
     def generate_solutions(self, params):
         '''
         Given 2d-array of params,
@@ -74,10 +99,18 @@ class Physics:
         
         return X_train
 
+
+
     def residual(self, Xhist):
         raise RuntimeError("Abstract method Physics.residual!")
         return res, res_norm
-    
+
+
+
+# -------------------------------------------------------------------------------------------------
+# Offline full order model class
+# -------------------------------------------------------------------------------------------------
+
 class OfflineFOM(Physics):
     def __init__(self, cfg, param_name=None):
         super().__init__(cfg, param_name)
@@ -107,9 +140,13 @@ class OfflineFOM(Physics):
 
         return
     
+
+
     def generate_solutions(self, params):
         raise RuntimeError("OfflineFOM does not support generate_solutions!!")
         return
+
+
 
     def export(self):
         dict_ = {'t_grid' : self.t_grid, 'x_grid' : self.x_grid, 'dt' : self.dt}
