@@ -273,7 +273,7 @@ class SINDy(LatentDynamics):
 
 
 
-    def simulate(self, coefs : np.ndarray, z0 : np.ndarray, t_grid : np.ndarray):
+    def simulate(self, coefs : np.ndarray, z0 : np.ndarray, t_grid : np.ndarray) -> np.ndarray:
         """
         Time integrates the latent dynamics when it uses the coefficients specified in coefs and 
         starts from the (single) initial condition in z0.
@@ -327,7 +327,7 @@ class SINDy(LatentDynamics):
     
 
 
-    def export(self):
+    def export(self) -> dict:
         """
         This function packages self's contents into a dictionary which it then returns. We can use 
         this dictionary to create a new SINDy object which has the same internal state as self. 
