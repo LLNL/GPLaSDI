@@ -155,7 +155,7 @@ class LatentDynamics:
     
 
 
-    def sample(self, coefs_sample, z0_sample, t_grid):
+    def sample(self, coefs_sample : np.ndarray, z0_sample : np.ndarray, t_grid : np.ndarray) -> np.ndarray:
         """
         simulate's the latent dynamics for a set of coefficients/initial conditions.
 
@@ -191,15 +191,21 @@ class LatentDynamics:
         # There needs to be as many initial conditions as sets of coefficients.
         assert(len(coefs_sample) == len(z0_sample))
 
+        # Cycle through the set of coefficients
         for i in range(len(coefs_sample)):
-            Z_i = self.simulate(coefs_sample[i], z0_sample[i], t_grid)
+            # Simulate the latent dynamics when we use the i'th set of coefficients + ICs
+            Z_i : np.ndarray = self.simulate(coefs_sample[i], z0_sample[i], t_grid)
+
+            # Append a leading dimension of size 1.
             Z_i = Z_i.reshape(1, Z_i.shape[0], Z_i.shape[1])
 
+            # Append the latest trajectory onto the Z_simulated array.
             if (i == 0):
                 Z_simulated = Z_i
             else:
                 Z_simulated = np.concatenate((Z_simulated, Z_i), axis = 0)
 
+        # All done!
         return Z_simulated
     
 
