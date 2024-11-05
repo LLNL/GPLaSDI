@@ -478,7 +478,10 @@ class BayesianGLaSDI:
             # -------------------------------------------------------------------------------------
             # Forward pass
 
-            # Run the forward pass
+            # Run the forward pass. This results in a tensor of shape (Np, Nt, Nz), where Np is the 
+            # number of parameters, Nt is the number of time steps in the time series, and Nz is 
+            # the latent space dimension. X_Pred, should have the same shape as X_Train, (Np, Nt, 
+            # Nx[0], .... , Nx[Nd - 1]). 
             Z               : torch.Tensor  = autoencoder_device.encoder(X_train_device)
             X_pred          : torch.Tensor  = autoencoder_device.decoder(Z)
             Z               : torch.Tensor  = Z.cpu()

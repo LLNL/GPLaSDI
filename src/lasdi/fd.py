@@ -18,19 +18,18 @@ class Stencil:
     leftBdrDepth        : int               = 0         # Number of time steps (at the start/stop of the time series) we use a special stencil on.
     leftBdrWidth        : list[int]         = []        # i'th element specifies the number of terms in the stencil for the i'th time step
     leftBdrStencils     : list[list[float]] = [[]]      # i'th element is a list wit ki = len(leftBdrWidth[i]) specifying the stencil weights of the first ki time series terms in the stencil for x(t_i)
-    leftBdrNorm         : list[float]       = []        # ??? 
+    leftBdrNorm         : list[float]       = []        # ??? TODO: what is this?
 
     """
     Suppose that InteriorStencils is an array of length Ns and interiorIndexes is a list of 
-    length Ns. Then the stencil contains Ns terms representing x(t_0), ... , x(t_{Nx -1}). Further
-    suppose the underlying time series contains Nx points. In this case, assuming index i is an 
-    "interior index" (not too close to 0 or Nx - 1), then we approximate the time derivative of z 
-    at time t_i as follows:
+    length Ns. Further suppose the underlying time series contains Nx points, x(t_0), ... , 
+    x(t_{Nx -1}). Assuming index i is an "interior index" (not too close to 0 or Nx - 1), then we 
+    approximate the time derivative of z at time t_i as follows:
         z'(t_i) \approx c_0 z(t_{i + i(0)}) + ... + c_{Ns - 1} z(t_{i + i(Ns - 1)})
     where c_k = interiorStencils[k] and i(k) = interiorIndexes[k]. Note that the indices may be 
     negative or positive. Thus, interiorStencils and interiorIndexes tell us how to construct the 
     finite difference scheme away from the boundary. 
-    
+    x
     For instance, the central difference scheme corresponds to interiorStencils = [-1/2, 1/2], 
     interiorIndexes = [-1, 1] and 
         z'(t_i) \approx (1/2)(-z(t_{i - 1}) + z_{t_{i + 1}}) 
@@ -38,18 +37,18 @@ class Stencil:
     Note: We assume that interiorIndexes is in ASCENDING order. 
     """
     interiorStencils    : np.ndarray    = np.array([])  # Specify the weights of the terms in the stencil
-    interiorIndexes     : list[int]     = []            # Specify the relative indices of the terms in the stencil
+    interiorIndexes     : list[int]     = []            # Specify the relative indices of the terms in the stencil. Must be in ascending order.
 
 
     
-    def getOperators(self, Nx : int, periodic : bool = False) -> tuple(spmatrix, torch.Tensor, torch.Tensor):
+    def getOperators(self, Nx : int, periodic : bool = False) -> tuple[spmatrix, torch.Tensor, torch.Tensor]:
         """
         The stencil class acts as an abstract base class for finite difference schemes. We assume
         that the user has a time series, x(t_0), ... , x(t_{Nx - 1}) \in \mathbb{R}^d. We will 
         further assume that the time stamps are evenly spaced, t_0, ... , t_{Nx - 1}. That is, 
-        there is some \Delta t such that t_k = t_0 + \Delta_t*k. We also assume that the user wants 
-        to approximate the time derivative of x at t_0, ... , t_{Nx - 1} using a finite difference 
-        scheme.
+        there is some \Delta t such that t_k = t_0 + \Delta_t*k for each k. We also assume the user 
+        wants to approximate the time derivative of x at t_0, ... , t_{Nx - 1} using a finite 
+        difference scheme.
 
         The getOperators method builds an a sparse Tensor housing the "operator matrix". This is 
         an Nx x Nx matrix that we use to apply the finite difference scheme to one component of 
@@ -57,10 +56,10 @@ class Stencil:
         x(t_{Nx - 1}) \in \mathbb{R}^d. Then, for each i \in \{ 1, 2, ... , d}, we construct Dxi 
         such that Dxi * xi is the vector whose i'th entry holds the approximation (using the 
         selected finite difference scheme) of x_i'(t_i). Here, xi = [x_i(t_0), ... , 
-        x_i(t_{Nx - 1})]. The line of code below sets up Dxi such that it gives the correct 
-        approximation to x_i'(t_j) whenever j is an interior index. The rest of this function 
-        adjusts the first/last few rows of Dxi so that it also gives the correct approximation 
-        at the boundaries (j close to to 0 or Nx - 1).
+        x_i(t_{Nx - 1})]. To build Dxi, we first set up a matrix to give the correct approximation
+        to x_i'(t_j) whenever j is an interior index. The rest of this function adjusts the 
+        first/last few rows of Dxi so that it also gives the correct approximation at the 
+        boundaries (j close to to 0 or Nx - 1).
 
         The Stencil class is not a standalone class; you shouldn't use it directly. Rather, you 
         should use one of the sub-classes defined below. Each one implements a specific finite 
@@ -84,14 +83,14 @@ class Stencil:
         -------------------------------------------------------------------------------------------
 
         Three elements. The first Dxi, the "Operator Matrix" described above. The second holds the 
-        "norm" tensor and the third holds the "PeriodicOffset" tensor 
-        (TODO: what are the last two of these used for?)
+        "norm" tensor and the third holds the "PeriodicOffset" tensor.
+        TODO: what are the last two of these used for? And what are they?
         """
 
         norm            = np.ones(Nx,)
         periodicOffset  = np.zeros(Nx,)
         
-        # Start building the "Operator Matirx" (See docstring)
+        # Start building the "Operator Matrix" (See docstring)
         Dxi : spmatrix  = sps.diags(self.interiorStencils,
                                     self.interiorIndexes,
                                     shape = (Nx, Nx), 
@@ -99,10 +98,11 @@ class Stencil:
         
         """
         If we assume the time series is periodic, then we need to adjust the first/last few 
-        rows to "wrap around". In this case, every index is an interior index. For this to work,
-        however, we may need to be able to fetch x(t_{-k}), or x(t_{Nx + k}). Periodicity 
-        means that we assume x(t_{-k}) = x(t_{Nx - k}) and x(t_{Nx + k}) = x(t_k). This means 
-        that we can use the last few components of x in place of terms like x(t_{-k}). For 
+        rows to "wrap around". In this case, every index is an interior index. However, this means
+        that we will need x(t_{-k}) when approximating x'(t_0), for instance, or x(t_{Nx + k}) 
+        when approximating x'(t_{Nx - 1}). Periodicity means we assume x(t_{-k}) = x(t_{Nx - k}) 
+        and x(t_{Nx + k}) = x(t_k). Thus, we can use the last few components of x in place of terms
+        like x(t_{-k}). For 
         instance, if we wanted to use a central difference scheme, then we have 
             x'(t_0) \approx (1/2)(-x(t_{-1}) + x(t_{1})) = (1/2)(-x(t_{Nx - 1}) + x(t_1))
         In other words, by modifying the first/last few rows of Dxi, we can build an operator
@@ -169,13 +169,12 @@ class Stencil:
                 # NOTE: Currently only consider skew-symmetric operators.
                 Dxi[-1-depth,-width:] = -Dxi[depth,(width-1)::-1]
             
-            # ???
+            # TODO: what is going on here?
             norm[:self.leftBdrDepth]    = self.leftBdrNorm
             norm[-self.leftBdrDepth:]   = norm[(self.leftBdrDepth-1)::-1]
 
-
         # Convert Dxi to a tensor. 
-        Dxf : torch.Tensor = self.convert(sps.coo_matrix(Dxi))
+        Dxi : torch.Tensor = self.convert(sps.coo_matrix(Dxi))
 
         # All done!
         return Dxi, torch.Tensor(norm), torch.Tensor(periodicOffset)

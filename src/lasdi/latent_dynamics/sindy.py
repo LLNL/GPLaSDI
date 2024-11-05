@@ -22,7 +22,6 @@ class SINDy(LatentDynamics):
     fd_oper     = None
 
 
-
     def __init__(self, 
                  dim        : int, 
                  nt         : int, 
@@ -87,33 +86,22 @@ class SINDy(LatentDynamics):
         self.fd_type    : str       = parser.getInput(['fd_type'], fallback = 'sbp12')
         self.fd         : callable  = FDdict[self.fd_type]
 
-        # RESUME HERE 
-        # RESUME HERE 
-        # RESUME HERE 
-        # RESUME HERE 
-        # RESUME HERE 
-        # RESUME HERE 
-        # RESUME HERE 
-        # RESUME HERE 
-        # RESUME HERE 
-        # RESUME HERE 
-        # RESUME HERE 
-        # RESUME HERE 
-        # RESUME HERE 
-        # RESUME HERE 
-        # RESUME HERE 
-        # RESUME HERE 
-        # RESUME HERE 
-        # RESUME HERE 
-        # RESUME HERE 
-        # RESUME HERE 
-        # RESUME HERE 
-        # RESUME HERE 
-        # RESUME HERE 
+        """
+        Fetch the operator matrix. What does this do? Suppose we have a time series with nt points, 
+        x(t_0), ... , x(t_{nt - 1}) \in \mathbb{R}^d. Further assume that for each j, 
+        t_j = t_0 + j \delta t, where \delta t is some positive constant. Let j \in {0, 1, ... , 
+        nt - 1}. Let xj be j'th vector whose k'th element is x_j(t_k). Then, the i'th element of 
+        M xj holds the approximation to x_j'(t_k) using the stencil we selected above. 
+
+        For instance, if we selected sdp12, corresponding to the central difference scheme, then 
+        we have (for j != 0, nt - 1)
+            [M xj]_i = (x_j(t_{i + 1}) - x(t_{j - 1}))/(2 \delta t).
+        """
         self.fd_oper, _, _          = self.fd.getOperators(self.nt)
 
+        # Fetch the norm we are going to use on the sindy coefficients.
         # NOTE(kevin): by default, this will be L1 norm.
-        self.coef_norm_order = parser.getInput(['coef_norm_order'], fallback=1)
+        self.coef_norm_order = parser.getInput(['coef_norm_order'], fallback = 1)
 
         # TODO(kevin): other loss functions
         self.MSE = torch.nn.MSELoss()
@@ -123,45 +111,126 @@ class SINDy(LatentDynamics):
     
 
 
-    def calibrate(self, Z, dt, compute_loss=True, numpy=False):
-        ''' loop over all train cases, if Z dimension is 3 '''
-        if (Z.dim() == 3):
-            n_train = Z.size(0)
+    def calibrate(self, 
+                  Z             : torch.Tensor,
+                  dt            : float, 
+                  compute_loss  : bool = True, 
+                  numpy         : bool = False) -> (np.ndarray | torch.Tensor) | tuple[(np.ndarray | torch.Tensor), torch.Tensor, torch.Tensor]:
+        """
+        This function computes the optimal SINDy coefficients using the current latent time 
+        series'. Specifically, let us consider the case when Z has two dimensions (the case when 
+        it has three is identical, just with different coefficients for each instance of the 
+        leading dimension of Z). In this case, we assume that the rows of Z correspond to a 
+        trajectory of latent states. Specifically, we assume the i'th row holds the latent state,
+        z, at time t_0 + i*dt. We use SINDy to find the coefficients in the dynamical system
+        z'(t) = C \Phi(z(t)), where C is a matrix of coefficients and \Phi(z(t)) represents a
+        library of terms. We find the matrix C corresponding to the dynamical system that best 
+        agrees with the data in the rows of Z. 
 
+
+        -------------------------------------------------------------------------------------------
+        Arguments
+        -------------------------------------------------------------------------------------------
+
+        Z: A 2 or 3d tensor. If Z is a 2d tensor, then it has shape (Nt, Nz) and it's i,j entry 
+        holds the j'th component of the latent state at the time t_0 + i*dt. If it is a 3d tensor,
+        then it has shape (Np, Nt, Nz). In this case, we assume there at Np different combinations
+        of parameter values. The i, j, k entry of Z in this case holds the k'th component of the 
+        latent encoding at time t_0 + j*dt when we use the i'th combination of parameter values. 
+
+        dt: The time step between time steps. See the description of the "Z" argument. 
+
+        compute_loss: A boolean which, if true, will prompt us to calculate the sindy and 
+        coefficient losses, which we will then return with the optimal SINDy coefficients. If not, 
+        we will only return the optimal SINDy coefficients.
+
+        numpy: A boolean. If True, we return the coefficient matrix as a numpy.ndarray object. If 
+        False, we return it as a torch.Tensor object.
+        
+
+        -------------------------------------------------------------------------------------------
+        Returns
+        -------------------------------------------------------------------------------------------
+
+        IF compute_loss is True, then we return three variables. The first is a matrix of shape
+        ()
+        """
+
+        # -----------------------------------------------------------------------------------------
+        # If Z has three dimensions, loop over all train cases.
+        if (Z.dim() == 3):
+            # Fetch the number of training cases.
+            n_train : int = Z.size(0)
+
+            # Prepare an array to house the flattened coefficient matrices for each combination of
+            # parameter values.
             if (numpy):
                 coefs = np.zeros([n_train, self.ncoefs])
             else:
                 coefs = torch.Tensor([n_train, self.ncoefs])
+
+            # Initialize the losses. Note that these are floats which we will replace with 
+            # tensors.
             loss_sindy, loss_coef = 0.0, 0.0
 
+            # Cycle through the combinations of parameter values.
             for i in range(n_train):
+                """"
+                Get the optimal SINDy coefficients for the i'th combination of parameter values. 
+                Remember that Z is 3d tensor of shape (Np, Nt, Nz) whose (i, j, k) entry holds 
+                the k'th component of the j'th frame of the latent trajectory for the i'th 
+                combination of parameter values. Note that Result is either a torch.Tensor
+                (if compute_loss = False and numpy = False), a numpy.ndarray (if numpy = True and 
+                compute_loss = True), or a 3 element tuple (if compute_loss = True).
+                """
                 result = self.calibrate(Z[i], dt, compute_loss, numpy)
+
+                # If we are computing losses, the 1 and 2 elements of return hold the sindy and 
+                # coefficient losses. Otherwise, the only return variable is the flattened 
+                # coefficient matrix from the i'th combination of parameter values.
                 if (compute_loss):
-                    coefs[i] = result[0]
+                    coefs[i]    = result[0]
                     loss_sindy += result[1]
-                    loss_coef += result[2]
+                    loss_coef  += result[2]
                 else:
                     coefs[i] = result
             
+            # Package everything to return!
             if (compute_loss):
                 return coefs, loss_sindy, loss_coef
             else:
                 return coefs
 
-        ''' evaluate for one train case '''
+
+        # -----------------------------------------------------------------------------------------
+        # evaluate for one training case.
         assert(Z.dim() == 2)
+
+        # First, compute the time derivatives. This yields a torch.Tensor object whose i,j entry 
+        # holds an approximation of (d/dt) Z_j(t_0 + i*dt)
         dZdt = self.compute_time_derivative(Z, dt)
         time_dim, space_dim = dZdt.shape
 
-        Z_i = torch.cat([torch.ones(time_dim, 1), Z], dim = 1)
-        coefs = torch.linalg.lstsq(Z_i, dZdt).solution
+        # Concatenate a column of zeros. 
+        Z_i     : torch.Tensor  = torch.cat([torch.ones(time_dim, 1), Z], dim = 1)
+        
+        # For each j, solve the least squares problem 
+        #   min{ || dZdt[:, j] - Z_i c_j|| : C_j \in \mathbb{R}ˆNl }
+        # where Nl is the number of library terms (in this case, just Nz + 1, since we only allow
+        # constant and linear terms). We store the resulting solutions in a matrix, coefs, whose 
+        # j'th column holds the results for the j'th column of dZdt. Thus, coefs is a 2d tensor
+        # with shape (Nl, Nz).
+        coefs   : torch.Tensor  = torch.linalg.lstsq(Z_i, dZdt).solution
 
+        # If we need to compute the loss, do so now. 
         if (compute_loss):
             loss_sindy = self.MSE(dZdt, Z_i @ coefs)
             # NOTE(kevin): by default, this will be L1 norm.
             loss_coef = torch.norm(coefs, self.coef_norm_order)
 
-        # output of lstsq is not contiguous in memory.
+        # All done. Prepare coefs and the losses to return. Note that we flatten the coefficient 
+        # matrix.
+        # Note: output of lstsq is not contiguous in memory.
         coefs = coefs.detach().flatten()
         if (numpy):
             coefs = coefs.numpy()
@@ -173,30 +242,41 @@ class SINDy(LatentDynamics):
 
 
 
-    def compute_time_derivative(self, Z, Dt):
+    def compute_time_derivative(self, Z : torch.Tensor, Dt : float) -> torch.Tensor:
+        """
+        This function builds the SINDy dataset, assuming only linear terms in the SINDy dataset. 
+        The time derivatives are computed through finite difference.
 
-        '''
 
-        Builds the SINDy dataset, assuming only linear terms in the SINDy dataset. The time derivatives are computed through
-        finite difference.
+        -------------------------------------------------------------------------------------------
+        Arguments
+        -------------------------------------------------------------------------------------------
 
-        Z is the encoder output (2D tensor), with shape [time_dim, space_dim]
-        Dt is the size of timestep (assumed to be a uniform scalar)
+        Z: A 2d tensor of shape (Nt, Nz) whose i, j entry holds the j'th component of the i'th 
+        time step in the latent time series. We assume that Z[i, :] represents the latent state
+        at time t_0 + i*Dt
 
-        The output dZdt is a 2D tensor with the same shape of Z.
+        Dt: The time step between latent frames (the time between Z[:, i] and Z[:, i + 1])
 
-        '''
-        return 1. / Dt * torch.sparse.mm(self.fd_oper, Z)
+
+        -------------------------------------------------------------------------------------------
+        Returns 
+        -------------------------------------------------------------------------------------------
+
+        The output dZdt is a 2D tensor with the same shape as Z. It's i, j entry holds an 
+        approximation to (d/dt)Z_j(t_0 + j Dt). We compute this approximation using self's stencil.
+        """
+
+        return (1. / Dt) * torch.sparse.mm(self.fd_oper, Z)
 
 
 
     def simulate(self, coefs, z0, t_grid):
-
-        '''
+        """
 
         Integrates each system of ODEs corresponding to each training points, given the initial condition Z0 = encoder(U0)
 
-        '''
+        """
         # copy is inevitable for numpy==1.26. removed copy=False temporarily.
         c_i = coefs.reshape([self.dim+1, self.dim]).T
         dzdt = lambda z, t : c_i[:, 1:] @ z + c_i[:, 0]
