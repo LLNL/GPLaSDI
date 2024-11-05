@@ -146,7 +146,9 @@ latent space IC (by encoding it using the autoencoder). We do this for each para
 combination and then return a list housing the latent space ICs.</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><strong>physics</strong> (<em>A “Physics” object that stores the datasets for each parameter combination.</em>)</p></li>
+<li><p><strong>combination of parameters.</strong></p></li>
+<li><p><strong>physics</strong> (<em>A “Physics” object that, among other things, stores the IC for each combination of</em>)</p></li>
+<li><p><strong>parameters.</strong></p></li>
 <li><p><strong>autoencoder</strong> (<em>The actual autoencoder object that we use to map the ICs into the latent space.</em>)</p></li>
 </ul>
 </div></blockquote>
@@ -210,7 +212,8 @@ combination and then return a list housing the latent space ICs.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron.init_weight">
 <span class="sig-name descname"><span class="pre">init_weight</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.init_weight" title="Permalink to this definition"></a></dt>
-<dd><p>This function initializes the weight matrices and bias vectors in self’s layers.</p>
+<dd><p>This function initializes the weight matrices and bias vectors in self’s layers. It takes
+no arguments and returns nothing!</p>
 </dd></dl>
 
 </dd></dl>
@@ -253,7 +256,12 @@ combination and then return a list housing the latent space ICs.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.latent_space.Autoencoder.export">
 <span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#lasdi.latent_space.Autoencoder.export" title="Permalink to this definition"></a></dt>
-<dd><p>This function extracts self’s parameters and returns them in a dictionary.</p>
+<dd><blockquote>
+<div><ul class="simple">
+<li><p><em>(that you initialized to have the same architecture as self) to make the other autoencoder</em></p></li>
+<li><p><em>identical to self.</em></p></li>
+</ul>
+</div></blockquote>
 </dd></dl>
 
 <dl class="py method">

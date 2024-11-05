@@ -55,12 +55,15 @@ Module Contents
 
 
    .. py:attribute:: nt
+      :type:  int
 
 
    .. py:attribute:: grid_size
+      :type:  list[int]
 
 
    .. py:attribute:: qgrid_size
+      :type:  list[int]
 
       numpy nd-array, assuming the shape of:
       - 1d: (space_dim[0],)

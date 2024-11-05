@@ -28,7 +28,6 @@ Module Contents
    We assume each target coefficient is independent with each other.
 
 
-
    -----------------------------------------------------------------------------------------------
    :Parameters: * **X** (*A 2d numpy array of shape (n_train, input_dim), where n_train is the number of training*)
                 * **examples and input_dim is the number of components in each input (e.g., the number of**
@@ -42,10 +41,9 @@ Module Contents
              * *columns of X and whose corresponding target values are the elements of the i'th column of Y.*
 
 
-.. py:function:: eval_gp(gp_list: list[sklearn.gaussian_process.GaussianProcessRegressor], param_grid: numpy.ndarray) -> tuple
+.. py:function:: eval_gp(gp_list: list[sklearn.gaussian_process.GaussianProcessRegressor], param_grid: numpy.ndarray) -> tuple[numpy.ndarray, numpy.ndarray]
 
    Computes the GPs predictive mean and standard deviation for points of the parameter space grid
-
 
 
    -----------------------------------------------------------------------------------------------
@@ -72,7 +70,6 @@ Module Contents
    coefficients at the specified parameter value (parma). Specifically, for the k'th SINDy
    coefficient, we draw n_samples samples of the predictive distribution for the k'th coefficient
    when param is the parameter.
-
 
 
    -----------------------------------------------------------------------------------------------

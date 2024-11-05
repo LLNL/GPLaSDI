@@ -45,8 +45,10 @@ Module Contents
 
    -----------------------------------------------------------------------------------------------
    :Parameters: * **param_grid** (*A 2d numpy.ndarray object of shape (number of parameter combination) x (number of*)
-                * **parameters).**
-                * **physics** (*A "Physics" object that stores the datasets for each parameter combination.*)
+                * **parameters). The i,j element of this array holds the value of the j'th parameter in the i'th**
+                * **combination of parameters.**
+                * **physics** (*A "Physics" object that, among other things, stores the IC for each combination of*)
+                * **parameters.**
                 * **autoencoder** (*The actual autoencoder object that we use to map the ICs into the latent space.*)
 
    -----------------------------------------------------------------------------------------------
@@ -105,14 +107,8 @@ Module Contents
 
    .. py:method:: init_weight() -> None
 
-      This function initializes the weight matrices and bias vectors in self's layers.
-
-
-      -------------------------------------------------------------------------------------------
-      :Parameters: **None!**
-
-      -------------------------------------------------------------------------------------------
-      :rtype: Nothing!
+      This function initializes the weight matrices and bias vectors in self's layers. It takes
+      no arguments and returns nothing!
 
 
 
@@ -155,14 +151,11 @@ Module Contents
 
    .. py:method:: export() -> dict
 
-      This function extracts self's parameters and returns them in a dictionary.
-
-
       -------------------------------------------------------------------------------------------
-      :Parameters: **None!**
-
-      -------------------------------------------------------------------------------------------
-      :rtype: The A dictionary housing self's state dictionary.
+      :returns: * *This function extracts self's parameters and returns them in a dictionary. You can pass*
+                * *the dictionary returned by this function to the load method of another Autoencoder object*
+                * *(that you initialized to have the same architecture as self) to make the other autoencoder*
+                * *identical to self.*
 
 
 

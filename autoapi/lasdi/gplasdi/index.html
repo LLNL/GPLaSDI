@@ -111,16 +111,16 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lasdi.gplasdi.average_rom" title="lasdi.gplasdi.average_rom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">average_rom</span></code></a>(autoencoder, physics, latent_dynamics, ...)</p></td>
-<td><p></p></td>
+<td><p>This function simulates the latent dynamics for a collection of testing parameters by using</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lasdi.gplasdi.sample_roms" title="lasdi.gplasdi.sample_roms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_roms</span></code></a>(autoencoder, physics, latent_dynamics, ...)</p></td>
-<td><p>Collect n_samples of ROM trajectories on param_grid.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lasdi.gplasdi.sample_roms" title="lasdi.gplasdi.sample_roms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_roms</span></code></a>(→ numpy.ndarray)</p></td>
+<td><p>This function samples the latent coefficients, solves the corresponding latent dynamics, and</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lasdi.gplasdi.get_fom_max_std" title="lasdi.gplasdi.get_fom_max_std"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_fom_max_std</span></code></a>(autoencoder, Zis)</p></td>
-<td><p>Computes the maximum standard deviation accross the parameter space grid and finds the corresponding parameter location</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lasdi.gplasdi.get_fom_max_std" title="lasdi.gplasdi.get_fom_max_std"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_fom_max_std</span></code></a>(→ int)</p></td>
+<td><p>Computes the maximum standard deviation across the trajectories in Zis and returns the</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lasdi.gplasdi.optimizer_to" title="lasdi.gplasdi.optimizer_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimizer_to</span></code></a>(optim, device)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lasdi.gplasdi.optimizer_to" title="lasdi.gplasdi.optimizer_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimizer_to</span></code></a>(→ None)</p></td>
+<td><p>This function moves an optimizer object to a specific device.</p></td>
 </tr>
 </tbody>
 </table>
@@ -129,42 +129,122 @@
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="lasdi.gplasdi.average_rom">
-<span class="sig-prename descclassname"><span class="pre">lasdi.gplasdi.</span></span><span class="sig-name descname"><span class="pre">average_rom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">autoencoder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">physics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latent_dynamics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gp_dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_grid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.gplasdi.average_rom" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">lasdi.gplasdi.</span></span><span class="sig-name descname"><span class="pre">average_rom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">autoencoder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../latent_space/index.html#lasdi.latent_space.Autoencoder" title="lasdi.latent_space.Autoencoder"><span class="pre">lasdi.latent_space.Autoencoder</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">physics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../physics/index.html#lasdi.physics.Physics" title="lasdi.physics.Physics"><span class="pre">lasdi.physics.Physics</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">latent_dynamics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../latent_dynamics/index.html#lasdi.latent_dynamics.LatentDynamics" title="lasdi.latent_dynamics.LatentDynamics"><span class="pre">lasdi.latent_dynamics.LatentDynamics</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">gp_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">sklearn.gaussian_process.GaussianProcessRegressor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.gplasdi.average_rom" title="Permalink to this definition"></a></dt>
+<dd><p>This function simulates the latent dynamics for a collection of testing parameters by using
+the mean of the posterior distribution for each coefficient’s posterior distribution.
+Specifically, for each parameter combination, we determine the mean of the posterior
+distribution for each coefficient. We then use this mean to simulate the latent dynamics
+forward in time (starting from the latent encoding of the fom initial condition for that
+combination of coefficients).</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>latent_dynamics</strong> (<em>A LatentDynamics object which describes how we specify the dynamics in the</em>)</p></li>
+<li><p><strong>Autoencoder’s latent space.</strong></p></li>
+<li><p><strong>gp_list</strong> (<em>a list of trained GP regressor objects. The number of elements in this list should</em>)</p></li>
+<li><p><strong>match the number of columns in param_grid. The i’th element of this list is a GP regressor</strong></p></li>
+<li><p><strong>object that predicts the i’th coefficient.</strong></p></li>
+<li><p><strong>param_grid</strong> (<em>A 2d numpy.ndarray object of shape (number of parameter combination) x (number of</em>)</p></li>
+<li><p><strong>parameters). The i,j element of this array holds the value of the j’th parameter in the i’th</strong></p></li>
+<li><p><strong>combination of parameters.</strong></p></li>
+</ul>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><em>from the i’th combination of parameter values</em></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lasdi.gplasdi.sample_roms">
-<span class="sig-prename descclassname"><span class="pre">lasdi.gplasdi.</span></span><span class="sig-name descname"><span class="pre">sample_roms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">autoencoder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">physics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latent_dynamics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gp_dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.gplasdi.sample_roms" title="Permalink to this definition"></a></dt>
-<dd><p>Collect n_samples of ROM trajectories on param_grid.
-gp_dictionary: list of Gaussian process regressors (size of n_test)
-param_grid: numpy 2d array
-n_samples: integer
-assert(len(gp_dictionnary) == param_grid.shape[0])</p>
-<p>output: np.array of size [n_test, n_samples, physics.nt, autoencoder.n_z]</p>
+<span class="sig-prename descclassname"><span class="pre">lasdi.gplasdi.</span></span><span class="sig-name descname"><span class="pre">sample_roms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">autoencoder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../latent_space/index.html#lasdi.latent_space.Autoencoder" title="lasdi.latent_space.Autoencoder"><span class="pre">lasdi.latent_space.Autoencoder</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">physics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../physics/index.html#lasdi.physics.Physics" title="lasdi.physics.Physics"><span class="pre">lasdi.physics.Physics</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">latent_dynamics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../latent_dynamics/index.html#lasdi.latent_dynamics.LatentDynamics" title="lasdi.latent_dynamics.LatentDynamics"><span class="pre">lasdi.latent_dynamics.LatentDynamics</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">gp_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">sklearn.gaussian_process.GaussianProcessRegressor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="headerlink" href="#lasdi.gplasdi.sample_roms" title="Permalink to this definition"></a></dt>
+<dd><p>This function samples the latent coefficients, solves the corresponding latent dynamics, and
+then returns the resulting latent solutions.</p>
+<p>Specifically, for each combination of parameter values in the param_grid, we draw n_samples
+samples of the latent coefficients (from the coefficient posterior distributions evaluated at
+that parameter value). This gives us a set of n_samples latent dynamics coefficients. For each
+set of coefficients, we solve the corresponding latent dynamics forward in time and store the
+resulting solution frames. We do this for each sample and each combination of parameter values,
+resulting in an (n_param, n_sample, n_t, n_z) array of solution frames, which is what we
+return.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>physics</strong> (<em>A “Physics” object that stores the ICs for each parameter combination.</em>)</p></li>
+<li><p><strong>latent_dynamics</strong> (<em>A LatentDynamics object which describes how we specify the dynamics in the</em>)</p></li>
+<li><p><strong>Autoencoder’s latent space. We use this to simulate the latent dynamics forward in time.</strong></p></li>
+<li><p><strong>gp_list</strong> (<em>a list of trained GP regressor objects. The number of elements in this list should</em>)</p></li>
+<li><p><strong>match the number of columns in param_grid. The i’th element of this list is a GP regressor</strong></p></li>
+<li><p><strong>object that predicts the i’th coefficient.</strong></p></li>
+<li><p><strong>param_grid</strong> (<em>A 2d numpy.ndarray object of shape (number of parameter combination) x (number of</em>)</p></li>
+<li><p><strong>parameters). The i,j element of this array holds the value of the j’th parameter in the i’th</strong></p></li>
+<li><p><strong>combination of parameters.</strong></p></li>
+<li><p><strong>n_samples</strong> (<em>The number of samples we want to draw from each posterior distribution for each</em>)</p></li>
+<li><p><strong>coefficient evaluated at each combination of parameter values.</strong></p></li>
+</ul>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><em>the j’th sample of latent coefficients drawn from the posterior distribution for the i’th</em></p></li>
+<li><p><em>combination of parameter values (i’th row of param_grid).</em></p></li>
+</ul>
+</div></blockquote>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lasdi.gplasdi.get_fom_max_std">
-<span class="sig-prename descclassname"><span class="pre">lasdi.gplasdi.</span></span><span class="sig-name descname"><span class="pre">get_fom_max_std</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">autoencoder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Zis</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.gplasdi.get_fom_max_std" title="Permalink to this definition"></a></dt>
-<dd><p>Computes the maximum standard deviation accross the parameter space grid and finds the corresponding parameter location</p>
+<span class="sig-prename descclassname"><span class="pre">lasdi.gplasdi.</span></span><span class="sig-name descname"><span class="pre">get_fom_max_std</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">autoencoder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../latent_space/index.html#lasdi.latent_space.Autoencoder" title="lasdi.latent_space.Autoencoder"><span class="pre">lasdi.latent_space.Autoencoder</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">Zis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#lasdi.gplasdi.get_fom_max_std" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the maximum standard deviation across the trajectories in Zis and returns the
+corresponding parameter index. Specifically, Zis is a 4d tensor of shape (n_test, n_samples,
+n_t, n_z). The first axis specifies which parameter combination we’re using. For each
+combination of parameters, we assume that we drew n_samples of the posterior distribution of
+the coefficients at that parameter value, simulated the corresponding dynamics for n_t time
+steps, and then recorded the results in Zis[i]. Thus, Zis[i, j, k, :] represents the k’th
+time step of the solution to the latent dynamics when we use the coefficients from the j’th
+sample of the posterior distribution for the i’th set of parameters.</p>
+<p>Let i in {1, 2, … , n_test} and k in {1, 2, … , n_t}. For each j, we map the k’th frame
+of the j’th solution trajectory for the i’th parameter combination (Zi[i, j, k, :]) to a fom
+frame. We do this for each j (the set of samples), which gives us a collection of n_sample
+fom frames, representing samples of the distribution of fom frames at the k’th time step
+when we use the posterior distribution for the i’th set of parameters. For each l in {1, 2,
+… , n_fom}, we compute the STD of the set of l’th components of these n_sample fom frames.
+We do this for each i and k and then figure out which i, k, l combination gives the largest
+STD. We return the corresponding i index.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Zis</strong> (<em>A 4d numpy array of shape (n_test, n_samples, n_t, n_z) whose i, j, k, l element holds</em>)</p></li>
+<li><p><strong>the l’th component of the k’th frame of the solution to the latent dynamics when we use the</strong></p></li>
+<li><p><strong>j’th sample of latent coefficients drawn from the posterior distribution for the i’th testing</strong></p></li>
+<li><p><strong>parameter.</strong></p></li>
+</ul>
+</div></blockquote>
+<section id="returns">
+<h3>Returns:<a class="headerlink" href="#returns" title="Permalink to this heading"></a></h3>
+<p>An integer. The index of the testing parameter that gives the largest standard deviation.
+Specifically, for each testing parameter, we compute the STD of each component of the fom
+solution at each frame generated by samples from the posterior coefficient distribution for
+that parameter. We compute the maximum of these STDs and pair that number with the parameter.
+We then return the index of the parameter whose corresponding maximum std (the number we pair
+with it) is greatest.</p>
+</section>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lasdi.gplasdi.optimizer_to">
-<span class="sig-prename descclassname"><span class="pre">lasdi.gplasdi.</span></span><span class="sig-name descname"><span class="pre">optimizer_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.gplasdi.optimizer_to" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">lasdi.gplasdi.</span></span><span class="sig-name descname"><span class="pre">optimizer_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.optim.Optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#lasdi.gplasdi.optimizer_to" title="Permalink to this definition"></a></dt>
+<dd><p>This function moves an optimizer object to a specific device.</p>
+</dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lasdi.gplasdi.</span></span><span class="sig-name descname"><span class="pre">BayesianGLaSDI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">physics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">autoencoder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latent_dynamics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_space</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lasdi.gplasdi.</span></span><span class="sig-name descname"><span class="pre">BayesianGLaSDI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">physics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../physics/index.html#lasdi.physics.Physics" title="lasdi.physics.Physics"><span class="pre">lasdi.physics.Physics</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">autoencoder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../latent_space/index.html#lasdi.latent_space.Autoencoder" title="lasdi.latent_space.Autoencoder"><span class="pre">lasdi.latent_space.Autoencoder</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">latent_dynamics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../latent_dynamics/index.html#lasdi.latent_dynamics.LatentDynamics" title="lasdi.latent_dynamics.LatentDynamics"><span class="pre">lasdi.latent_dynamics.LatentDynamics</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_space</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../param/index.html#lasdi.param.ParameterSpace" title="lasdi.param.ParameterSpace"><span class="pre">lasdi.param.ParameterSpace</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI" title="Permalink to this definition"></a></dt>
 <dd><dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.X_train">
-<span class="sig-name descname"><span class="pre">X_train</span></span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.X_train" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">X_train</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">torch.Tensor</span></em><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.X_train" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.X_test">
-<span class="sig-name descname"><span class="pre">X_test</span></span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.X_test" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">X_test</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">torch.Tensor</span></em><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.X_test" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -194,42 +274,42 @@ assert(len(gp_dictionnary) == param_grid.shape[0])</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.n_samples">
-<span class="sig-name descname"><span class="pre">n_samples</span></span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.n_samples" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">n_samples</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.n_samples" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.lr">
-<span class="sig-name descname"><span class="pre">lr</span></span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.lr" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">lr</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.lr" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.n_iter">
-<span class="sig-name descname"><span class="pre">n_iter</span></span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.n_iter" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">n_iter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.n_iter" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.max_iter">
-<span class="sig-name descname"><span class="pre">max_iter</span></span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.max_iter" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">max_iter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.max_iter" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.max_greedy_iter">
-<span class="sig-name descname"><span class="pre">max_greedy_iter</span></span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.max_greedy_iter" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">max_greedy_iter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.max_greedy_iter" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.ld_weight">
-<span class="sig-name descname"><span class="pre">ld_weight</span></span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.ld_weight" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">ld_weight</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.ld_weight" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.coef_weight">
-<span class="sig-name descname"><span class="pre">coef_weight</span></span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.coef_weight" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">coef_weight</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.coef_weight" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.optimizer">
-<span class="sig-name descname"><span class="pre">optimizer</span></span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.optimizer" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">optimizer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">torch.optim.Optimizer</span></em><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.optimizer" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -239,48 +319,69 @@ assert(len(gp_dictionnary) == param_grid.shape[0])</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.path_checkpoint">
-<span class="sig-name descname"><span class="pre">path_checkpoint</span></span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.path_checkpoint" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">path_checkpoint</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.path_checkpoint" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.path_results">
-<span class="sig-name descname"><span class="pre">path_results</span></span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.path_results" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">path_results</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.path_results" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.best_loss">
-<span class="sig-name descname"><span class="pre">best_loss</span></span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.best_loss" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">best_loss</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.best_loss" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.best_coefs">
-<span class="sig-name descname"><span class="pre">best_coefs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.best_coefs" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">best_coefs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.best_coefs" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.restart_iter">
-<span class="sig-name descname"><span class="pre">restart_iter</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.restart_iter" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">restart_iter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.restart_iter" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.train">
-<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.train" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.train" title="Permalink to this definition"></a></dt>
+<dd><p>Runs a round of training on the autoencoder.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.get_new_sample_point">
-<span class="sig-name descname"><span class="pre">get_new_sample_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.get_new_sample_point" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">get_new_sample_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.get_new_sample_point" title="Permalink to this definition"></a></dt>
+<dd><p>This function uses a greedy process to sample a new parameter value. Specifically, it runs
+through each combination of parameters in in self.param_space. For the i’th combination of
+parameters, we generate a collection of samples of the coefficients in the latent dynamics.
+We draw the k’th sample of the j’th coefficient from the posterior distribution for the
+j’th coefficient at the i’th combination of parameters. We map the resulting solution back
+into the real space and evaluate the standard deviation of the fom frames. We return the
+combination of parameters which engenders the largest standard deviation (see the function
+get_fom_max_std).</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.export">
-<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.export" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.export" title="Permalink to this definition"></a></dt>
+<dd><blockquote>
+<div><ul class="simple">
+<li><p><em>objects) to make a GLaSDI object whose internal state matches that of self.</em></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.load">
-<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.load" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.load" title="Permalink to this definition"></a></dt>
+<dd><p>Modifies self’s internal state to match the one whose export method generated the <a href="#id1"><span class="problematic" id="id2">dict_</span></a>
+dictionary.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>generated dict_.</strong></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
 
 </dd></dl>
 
