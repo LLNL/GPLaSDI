@@ -271,24 +271,82 @@ class SINDy(LatentDynamics):
 
 
 
-    def simulate(self, coefs, z0, t_grid):
+    def simulate(self, coefs : np.ndarray, z0 : np.ndarray, t_grid : np.ndarray):
+        """
+        For each combination of training parameters, this function integrates the corresponding 
+        system of ODEs given the initial condition Z0 = encoder(U0)
+
+
+        -------------------------------------------------------------------------------------------
+        Arguments
+        -------------------------------------------------------------------------------------------
+        
+        coefs: A one dimensional numpy.ndarray object representing the flattened copy of the array 
+        of latent dynamics coefficients that calibrate returns.
+
+        z0: A numpy ndarray object of shape nz representing the initial condition for the latent 
+        dynamics. Thus, the i'th component of this array should hold the i'th component of the 
+        latent dynamics initial condition.
+
+        t_grid: A 1d numpy ndarray object whose i'th entry holds the value of the i'th time value 
+        where we want to compute the latent solution. The elements of this array should be in 
+        ascending order.
+
+
+        -------------------------------------------------------------------------------------------
+        Returns
+        -------------------------------------------------------------------------------------------        
+        
+        A 2d numpy.ndarray object holding the solution to the latent dynamics at the time values 
+        specified in t_grid. Specifically, this is a 2d array of shape (nt, nz), where nt is the 
+        number of time steps (size of t_grid) and nz is the latent space dimension (self.dim). 
+        Thus, the i,j element of this matrix holds the j'th component of the latent solution at 
+        the time stored in the i'th element of t_grid. 
         """
 
-        Integrates each system of ODEs corresponding to each training points, given the initial condition Z0 = encoder(U0)
+        # First, reshape coefs as a matrix. Since we only allow for linear terms, there are nz + 1
+        # library terms and nz equations, where nz = self.dim. 
+        # Note: copy is inevitable for numpy==1.26. removed copy=False temporarily.
+        c_i     = coefs.reshape([self.dim + 1, self.dim]).T
 
-        """
-        # copy is inevitable for numpy==1.26. removed copy=False temporarily.
-        c_i = coefs.reshape([self.dim+1, self.dim]).T
-        dzdt = lambda z, t : c_i[:, 1:] @ z + c_i[:, 0]
+        # Set up a lambda function to approximate dzdt. In SINDy, we learn a coefficient matrix 
+        # C such that the latent state evolves according to the dynamical system 
+        #   z'(t) = C \Phi(z(t)), 
+        # where \Phi(z(t)) is the library of terms. Note that the zero column of C corresponds 
+        # to the constant library term, 1. 
+        dzdt    = lambda z, t : c_i[:, 1:] @ z + c_i[:, 0]
 
+        # Solve the ODE forward in time.
         Z_i = odeint(dzdt, z0, t_grid)
 
+        # All done!
         return Z_i
     
 
 
     def export(self):
-        param_dict = super().export()
-        param_dict['fd_type'] = self.fd_type
-        param_dict['coef_norm_order'] = self.coef_norm_order
+        """
+        This function packages self's contents into a dictionary which it then returns. We can use 
+        this dictionary to create a new SINDy object which has the same internal state as self. 
+        
+        
+        -------------------------------------------------------------------------------------------
+        Arguments
+        -------------------------------------------------------------------------------------------
+        
+        None!
+
+
+        -------------------------------------------------------------------------------------------
+        Returns
+        -------------------------------------------------------------------------------------------
+        
+        A dictionary with two keys: fd_type and coef_norm_order. The former specifies which finite
+        different scheme we use while the latter specifies which norm we want to use when computing
+        the coefficient loss. 
+        """
+
+        param_dict                      = super().export()
+        param_dict['fd_type']           = self.fd_type
+        param_dict['coef_norm_order']   = self.coef_norm_order
         return param_dict
