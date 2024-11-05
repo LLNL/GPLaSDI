@@ -21,9 +21,10 @@ class Burgers1D(Physics):
 
         self.offline = parser.getInput(['offline_driver'], fallback=False)
 
-        self.nt = parser.getInput(['number_of_timesteps'], datatype=int)
-        self.grid_size = parser.getInput(['grid_size'], datatype=list)
-        self.qgrid_size = self.grid_size
+        self.nt         : int       = parser.getInput(['number_of_timesteps'], datatype = int)
+        self.grid_size  : list[int] = parser.getInput(['grid_size'], datatype = list)
+        self.qgrid_size : list[int] = self.grid_size
+        
         assert(self.dim == len(self.grid_size))
 
         self.xmin = parser.getInput(['xmin'], datatype=float)
