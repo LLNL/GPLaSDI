@@ -27,172 +27,81 @@ Functions
 
    lasdi.param.get_1dspace_from_list
    lasdi.param.create_uniform_1dspace
+   lasdi.param.get_1dspace_for_exterior
 
 
 Module Contents
 ---------------
 
-.. py:function:: get_1dspace_from_list(param_dict: dict) -> tuple[int, numpy.ndarray]
+.. py:function:: get_1dspace_from_list(config)
 
-   This function generates the parameter range (set of possible parameter values) for a parameter
-   that uses the list type test space. That is, "test_space_type" should be a key for the
-   parameter dictionary and the corresponding value should be "list". The parameter dictionary
-   should also have a "list" key whose value is a list of the possible parameter values.
+.. py:function:: create_uniform_1dspace(config)
 
-   We parse this list and turn it into a numpy ndarray.
-
-
-   -----------------------------------------------------------------------------------------------
-   :Parameters: * **param_dict** (*A dictionary specifying one of the parameters. We should fetch this from the*)
-                * **configuration yaml file. It must have a "list" key whose corresponding value is a list of**
-                * **floats.**
-
-   -----------------------------------------------------------------------------------------------
-   :returns: * **Two arguments** (*Nx and paramRange. paramRange is a 1d numpy ndarray (whose ith value is the*)
-             * *i'th element of param_dict["list"]). Nx is the length of paramRange.*
-
-
-.. py:function:: create_uniform_1dspace(param_dict: dict) -> tuple[int, numpy.ndarray]
-
-   This function generates the parameter range (set of possible parameter values) for a parameter
-   that uses the uniform type test space. That is, "test_space_type" should be a key for the
-   parameter dictionary and the corresponding value should be "uniform". The parameter dictionary
-   should also have the following keys:
-       "min"
-       "max"
-       "sample_size"
-       "log_scale"
-   "min" and "max" specify the minimum and maximum value of the parameter, respectively.
-   "sample_size" specifies the number of parameter values we generate. Finally, log_scale, if
-   true, specifies if we should use a uniform or logarithmic spacing between samples of the
-   parameter.
-
-   The values corresponding to "min" and "max" should be floats while the values corresponding to
-   "sample_size" and "log_scale" should be an int and a bool, respectively.
-
-
-   -----------------------------------------------------------------------------------------------
-   :Parameters: * **param_dict** (*A dictionary specifying one of the parameters. We should fetch this from the*)
-                * **configuration yaml file. It must have a "min", "max", "sample_size", and "log_scale"**
-                * **keys (see above).**
-
-   -----------------------------------------------------------------------------------------------
-   :returns: * **Two arguments** (*Nx and paramRange. paramRange is a 1d numpy ndarray (whose ith value is the*)
-             * *i'th possible value of the parameter. Thus, paramRange[0] = param_dict["min"] and*
-             * *paramRange[-1] = param_dict["max"]). Nx is the length of paramRange or, equivalently*
-             * *param_dict["sample_size"].*
-
+.. py:function:: get_1dspace_for_exterior(config)
 
 .. py:data:: getParam1DSpace
-   :type:  dict[str, callable]
 
-.. py:class:: ParameterSpace(config: dict)
+.. py:class:: ParameterSpace(config)
 
    .. py:attribute:: param_list
-      :type:  list[dict]
       :value: []
 
 
 
    .. py:attribute:: param_name
-      :type:  list[str]
       :value: []
 
 
 
    .. py:attribute:: n_param
-      :type:  int
       :value: 0
 
 
 
    .. py:attribute:: train_space
-      :type:  numpy.ndarray
       :value: None
 
 
 
    .. py:attribute:: test_space
-      :type:  numpy.ndarray
       :value: None
 
 
 
    .. py:attribute:: n_init
-      :type:  int
       :value: 0
 
 
 
    .. py:attribute:: test_grid_sizes
-      :type:  list[int]
       :value: []
 
 
 
    .. py:attribute:: test_meshgrid
-      :type:  tuple[numpy.ndarray]
       :value: None
 
 
 
-   .. py:method:: n_train() -> int
-
-      Returns the number of combinations of parameters in the training set.
+   .. py:method:: n_train()
 
 
-
-   .. py:method:: n_test() -> int
-
-      Returns the number of combinations of parameters in the testing set.
+   .. py:method:: n_test()
 
 
-
-   .. py:method:: createInitialTrainSpace(param_list: list[dict]) -> numpy.ndarray
-
-      Sets up a grid of parameter values to train at. Note that we only use the min and max value
-      of each parameter when setting up this grid.
+   .. py:method:: createInitialTrainSpace(param_list)
 
 
-      -------------------------------------------------------------------------------------------
-      :Parameters: * **param_list** (*A list of parameter dictionaries. Each entry should be a dictionary with the*)
-                   * **following keys** --
-
-                     - name
-                     - min
-                     - max
-
-      -------------------------------------------------------------------------------------------
-      :returns: * *A 2d array of shape ((2)^k, k), where k is the number of parameters (k == len(param_list)).*
-                * *The i'th column is the flattened i'th mesh_grid array we when we create a mesh grid using*
-                * *the min and max value of each parameter as the argument. See "createHyperMeshGrid" for*
-                * *details.*
-                * *Specifically, we return exactly what "createHyperGridSpace" returns. See the doc-string*
-                * *for that function for further details.*
+   .. py:method:: createInitialTrainSpaceForHull(param_list)
 
 
-
-   .. py:method:: createTestGridSpace(param_list: list[dict]) -> tuple[list[int], tuple[numpy.ndarray], numpy.ndarray]
-
-      This function sets up a grid of parameter values to test at.
+   .. py:method:: createTestGridSpace(param_list)
 
 
-      -------------------------------------------------------------------------------------------
-      :Parameters: * **param_list** (*A list of parameter dictionaries. Each dictionary should either use the*)
-                   * **"uniform" or "list" format. See create_uniform_1dspace and get_1dspace_from_list,**
-                   * **respectively.**
+   .. py:method:: createTestGridSpaceForHull(param_list)
 
-      -------------------------------------------------------------------------------------------
-      :returns: * *A three element tuple.*
-                * *The first is a list whose i'th element specifies the number of distinct values of the i'th*
-                * *parameter we consider (this is the length of the i'th element of "paramRanges" below).*
-                * *The second is a a tuple of k numpy ndarrays (where k = len(param_list)), the i'th one of*
-                * *which is a k-dimensional array with shape (N0, ... , N{k - 1}), where Ni =*
-                * *param_list[i].size whose i(0), ... , i(k - 1) element specifies the value of the i'th*
-                * *parameter in the i(0), ... , i(k - 1)'th unique combination of parameter values.*
-                * *The third one is a 2d array of parameter values. It has shape (M, k), where*
-                * *M = \prod_{i = 0}^{k - 1} param_list[i].size.*
 
+   .. py:method:: createTestSpaceFromHull(param_list)
 
 
    .. py:method:: getParameter(param_vector)
@@ -202,110 +111,35 @@ Module Contents
 
 
 
-   .. py:method:: createHyperMeshGrid(param_ranges: list[numpy.ndarray]) -> tuple[numpy.ndarray]
+   .. py:method:: createHyperMeshGrid(param_ranges)
 
-      This function generates arrays of parameter values. Specifically, if there are k
-      parameters (param_ranges has k elements), then we return k k-d arrays, the i'th one of
-      which is a k-dimensional array whose i(0), ... , i(k - 1) element specifies the value of
-      the i'th variable in the i(0), ... , i(k - 1)'th unique combination of parameter values.
+      param_ranges: list of numpy 1d arrays, each corresponding to 1d parameter grid space.
+                    The list size is equal to the number of parameters.
 
-
-      -------------------------------------------------------------------------------------------
-      :Parameters: * **param_ranges** (*list of numpy 1d arrays, each corresponding to 1d parameter grid space. The*)
-                   * **i'th element of this list should be a 2-element numpy.ndarray object housing the max and**
-                   * **min value for the i'th parameter. The list size should equal the number of parameters.**
-
-      -------------------------------------------------------------------------------------------
-      :returns: * *the "paramSpaces" tuple. This is a tuple of numpy ndarray objects, the i'th one of which*
-                * *gives the grid of parameter values for the i'th parameter. Specifically, if there are*
-                * *k parameters and if param_range[i].size = Ni, then the j'th return array has shape*
-                * *(N0, ... , N{k - 1}) and the i(0), ... , i(k - 1) element of this array houses the i(j)'th*
-                * *value of the j'th parameter.*
-                * *Thus, if there are k parameters, the returned tuple has k elements, each one of*
-                * *which is an array of shape (N0, ... , N{k - 1}).*
+      Output: paramSpaces
+          - tuple of numpy nd arrays, corresponding to each parameter.
+            Dimension of the array equals to the number of parameters
 
 
 
-   .. py:method:: createHyperGridSpace(mesh_grids: tuple[numpy.ndarray]) -> numpy.ndarray
+   .. py:method:: createHyperGridSpace(mesh_grids)
 
-      Flattens the mesh_grid numpy.ndarray objects returned by createHyperMeshGrid and combines
-      them into a single 2d array of shape (grid size, number of parameters) (see below).
+      mesh_grids: tuple of numpy nd arrays, corresponding to each parameter.
+                  Dimension of the array equals to the number of parameters
 
+      Output: param_grid
+          - numpy 2d array of size (grid size x number of parameters).
 
-      -------------------------------------------------------------------------------------------
-      :Parameters: * **mesh_grids** (*tuple of numpy nd arrays, corresponding to each parameter. This should ALWAYS*)
-                   * **be the output of the "CreateHyperMeshGrid" function. See the return section of that**
-                   * **function's docstring for details.**
-
-      -------------------------------------------------------------------------------------------
-      :returns: * *The param_grid. This is a 2d numpy.ndarray object of shape (grid size, number of*
-                * *parameters). If each element of mesh_grids is a numpy.ndarray object of shape (N(1), ... ,*
-                * *N(k)) (k parameters), then (grid size) = N(1)*N(2)*...*N(k) and (number of parameters) = k.*
+          grid size is the size of a numpy nd array.
 
 
 
-   .. py:method:: appendTrainSpace(param: numpy.ndarray) -> None
-
-      Adds a new parameter to self's train space attribute.
+   .. py:method:: appendTrainSpace(param)
 
 
-      -------------------------------------------------------------------------------------------
-      :Parameters: * **param** (*A 1d numpy ndarray object. It should have shape (n_param) and should hold a*)
-                   * **parameter value that we want to add to the training set.**
-
-      -------------------------------------------------------------------------------------------
-      :rtype: Nothing!
+   .. py:method:: export()
 
 
-
-   .. py:method:: export() -> dict
-
-      This function packages the testing/training examples into a dictionary, which it returns.
-
-
-      -------------------------------------------------------------------------------------------
-      :Parameters: * **None!**
-                   * **-------------------------------------------------------------------------------------------**
-
-      :returns: * *A dictionary with 4 keys. Below is a list of the keys with a short description of each*
-                * *corresponding value.* -- train_space: self.train_space, a 2d array of shape (n_train, n_param) whose i,j element
-                  holds the value of the j'th parameter in the i'th training case.
-
-                  test_space: self.test_space, a 2d array of shape (n_test, n_param) whose i,j element
-                  holds the value of the j'th parameter in the i'th testing case.
-
-                  test_grid_sizes: A list whose i'th element specifies how many distinct parameter values
-                  we use for the i'th parameter.
-
-                  test_meshgrid: a tuple of n_param numpy.ndarray array objects whose i'th element is a
-                  n_param-dimensional array whose i(1), i(2), ... , i(n_param) element holds the value of
-                  the i'th parameter in the i(1), ... , i(n_param) combination of parameter values in the
-                  testing test.
-
-                  n_init: The number of combinations of training parameters in the training set.
-
-
-
-   .. py:method:: load(dict_: dict) -> None
-
-      This function builds a parameter space object from a dictionary. This dictionary should
-      be one that was returned by the export method, or a loaded copy of a dictionary that was
-      returned by the export method.
-
-
-      -------------------------------------------------------------------------------------------
-      :Parameters: * **dict_** (*This should be a dictionary with the following keys:*) --
-
-                     - train_space
-                     - test_space
-                     - test_grid_sizes
-                     - test_meshgrid
-                     - n_init
-                   * **This dictionary should have been returned by the export method. We use the values in this**
-                   * **dictionary to set up self.**
-
-      -------------------------------------------------------------------------------------------
-      :rtype: Nothing!
-
+   .. py:method:: load(dict_)
 
 

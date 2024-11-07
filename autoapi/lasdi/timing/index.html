@@ -101,7 +101,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lasdi.timing.Timer" title="lasdi.timing.Timer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Timer</span></code></a></p></td>
-<td><p></p></td>
+<td><p>A light-weight timer class.</p></td>
 </tr>
 </tbody>
 </table>
@@ -111,91 +111,118 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="lasdi.timing.Timer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lasdi.timing.</span></span><span class="sig-name descname"><span class="pre">Timer</span></span><a class="headerlink" href="#lasdi.timing.Timer" title="Permalink to this definition"></a></dt>
-<dd><dl class="py attribute">
+<dd><p>A light-weight timer class.</p>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.timing.Timer.names">
-<span class="sig-name descname"><span class="pre">names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#lasdi.timing.Timer.names" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">names</span></span><a class="headerlink" href="#lasdi.timing.Timer.names" title="Permalink to this definition"></a></dt>
+<dd><p>Dictionary that maps job names to job indices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict(str:int)</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.timing.Timer.calls">
-<span class="sig-name descname"><span class="pre">calls</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.timing.Timer.calls" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">calls</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.timing.Timer.calls" title="Permalink to this definition"></a></dt>
+<dd><p>List that stores the number of calls for each job.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list(int)</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.timing.Timer.times">
-<span class="sig-name descname"><span class="pre">times</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.timing.Timer.times" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">times</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.timing.Timer.times" title="Permalink to this definition"></a></dt>
+<dd><p>List that stores the total time for each job.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list(float)</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.timing.Timer.starts">
-<span class="sig-name descname"><span class="pre">starts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.timing.Timer.starts" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">starts</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.timing.Timer.starts" title="Permalink to this definition"></a></dt>
+<dd><p>List that stores the start time for each job.
+If the job is not running, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> is stored instead.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list(float)</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.timing.Timer.start">
-<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#lasdi.timing.Timer.start" title="Permalink to this definition"></a></dt>
-<dd><p>Starts a specific timer. The user must specify the name of the timer they want to start.
-The specified timer can not already be running!</p>
+<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.timing.Timer.start" title="Permalink to this definition"></a></dt>
+<dd><p>Start a job named <code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code>.
+If the job is not listed, register the job in the job list.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>name (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>): Name of the job to be started.</p>
+</dd>
+<dt>Note:</dt><dd><p>The job must not have started before calling this method.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Does not return a value.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.timing.Timer.end">
-<span class="sig-name descname"><span class="pre">end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#lasdi.timing.Timer.end" title="Permalink to this definition"></a></dt>
-<dd><p>Stops a specific timer. The user must specify the name of the timer they want to stop.</p>
+<span class="sig-name descname"><span class="pre">end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.timing.Timer.end" title="Permalink to this definition"></a></dt>
+<dd><p>End a job named <code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code>.
+Increase the number of calls and the runtime for the job.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>name (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>): Name of the job to be ended.</p>
+</dd>
+<dt>Note:</dt><dd><p>The job must have started before calling this method.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Does not return a value.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.timing.Timer.print">
-<span class="sig-name descname"><span class="pre">print</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#lasdi.timing.Timer.print" title="Permalink to this definition"></a></dt>
-<dd><p>This function reports information on every timer in self. It has no arguments and returns
-nothing.</p>
+<span class="sig-name descname"><span class="pre">print</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.timing.Timer.print" title="Permalink to this definition"></a></dt>
+<dd><p>Print the list of jobs and their number of calls, total time and time per each call.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>Does not return a value.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.timing.Timer.export">
-<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#lasdi.timing.Timer.export" title="Permalink to this definition"></a></dt>
-<dd><p>This function extracts the names, calls, and times attributes of self, stores them in a
-dictionary, and then returns that dictionary. If you have another dictionary object,
-you can passed the returned dictionary to that object’s load method to make that object
-into an identical copy of self.</p>
-<blockquote>
-<div><blockquote>
-<div><ul class="simple">
-<li><p>names</p></li>
-<li><p>calls</p></li>
-<li><p>times</p></li>
-</ul>
-</div></blockquote>
-<ul class="simple">
-<li><p><em>names is a dictionary with string keys whose corresponding values are integer indexes. If a</em></p></li>
-<li><p><em>particular timer was the k’th one added to self, then it’s value in names will be k.</em></p></li>
-<li><p><em>calls is a list whose k’th element specifies how many times the k’th timer was stopped.</em></p></li>
-<li><p><em>times is a list whose k’th element specifies the total time recorded on the k’th timer.</em></p></li>
-</ul>
-</div></blockquote>
+<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.timing.Timer.export" title="Permalink to this definition"></a></dt>
+<dd><p>Export the list of jobs and their number of calls and total time
+into a dictionary.</p>
+<dl class="simple">
+<dt>Note:</dt><dd><p>All jobs must be ended before calling this method.</p>
+</dd>
+<dt>Returns:</dt><dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code> that contains “names”, “calls”, and “times” as keys</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.timing.Timer.load">
-<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#lasdi.timing.Timer.load" title="Permalink to this definition"></a></dt>
-<dd><p>This function de-serializes a timer object, making self into an identical copy of a
-previously serialized timer object. Specifically, we replace self’s names, calls, and
-times attributes using those in the passed <a href="#id1"><span class="problematic" id="id2">dict_</span></a>. We use this function to restore a
-timer object’s state after loading from a checkpoint.</p>
-<blockquote>
-<div><blockquote>
-<div><ul class="simple">
-<li><p>names</p></li>
-<li><p>calls</p></li>
-<li><p>times</p></li>
-</ul>
-</div></blockquote>
-<ul class="simple">
-<li><p><strong>the corresponding values should be the names, calls, and times attributes of another timer</strong></p></li>
-<li><p><strong>object, respectively. We replace self’s attributes with those the values in dict_. dict_</strong></p></li>
-<li><p><strong>should be the dictionary returned by calling export on a timer object.</strong></p></li>
-</ul>
-</div></blockquote>
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.timing.Timer.load" title="Permalink to this definition"></a></dt>
+<dd><p>Load the list of jobs and their number of calls and total time
+from a dictionary.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p><cite>dict_</cite> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>): Dictionary that contains the list of jobs and their calls and times.</p>
+</dd>
+<dt>Note:</dt><dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict_['names']</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">dict_['calls']</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">dict_['times']</span></code> must have the same size.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Does not return a value</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
