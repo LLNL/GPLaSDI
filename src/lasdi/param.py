@@ -48,15 +48,19 @@ class ParameterSpace:
         for param in self.param_list:
             self.param_name += [param['name']]
 
-        self.train_space = self.createInitialTrainSpace(self.param_list)
-        self.train_space = self.createInitialTrainSpaceForHull(self.param_list)
-        self.n_init = self.train_space.shape[0]
+        # self.train_space = self.createInitialTrainSpace(self.param_list)
+        # self.train_space = self.createInitialTrainSpaceForHull(self.param_list)
+        # self.n_init = self.train_space.shape[0]
 
         test_space_type = parser.getInput(['test_space', 'type'], datatype=str)
         if (test_space_type == 'grid'):
+            self.train_space = self.createInitialTrainSpace(self.param_list)
+            self.n_init = self.train_space.shape[0]
             self.test_grid_sizes, self.test_meshgrid, self.test_space = self.createTestGridSpace(self.param_list)
         if (test_space_type == 'hull'):
             assert self.n_param == 2, 'Convex hull only implemented for 2D parameter space!'
+            self.train_space = self.createInitialTrainSpaceForHull(self.param_list)
+            self.n_init = self.train_space.shape[0]
             self.test_grid_sizes, self.test_meshgrid, self.test_space = self.createTestSpaceFromHull(self.param_list)
 
         return
