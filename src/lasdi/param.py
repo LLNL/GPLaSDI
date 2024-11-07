@@ -1,4 +1,6 @@
 import numpy as np
+from scipy.spatial import ConvexHull, convex_hull_plot_2d
+from matplotlib.path import Path
 from .inputs import InputParser
 
 def get_1dspace_from_list(config):
@@ -16,8 +18,14 @@ def create_uniform_1dspace(config):
         paramRange = np.linspace(minval, maxval, Nx)
     return Nx, paramRange
 
+def get_1dspace_for_exterior(config):
+    Nx = config['sample_size']
+    paramRange = np.array(config['list'])
+    return Nx, paramRange
+
 getParam1DSpace = {'list': get_1dspace_from_list,
-                   'uniform': create_uniform_1dspace}
+                   'uniform': create_uniform_1dspace,
+                   'exterior': get_1dspace_for_exterior}
 
 class ParameterSpace:
     param_list = []
@@ -46,6 +54,9 @@ class ParameterSpace:
         test_space_type = parser.getInput(['test_space', 'type'], datatype=str)
         if (test_space_type == 'grid'):
             self.test_grid_sizes, self.test_meshgrid, self.test_space = self.createTestGridSpace(self.param_list)
+        if (test_space_type == 'hull'):
+            assert len(self.param_list) == 2, 'Convex hull only implemented for 2D parameter space!'
+            self.test_grid_sizes, self.test_meshgrid, self.test_space = self.createTestSpaceFromHull(self.param_list)
 
         return
     
@@ -77,6 +88,22 @@ class ParameterSpace:
 
         mesh_grids = self.createHyperMeshGrid(paramRanges)
         return gridSizes, mesh_grids, self.createHyperGridSpace(mesh_grids)
+    
+    def createTestSpaceFromHull(self, param_list):
+        #get the initial over the parameters
+        gridSizes, mesh_grids, test_space = self.createTestGridSpace(self.param_list)
+        hull = ConvexHull(test_space)
+        hull_path = Path( hull.points[hull.vertices] ) #note: Path only works in 2D
+
+        k = []
+        for i in range(test_space.shape[0]):
+            #We check if the point is inside the convex hull, otherwise we will discard it           
+            if hull_path.contains_point(test_space[i,:]):
+                k.append(i)
+
+        test_space = test_space[k]
+
+        return gridSizes, mesh_grids, test_space
     
     def getParameter(self, param_vector):
         '''
