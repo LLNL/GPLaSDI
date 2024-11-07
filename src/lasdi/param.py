@@ -90,8 +90,9 @@ class ParameterSpace:
         return gridSizes, mesh_grids, self.createHyperGridSpace(mesh_grids)
     
     def createTestSpaceFromHull(self, param_list):
-        #get the initial over the parameters
+        #get the initial grid over the parameters
         gridSizes, mesh_grids, test_space = self.createTestGridSpace(self.param_list)
+
         hull = ConvexHull(test_space)
         hull_path = Path( hull.points[hull.vertices] ) #note: Path only works in 2D
 
