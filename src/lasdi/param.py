@@ -49,13 +49,14 @@ class ParameterSpace:
             self.param_name += [param['name']]
 
         self.train_space = self.createInitialTrainSpace(self.param_list)
+        self.train_space = self.createInitialTrainSpaceForHull(self.param_list)
         self.n_init = self.train_space.shape[0]
 
         test_space_type = parser.getInput(['test_space', 'type'], datatype=str)
         if (test_space_type == 'grid'):
             self.test_grid_sizes, self.test_meshgrid, self.test_space = self.createTestGridSpace(self.param_list)
         if (test_space_type == 'hull'):
-            assert len(self.param_list) == 2, 'Convex hull only implemented for 2D parameter space!'
+            assert self.n_param == 2, 'Convex hull only implemented for 2D parameter space!'
             self.test_grid_sizes, self.test_meshgrid, self.test_space = self.createTestSpaceFromHull(self.param_list)
 
         return
@@ -77,6 +78,16 @@ class ParameterSpace:
         mesh_grids = self.createHyperMeshGrid(paramRanges)
         return self.createHyperGridSpace(mesh_grids)
     
+    def createInitialTrainSpaceForHull(self, param_list):
+        paramRanges = []
+
+        for param in param_list:
+            _, paramRange = getParam1DSpace[param['test_space_type']](param)
+            paramRanges += [paramRange]
+
+        mesh_grids = np.vstack((paramRanges)).T
+        return mesh_grids
+    
     def createTestGridSpace(self, param_list):
         paramRanges = []
         gridSizes = []
@@ -89,11 +100,25 @@ class ParameterSpace:
         mesh_grids = self.createHyperMeshGrid(paramRanges)
         return gridSizes, mesh_grids, self.createHyperGridSpace(mesh_grids)
     
+    def createTestGridSpaceForHull(self, param_list):
+        paramRanges = []
+        gridSizes = []
+
+        for param in param_list:
+            Nx, _ = getParam1DSpace[param['test_space_type']](param)
+            minval = param['min']
+            maxval = param['max']
+            gridSizes += [Nx]
+            paramRanges += [np.linspace(minval, maxval, Nx)]
+
+        mesh_grids = self.createHyperMeshGrid(paramRanges)
+        return gridSizes, mesh_grids, self.createHyperGridSpace(mesh_grids)
+    
     def createTestSpaceFromHull(self, param_list):
         #get the initial grid over the parameters
-        gridSizes, mesh_grids, test_space = self.createTestGridSpace(self.param_list)
+        gridSizes, mesh_grids, test_space = self.createTestGridSpaceForHull(self.param_list)
 
-        hull = ConvexHull(test_space)
+        hull = ConvexHull(self.train_space)
         hull_path = Path( hull.points[hull.vertices] ) #note: Path only works in 2D
 
         k = []
