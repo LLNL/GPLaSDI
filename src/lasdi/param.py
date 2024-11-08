@@ -1,6 +1,5 @@
 import numpy as np
-from scipy.spatial import ConvexHull, convex_hull_plot_2d
-from matplotlib.path import Path
+from scipy.spatial import Delaunay
 from .inputs import InputParser
 
 def get_1dspace_from_list(config):
@@ -48,19 +47,17 @@ class ParameterSpace:
         for param in self.param_list:
             self.param_name += [param['name']]
 
-        # self.train_space = self.createInitialTrainSpace(self.param_list)
-        # self.train_space = self.createInitialTrainSpaceForHull(self.param_list)
-        # self.n_init = self.train_space.shape[0]
-
         test_space_type = parser.getInput(['test_space', 'type'], datatype=str)
         if (test_space_type == 'grid'):
             self.train_space = self.createInitialTrainSpace(self.param_list)
             self.n_init = self.train_space.shape[0]
+
             self.test_grid_sizes, self.test_meshgrid, self.test_space = self.createTestGridSpace(self.param_list)
         if (test_space_type == 'hull'):
-            assert self.n_param == 2, 'Convex hull only implemented for 2D parameter space!'
+            assert self.n_param >=2, 'Must have at least 2 parameters if test_space is \'hull\' '
             self.train_space = self.createInitialTrainSpaceForHull(self.param_list)
             self.n_init = self.train_space.shape[0]
+
             self.test_grid_sizes, self.test_meshgrid, self.test_space = self.createTestSpaceFromHull(self.param_list)
 
         return
@@ -83,11 +80,28 @@ class ParameterSpace:
         return self.createHyperGridSpace(mesh_grids)
     
     def createInitialTrainSpaceForHull(self, param_list):
+        '''
+        If test_space is 'hull', then the provided training parameters must be 
+        points on the exterior of our training space. So, we form the provided points
+        into an array.
+        '''
+
         paramRanges = []
 
+        k = 0
         for param in param_list:
+            assert (param['test_space_type'] == 'exterior'), ('test_space_type for all parameters must '
+                                                            'be \'exterior\' when test_space is \'hull\'. ')
+            
             _, paramRange = getParam1DSpace[param['test_space_type']](param)
             paramRanges += [paramRange]
+
+            if k > 0:
+                assert (len(paramRanges[k])==len(paramRanges[k - 1])), (f'Training parameters {k} and {k-1} have '
+                                                            'different lengths. All training parameters '
+                                                            'must have same length when test_space is \'hull\'.')
+            k = k + 1
+
 
         mesh_grids = np.vstack((paramRanges)).T
         return mesh_grids
@@ -105,6 +119,12 @@ class ParameterSpace:
         return gridSizes, mesh_grids, self.createHyperGridSpace(mesh_grids)
     
     def createTestGridSpaceForHull(self, param_list):
+        '''
+        This is similar to createTestGridSpace, but with some different variables.
+        We take the min/max value of each parameter, and create a uniform rectangular grid
+        over the parameter space with 'sample_size' points in each dimension. 
+        '''
+
         paramRanges = []
         gridSizes = []
 
@@ -122,16 +142,13 @@ class ParameterSpace:
         #get the initial grid over the parameters
         gridSizes, mesh_grids, test_space = self.createTestGridSpaceForHull(self.param_list)
 
-        hull = ConvexHull(self.train_space)
-        hull_path = Path( hull.points[hull.vertices] ) #note: Path only works in 2D
 
-        k = []
-        for i in range(test_space.shape[0]):
-            #We check if the point is inside the convex hull, otherwise we will discard it           
-            if hull_path.contains_point(test_space[i,:]):
-                k.append(i)
-
-        test_space = test_space[k]
+        #mesh training space. This will be slow in higher dimensions
+        cloud = Delaunay(self.train_space)
+        #Determine if each point is in/out of convex Hull
+        mask = cloud.find_simplex(test_space)>=0
+        #Only keep points in convex Hull
+        test_space = test_space[mask]
 
         return gridSizes, mesh_grids, test_space
     
