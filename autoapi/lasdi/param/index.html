@@ -215,7 +215,10 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.createInitialTrainSpaceForHull">
 <span class="sig-name descname"><span class="pre">createInitialTrainSpaceForHull</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace.createInitialTrainSpaceForHull" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>If test_space is ‘hull’, then the provided training parameters must be
+points on the exterior of our training space. So, we form the provided points
+into an array.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.createTestGridSpace">
@@ -225,7 +228,10 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.createTestGridSpaceForHull">
 <span class="sig-name descname"><span class="pre">createTestGridSpaceForHull</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace.createTestGridSpaceForHull" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>This is similar to createTestGridSpace, but with some different variables.
+We take the min/max value of each parameter, and create a uniform rectangular grid
+over the parameter space with ‘sample_size’ points in each dimension.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.createTestSpaceFromHull">

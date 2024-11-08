@@ -94,11 +94,21 @@ Module Contents
 
    .. py:method:: createInitialTrainSpaceForHull(param_list)
 
+      If test_space is 'hull', then the provided training parameters must be
+      points on the exterior of our training space. So, we form the provided points
+      into an array.
+
+
 
    .. py:method:: createTestGridSpace(param_list)
 
 
    .. py:method:: createTestGridSpaceForHull(param_list)
+
+      This is similar to createTestGridSpace, but with some different variables.
+      We take the min/max value of each parameter, and create a uniform rectangular grid
+      over the parameter space with 'sample_size' points in each dimension.
+
 
 
    .. py:method:: createTestSpaceFromHull(param_list)
