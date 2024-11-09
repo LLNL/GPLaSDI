@@ -1,60 +1,234 @@
-import numpy as np
-import scipy.sparse as sps
-import torch
+# -------------------------------------------------------------------------------------------------
+# Imports and Setup
+# -------------------------------------------------------------------------------------------------
+
+import  numpy           as      np
+import  scipy.sparse    as      sps
+from    scipy.sparse    import  spmatrix;
+import  torch
+
+
+
+# -------------------------------------------------------------------------------------------------
+# Stencil class
+# -------------------------------------------------------------------------------------------------
 
 class Stencil:
-    leftBdrDepth = 0
-    leftBdrWidth = []
-    leftBdrStencils = [[]]
-    leftBdrNorm = []
+    # Class variables
+    leftBdrDepth        : int               = 0         # Number of time steps (at the start/stop of the time series) we use a special stencil on.
+    leftBdrWidth        : list[int]         = []        # i'th element specifies the number of terms in the stencil for the i'th time step
+    leftBdrStencils     : list[list[float]] = [[]]      # i'th element is a list wit ki = len(leftBdrWidth[i]) specifying the stencil weights of the first ki time series terms in the stencil for x(t_i)
+    leftBdrNorm         : list[float]       = []        # ??? TODO: what is this?
 
-    interiorStencils = np.array([])
-    interiorIndexes = []
+    """
+    Suppose that InteriorStencils is an array of length Ns and interiorIndexes is a list of 
+    length Ns. Further suppose the underlying time series contains Nx points, x(t_0), ... , 
+    x(t_{Nx -1}). Assuming index i is an "interior index" (not too close to 0 or Nx - 1), then we 
+    approximate the time derivative of z at time t_i as follows:
+        z'(t_i) \approx c_0 z(t_{i + i(0)}) + ... + c_{Ns - 1} z(t_{i + i(Ns - 1)})
+    where c_k = interiorStencils[k] and i(k) = interiorIndexes[k]. Note that the indices may be 
+    negative or positive. Thus, interiorStencils and interiorIndexes tell us how to construct the 
+    finite difference scheme away from the boundary. 
+    x
+    For instance, the central difference scheme corresponds to interiorStencils = [-1/2, 1/2], 
+    interiorIndexes = [-1, 1] and 
+        z'(t_i) \approx (1/2)(-z(t_{i - 1}) + z_{t_{i + 1}}) 
 
-    def getOperators(self, Nx, periodic=False):
-        norm = np.ones(Nx,)
-        periodicOffset = np.zeros(Nx,)
-        Dxi = sps.diags(self.interiorStencils,
-                        self.interiorIndexes,
-                        shape=(Nx, Nx), format='lil')
+    Note: We assume that interiorIndexes is in ASCENDING order. 
+    """
+    interiorStencils    : np.ndarray    = np.array([])  # Specify the weights of the terms in the stencil
+    interiorIndexes     : list[int]     = []            # Specify the relative indices of the terms in the stencil. Must be in ascending order.
+
+
+    
+    def getOperators(self, Nx : int, periodic : bool = False) -> tuple[spmatrix, torch.Tensor, torch.Tensor]:
+        """
+        The stencil class acts as an abstract base class for finite difference schemes. We assume
+        that the user has a time series, x(t_0), ... , x(t_{Nx - 1}) \in \mathbb{R}^d. We will 
+        further assume that the time stamps are evenly spaced, t_0, ... , t_{Nx - 1}. That is, 
+        there is some \Delta t such that t_k = t_0 + \Delta_t*k for each k. We also assume the user 
+        wants to approximate the time derivative of x at t_0, ... , t_{Nx - 1} using a finite 
+        difference scheme.
+
+        The getOperators method builds an a sparse Tensor housing the "operator matrix". This is 
+        an Nx x Nx matrix that we use to apply the finite difference scheme to one component of 
+        the time series. How does this work? Suppose the time series is x(t_0), ... , 
+        x(t_{Nx - 1}) \in \mathbb{R}^d. Then, for each i \in \{ 1, 2, ... , d}, we construct Dxi 
+        such that Dxi * xi is the vector whose i'th entry holds the approximation (using the 
+        selected finite difference scheme) of x_i'(t_i). Here, xi = [x_i(t_0), ... , 
+        x_i(t_{Nx - 1})]. To build Dxi, we first set up a matrix to give the correct approximation
+        to x_i'(t_j) whenever j is an interior index. The rest of this function adjusts the 
+        first/last few rows of Dxi so that it also gives the correct approximation at the 
+        boundaries (j close to to 0 or Nx - 1).
+
+        The Stencil class is not a standalone class; you shouldn't use it directly. Rather, you 
+        should use one of the sub-classes defined below. Each one implements a specific finite 
+        difference scheme to approximate the time derivatives at t_0, ... , t_{Nx - 1} (they may 
+        use different rules on the left and right boundary). Each sub-class should set the 
+        interiorStencils and interiorIndexes attributes.
+        
+        
+        -------------------------------------------------------------------------------------------
+        Arguments
+        -------------------------------------------------------------------------------------------
+
+        Nx: An integer specifying the number of points in the time series we want to apply a 
+        finite difference scheme to.
+
+        periodic: A boolean specifying if we should treat the time series as periodic or not.    
+
+        
+        -------------------------------------------------------------------------------------------
+        Returns
+        -------------------------------------------------------------------------------------------
+
+        Three elements. The first Dxi, the "Operator Matrix" described above. The second holds the 
+        "norm" tensor and the third holds the "PeriodicOffset" tensor.
+        TODO: what are the last two of these used for? And what are they?
+        """
+
+        norm            = np.ones(Nx,)
+        periodicOffset  = np.zeros(Nx,)
+        
+        # Start building the "Operator Matrix" (See docstring)
+        Dxi : spmatrix  = sps.diags(self.interiorStencils,
+                                    self.interiorIndexes,
+                                    shape = (Nx, Nx), 
+                                    format = 'lil')
+        
+        """
+        If we assume the time series is periodic, then we need to adjust the first/last few 
+        rows to "wrap around". In this case, every index is an interior index. However, this means
+        that we will need x(t_{-k}) when approximating x'(t_0), for instance, or x(t_{Nx + k}) 
+        when approximating x'(t_{Nx - 1}). Periodicity means we assume x(t_{-k}) = x(t_{Nx - k}) 
+        and x(t_{Nx + k}) = x(t_k). Thus, we can use the last few components of x in place of terms
+        like x(t_{-k}). For 
+        instance, if we wanted to use a central difference scheme, then we have 
+            x'(t_0) \approx (1/2)(-x(t_{-1}) + x(t_{1})) = (1/2)(-x(t_{Nx - 1}) + x(t_1))
+        In other words, by modifying the first/last few rows of Dxi, we can build an operator
+        matrix that can recover our approximation of x' near the boundaries (think about it).
+        """
         if (periodic):
-            bdrIdxes = ([k for k in range(-self.interiorIndexes[0])] +
-                        [k for k in range(-self.interiorIndexes[-1], 0)])
+            """
+            Get the indices less than zero and greater than Nx that we will need to update the
+            first/last few rows ofDxi. Remember that the elements of interiorIndexes are in 
+            ascending order. Thus, if interiorIndexes[0] = -k, then we need to update the first 
+            k rows of Dxi to account for the periodic BCs (think about it). Likewise, if 
+            interiorIndexes[-1] = j, then we also need to update the final j rows of Dxi (think 
+            about it).
+
+            If the smallest and largest elements of interiorIndexes are -k and j, respectively, 
+            then the line below produces the list [0, 1, ... , k - 1, -j, -j + 1, ... , -1].
+            """
+            bdrIdxes : list[int] = ([k for k in range(-self.interiorIndexes[0])] +
+                                    [k for k in range(-self.interiorIndexes[-1], 0)])
+            
+            # Cycle through the rows of Dxi that we need to correct.
             for idx in bdrIdxes:
-                colIdx = [k + idx for k in self.interiorIndexes]
-                Dxi[idx, colIdx] = self.interiorStencils
+                # Determine which columns of Dxi we need to access to apply the stencil for the 
+                # idx'th row of Dxi (corresponding to time t_i). 
+                colIdx : list[int]  = [k + idx for k in self.interiorIndexes]
+
+                # Now set the corresponding elements with appropriate wrap around (note that if 
+                # one index is negative, then numpy's indexing rules will automatically wrap it
+                # since x[-k] = x[x.len - k]).
+                Dxi[idx, colIdx]    = self.interiorStencils
+                
+                # Set up the periodicOffset. If idx is negative, we are fixing one of the last
+                # few rows of Dxi. In this case, periodicOffset holds the sum of the weights 
+                # of the indices at and to the right of the current index in the interiorStencil.
+                # Otherwise, we set it to the sum of the weights of the indices to the left.
                 if (idx < 0):
-                    temp = [k>=0 for k in colIdx]
+                    temp = [k >= 0 for k in colIdx]
                     periodicOffset[idx] = np.sum(self.interiorStencils[temp])
                 else:
-                    temp = [k<0 for k in colIdx]
+                    temp = [k < 0 for k in colIdx]
                     periodicOffset[idx] = -np.sum(self.interiorStencils[temp])
+        
+        # Otherwise, we need use special stencils for the left and right boundary terms.
         else:
-            Dxi[:self.leftBdrDepth,:] = 0.
-            Dxi[-self.leftBdrDepth:,:] = 0.
+            # If leftBrdDepth = k, then we use a special stencil to approximate x'(t_0), ... , 
+            # x'(t_{k - 1}) and for x'(t_{Nx - k}), ... , x'(t_{Nx - 1}). We begin by zeroing out
+            # the first/last k rows of Dxi.
+            Dxi[:self.leftBdrDepth,:]   = 0.
+            Dxi[-self.leftBdrDepth:,:]  = 0.
+
+            # Now, populate the first/last few rows of Dxi to implement the boundary stencil. 
             for depth in range(self.leftBdrDepth):
-                width = self.leftBdrWidth[depth]
+                # leftBdrWidth[depth] = k means that the stencil for x(t_{depth}) depends on 
+                # x(t_0), ... , x(t_{k - 1}).
+                width   : int  = self.leftBdrWidth[depth]
+                
+                # Update the first width elements of the depth'th row of Dxi using the depth'th 
+                # elements of leftBdrStencils (which holds the stencil weights for this row's 
+                # stencil)
                 Dxi[depth,:width] = self.leftBdrStencils[depth]
+
+                # Update the (depth - 1)'th to last row of Dxi using the reversed stencil (which 
+                # gives us an equivalent stencil for right boundaries).
                 # NOTE: Currently only consider skew-symmetric operators.
                 Dxi[-1-depth,-width:] = -Dxi[depth,(width-1)::-1]
-            norm[:self.leftBdrDepth] = self.leftBdrNorm
-            norm[-self.leftBdrDepth:] = norm[(self.leftBdrDepth-1)::-1]
+            
+            # TODO: what is going on here?
+            norm[:self.leftBdrDepth]    = self.leftBdrNorm
+            norm[-self.leftBdrDepth:]   = norm[(self.leftBdrDepth-1)::-1]
 
-        Dxi = self.convert(sps.coo_matrix(Dxi))
+        # Convert Dxi to a tensor. 
+        Dxi : torch.Tensor = self.convert(sps.coo_matrix(Dxi))
+
+        # All done!
         return Dxi, torch.Tensor(norm), torch.Tensor(periodicOffset)
     
-    def convert(self, scipy_coo):
+
+
+    def convert(self, scipy_coo : spmatrix) -> torch.Tensor:
+        """
+        Converts scipy_coo, a sparse numpy array, to a sparse torch Tensor.
+
+
+        -------------------------------------------------------------------------------------------
+        Arguments
+        -------------------------------------------------------------------------------------------
+
+        scipy_coo: A sparse numpy array.
+
+        
+        -------------------------------------------------------------------------------------------
+        Returns
+        -------------------------------------------------------------------------------------------
+
+        A tensor version of scipy_coo.
+        """
+        
         if (type(scipy_coo) is not sps._coo.coo_matrix):
             raise RuntimeError("The input sparse matrix must be in scipy COO format!")
 
-        values = scipy_coo.data
-        indices = np.vstack((scipy_coo.row, scipy_coo.col))
 
-        i = torch.LongTensor(indices)
-        v = torch.FloatTensor(values)
+        # Fetch the values of the non-zero entries of scipy_coo.  
+        values : np.ndarray = scipy_coo.data
+
+        # Get the row, column numbers of the non-zero entries of scipy_coo. vertically stack them 
+        # into a 2 x N matrix (N being the number of non-zero entries in scipy_coo) whose j'th 
+        # column holds the row and column number of the j'th non-zero cell in scipy_coo.
+        indices : np.ndarray = np.vstack((scipy_coo.row, scipy_coo.col))
+
+        # Convert indices to a tensor
+        i : torch.Tensor = torch.LongTensor(indices)
+
+        # Convert the list of non-zero values in scipy_coo to a tensor.
+        v : torch.Tensor = torch.FloatTensor(values)
+
+        # Get the shape of scipy.coo
         shape = scipy_coo.shape
 
+        # Convert scipy_coo to a tensor and return!
         return torch.sparse_coo_tensor(i, v, torch.Size(shape))
+
+
+
+# -------------------------------------------------------------------------------------------------
+# Stencil sub-classes
+# -------------------------------------------------------------------------------------------------
 
 class SBP12(Stencil):
     def __init__(self):
@@ -66,7 +240,9 @@ class SBP12(Stencil):
         self.interiorStencils = np.array([-0.5, 0.5])
         self.interiorIndexes = [-1, 1]
         return
-    
+
+
+   
 class SBP24(Stencil):
     def __init__(self):
         self.leftBdrDepth = 4
@@ -80,6 +256,8 @@ class SBP24(Stencil):
         self.interiorStencils = np.array([1./12., -2./3., 2./3., -1./12.])
         self.interiorIndexes = [-2, -1, 1, 2]
         return
+
+
 
 class SBP36(Stencil):
     def __init__(self):
@@ -97,6 +275,8 @@ class SBP36(Stencil):
         self.interiorStencils = np.array([-1./60., 3./20., -3./4., 3./4., -3./20., 1./60.])
         self.interiorIndexes = [-3, -2, -1, 1, 2, 3]
         return
+
+
 
 class SBP48(Stencil):
     def __init__(self):
@@ -215,6 +395,8 @@ class SBP48(Stencil):
         self.interiorStencils = np.array([1./280., -4./105., 1./5., -4./5., 4./5., -1./5., 4./105., -1./280.])
         self.interiorIndexes = [-4, -3, -2, -1, 1, 2, 3, 4]
         return
+
+
 
 FDdict = {'sbp12': SBP12(),
           'sbp24': SBP24(),
