@@ -135,43 +135,92 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lasdi.fd.</span></span><span class="sig-name descname"><span class="pre">Stencil</span></span><a class="headerlink" href="#lasdi.fd.Stencil" title="Permalink to this definition"></a></dt>
 <dd><dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.fd.Stencil.leftBdrDepth">
-<span class="sig-name descname"><span class="pre">leftBdrDepth</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#lasdi.fd.Stencil.leftBdrDepth" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">leftBdrDepth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#lasdi.fd.Stencil.leftBdrDepth" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.fd.Stencil.leftBdrWidth">
-<span class="sig-name descname"><span class="pre">leftBdrWidth</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.fd.Stencil.leftBdrWidth" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">leftBdrWidth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.fd.Stencil.leftBdrWidth" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.fd.Stencil.leftBdrStencils">
-<span class="sig-name descname"><span class="pre">leftBdrStencils</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[[]]</span></em><a class="headerlink" href="#lasdi.fd.Stencil.leftBdrStencils" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">leftBdrStencils</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[[]]</span></em><a class="headerlink" href="#lasdi.fd.Stencil.leftBdrStencils" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.fd.Stencil.leftBdrNorm">
-<span class="sig-name descname"><span class="pre">leftBdrNorm</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.fd.Stencil.leftBdrNorm" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">leftBdrNorm</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.fd.Stencil.leftBdrNorm" title="Permalink to this definition"></a></dt>
+<dd><p>Suppose that InteriorStencils is an array of length Ns and interiorIndexes is a list of
+length Ns. Further suppose the underlying time series contains Nx points, x(t_0), … ,
+x(t_{Nx -1}). Assuming index i is an “interior index” (not too close to 0 or Nx - 1), then we
+approximate the time derivative of z at time t_i as follows:</p>
+<blockquote>
+<div><p>z’(t_i) pprox c_0 z(t_{i + i(0)}) + … + c_{Ns - 1} z(t_{i + i(Ns - 1)})</p>
+</div></blockquote>
+<p>where c_k = interiorStencils[k] and i(k) = interiorIndexes[k]. Note that the indices may be
+negative or positive. Thus, interiorStencils and interiorIndexes tell us how to construct the
+finite difference scheme away from the boundary.
+x
+For instance, the central difference scheme corresponds to interiorStencils = [-1/2, 1/2],
+interiorIndexes = [-1, 1] and</p>
+<blockquote>
+<div><p>z’(t_i) pprox (1/2)(-z(t_{i - 1}) + z_{t_{i + 1}})</p>
+</div></blockquote>
+<p>Note: We assume that interiorIndexes is in ASCENDING order.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.fd.Stencil.interiorStencils">
-<span class="sig-name descname"><span class="pre">interiorStencils</span></span><a class="headerlink" href="#lasdi.fd.Stencil.interiorStencils" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">interiorStencils</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="headerlink" href="#lasdi.fd.Stencil.interiorStencils" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.fd.Stencil.interiorIndexes">
-<span class="sig-name descname"><span class="pre">interiorIndexes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.fd.Stencil.interiorIndexes" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">interiorIndexes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.fd.Stencil.interiorIndexes" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.fd.Stencil.getOperators">
-<span class="sig-name descname"><span class="pre">getOperators</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Nx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periodic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.fd.Stencil.getOperators" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">getOperators</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Nx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periodic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">scipy.sparse.spmatrix</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#lasdi.fd.Stencil.getOperators" title="Permalink to this definition"></a></dt>
+<dd><p>The stencil class acts as an abstract base class for finite difference schemes. We assume
+that the user has a time series, x(t_0), … , x(t_{Nx - 1}) in mathbb{R}^d. We will
+further assume that the time stamps are evenly spaced, t_0, … , t_{Nx - 1}. That is,
+there is some Delta t such that t_k = t_0 + Delta_t*k for each k. We also assume the user
+wants to approximate the time derivative of x at t_0, … , t_{Nx - 1} using a finite
+difference scheme.</p>
+<p>The getOperators method builds an a sparse Tensor housing the “operator matrix”. This is
+an Nx x Nx matrix that we use to apply the finite difference scheme to one component of
+the time series. How does this work? Suppose the time series is x(t_0), … ,
+x(t_{Nx - 1}) in mathbb{R}^d. Then, for each i in { 1, 2, … , d}, we construct Dxi
+such that Dxi * xi is the vector whose i’th entry holds the approximation (using the
+selected finite difference scheme) of x_i’(t_i). Here, xi = [x_i(t_0), … ,
+x_i(t_{Nx - 1})]. To build Dxi, we first set up a matrix to give the correct approximation
+to x_i’(t_j) whenever j is an interior index. The rest of this function adjusts the
+first/last few rows of Dxi so that it also gives the correct approximation at the
+boundaries (j close to to 0 or Nx - 1).</p>
+<p>The Stencil class is not a standalone class; you shouldn’t use it directly. Rather, you
+should use one of the sub-classes defined below. Each one implements a specific finite
+difference scheme to approximate the time derivatives at t_0, … , t_{Nx - 1} (they may
+use different rules on the left and right boundary). Each sub-class should set the
+interiorStencils and interiorIndexes attributes.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>periodic</strong> (<em>A boolean specifying if we should treat the time series as periodic or not.</em>)</p></li>
+</ul>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>TODO</strong> (<em>what are the last two of these used for? And what are they?</em>)</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.fd.Stencil.convert">
-<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scipy_coo</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.fd.Stencil.convert" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scipy_coo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">scipy.sparse.spmatrix</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.Tensor</span></span></span><a class="headerlink" href="#lasdi.fd.Stencil.convert" title="Permalink to this definition"></a></dt>
+<dd><p>Converts scipy_coo, a sparse numpy array, to a sparse torch Tensor.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -197,7 +246,24 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.fd.SBP12.leftBdrNorm">
 <span class="sig-name descname"><span class="pre">leftBdrNorm</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0.5]</span></em><a class="headerlink" href="#lasdi.fd.SBP12.leftBdrNorm" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Suppose that InteriorStencils is an array of length Ns and interiorIndexes is a list of
+length Ns. Further suppose the underlying time series contains Nx points, x(t_0), … ,
+x(t_{Nx -1}). Assuming index i is an “interior index” (not too close to 0 or Nx - 1), then we
+approximate the time derivative of z at time t_i as follows:</p>
+<blockquote>
+<div><p>z’(t_i) pprox c_0 z(t_{i + i(0)}) + … + c_{Ns - 1} z(t_{i + i(Ns - 1)})</p>
+</div></blockquote>
+<p>where c_k = interiorStencils[k] and i(k) = interiorIndexes[k]. Note that the indices may be
+negative or positive. Thus, interiorStencils and interiorIndexes tell us how to construct the
+finite difference scheme away from the boundary.
+x
+For instance, the central difference scheme corresponds to interiorStencils = [-1/2, 1/2],
+interiorIndexes = [-1, 1] and</p>
+<blockquote>
+<div><p>z’(t_i) pprox (1/2)(-z(t_{i - 1}) + z_{t_{i + 1}})</p>
+</div></blockquote>
+<p>Note: We assume that interiorIndexes is in ASCENDING order.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.fd.SBP12.interiorStencils">
@@ -233,7 +299,24 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.fd.SBP24.leftBdrNorm">
 <span class="sig-name descname"><span class="pre">leftBdrNorm</span></span><a class="headerlink" href="#lasdi.fd.SBP24.leftBdrNorm" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Suppose that InteriorStencils is an array of length Ns and interiorIndexes is a list of
+length Ns. Further suppose the underlying time series contains Nx points, x(t_0), … ,
+x(t_{Nx -1}). Assuming index i is an “interior index” (not too close to 0 or Nx - 1), then we
+approximate the time derivative of z at time t_i as follows:</p>
+<blockquote>
+<div><p>z’(t_i) pprox c_0 z(t_{i + i(0)}) + … + c_{Ns - 1} z(t_{i + i(Ns - 1)})</p>
+</div></blockquote>
+<p>where c_k = interiorStencils[k] and i(k) = interiorIndexes[k]. Note that the indices may be
+negative or positive. Thus, interiorStencils and interiorIndexes tell us how to construct the
+finite difference scheme away from the boundary.
+x
+For instance, the central difference scheme corresponds to interiorStencils = [-1/2, 1/2],
+interiorIndexes = [-1, 1] and</p>
+<blockquote>
+<div><p>z’(t_i) pprox (1/2)(-z(t_{i - 1}) + z_{t_{i + 1}})</p>
+</div></blockquote>
+<p>Note: We assume that interiorIndexes is in ASCENDING order.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.fd.SBP24.interiorStencils">
@@ -269,7 +352,24 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.fd.SBP36.leftBdrNorm">
 <span class="sig-name descname"><span class="pre">leftBdrNorm</span></span><a class="headerlink" href="#lasdi.fd.SBP36.leftBdrNorm" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Suppose that InteriorStencils is an array of length Ns and interiorIndexes is a list of
+length Ns. Further suppose the underlying time series contains Nx points, x(t_0), … ,
+x(t_{Nx -1}). Assuming index i is an “interior index” (not too close to 0 or Nx - 1), then we
+approximate the time derivative of z at time t_i as follows:</p>
+<blockquote>
+<div><p>z’(t_i) pprox c_0 z(t_{i + i(0)}) + … + c_{Ns - 1} z(t_{i + i(Ns - 1)})</p>
+</div></blockquote>
+<p>where c_k = interiorStencils[k] and i(k) = interiorIndexes[k]. Note that the indices may be
+negative or positive. Thus, interiorStencils and interiorIndexes tell us how to construct the
+finite difference scheme away from the boundary.
+x
+For instance, the central difference scheme corresponds to interiorStencils = [-1/2, 1/2],
+interiorIndexes = [-1, 1] and</p>
+<blockquote>
+<div><p>z’(t_i) pprox (1/2)(-z(t_{i - 1}) + z_{t_{i + 1}})</p>
+</div></blockquote>
+<p>Note: We assume that interiorIndexes is in ASCENDING order.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.fd.SBP36.interiorStencils">
@@ -300,7 +400,24 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.fd.SBP48.leftBdrNorm">
 <span class="sig-name descname"><span class="pre">leftBdrNorm</span></span><a class="headerlink" href="#lasdi.fd.SBP48.leftBdrNorm" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Suppose that InteriorStencils is an array of length Ns and interiorIndexes is a list of
+length Ns. Further suppose the underlying time series contains Nx points, x(t_0), … ,
+x(t_{Nx -1}). Assuming index i is an “interior index” (not too close to 0 or Nx - 1), then we
+approximate the time derivative of z at time t_i as follows:</p>
+<blockquote>
+<div><p>z’(t_i) pprox c_0 z(t_{i + i(0)}) + … + c_{Ns - 1} z(t_{i + i(Ns - 1)})</p>
+</div></blockquote>
+<p>where c_k = interiorStencils[k] and i(k) = interiorIndexes[k]. Note that the indices may be
+negative or positive. Thus, interiorStencils and interiorIndexes tell us how to construct the
+finite difference scheme away from the boundary.
+x
+For instance, the central difference scheme corresponds to interiorStencils = [-1/2, 1/2],
+interiorIndexes = [-1, 1] and</p>
+<blockquote>
+<div><p>z’(t_i) pprox (1/2)(-z(t_{i - 1}) + z_{t_{i + 1}})</p>
+</div></blockquote>
+<p>Note: We assume that interiorIndexes is in ASCENDING order.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.fd.SBP48.leftBdrStencils">

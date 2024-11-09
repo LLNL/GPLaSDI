@@ -15,7 +15,7 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: SINDy(dim, nt, config)
+.. py:class:: SINDy(dim: int, nt: int, config: dict)
 
    Bases: :py:obj:`lasdi.latent_dynamics.LatentDynamics`
 
@@ -44,32 +44,97 @@ Module Contents
    .. py:attribute:: MSE
 
 
-   .. py:method:: calibrate(Z, dt, compute_loss=True, numpy=False)
+   .. py:method:: calibrate(Z: torch.Tensor, dt: float, compute_loss: bool = True, numpy: bool = False) -> numpy.ndarray | torch.Tensor | tuple[numpy.ndarray | torch.Tensor, torch.Tensor, torch.Tensor]
 
-      loop over all train cases, if Z dimension is 3
-
-
-
-   .. py:method:: compute_time_derivative(Z, Dt)
-
-      Builds the SINDy dataset, assuming only linear terms in the SINDy dataset. The time derivatives are computed through
-      finite difference.
-
-      Z is the encoder output (2D tensor), with shape [time_dim, space_dim]
-      Dt is the size of timestep (assumed to be a uniform scalar)
-
-      The output dZdt is a 2D tensor with the same shape of Z.
+      This function computes the optimal SINDy coefficients using the current latent time
+      series'. Specifically, let us consider the case when Z has two dimensions (the case when
+      it has three is identical, just with different coefficients for each instance of the
+      leading dimension of Z). In this case, we assume that the rows of Z correspond to a
+      trajectory of latent states. Specifically, we assume the i'th row holds the latent state,
+      z, at time t_0 + i*dt. We use SINDy to find the coefficients in the dynamical system
+      z'(t) = C \Phi(z(t)), where C is a matrix of coefficients and \Phi(z(t)) represents a
+      library of terms. We find the matrix C corresponding to the dynamical system that best
+      agrees with the data in the rows of Z.
 
 
+      -------------------------------------------------------------------------------------------
+      :Parameters: * **Z** (*A 2d or 3d tensor. If Z is a 2d tensor, then it has shape (Nt, Nz), where Nt specifies*)
+                   * **the number of time steps in each sequence of latent states and Nz is the dimension of the**
+                   * **latent space. In this case, the i,j entry of Z holds the j'th component of the latent state**
+                   * **at the time t_0 + i*dt. If it is a 3d tensor, then it has shape (Np, Nt, Nz). In this case,**
+                   * **we assume there at Np different combinations of parameter values. The i, j, k entry of Z in**
+                   * **this case holds the k'th component of the latent encoding at time t_0 + j*dt when we use**
+                   * **he i'th combination of parameter values.**
+                   * **dt** (*The time step between time steps. See the description of the "Z" argument.*)
+                   * **compute_loss** (*A boolean which, if true, will prompt us to calculate the sindy and*)
+                   * **coefficient losses, which we will then return with the optimal SINDy coefficients. If not,**
+                   * **we will only return the optimal SINDy coefficients.**
+                   * **numpy** (*A boolean. If True, we return the coefficient matrix as a numpy.ndarray object. If*)
+                   * **False, we return it as a torch.Tensor object.**
+
+      -------------------------------------------------------------------------------------------
+      :returns: * *IF compute_loss is True, then we return three variables. The first is a matrix of shape*
+                * *()*
 
 
-   .. py:method:: simulate(coefs, z0, t_grid)
 
-      Integrates each system of ODEs corresponding to each training points, given the initial condition Z0 = encoder(U0)
+   .. py:method:: compute_time_derivative(Z: torch.Tensor, Dt: float) -> torch.Tensor
+
+      This function builds the SINDy dataset, assuming only linear terms in the SINDy dataset.
+      The time derivatives are computed through finite difference.
+
+
+      -------------------------------------------------------------------------------------------
+      :Parameters: * **Z** (*A 2d tensor of shape (Nt, Nz) whose i, j entry holds the j'th component of the i'th*)
+                   * **time step in the latent time series. We assume that Z[i,** (*] represents the latent state*)
+                   * **at time t_0 + i*Dt**
+                   * **Dt** (*The time step between latent frames (the time between Z[:, i] and Z[:, i + 1])*)
+
+      -------------------------------------------------------------------------------------------
+      :returns: * *The output dZdt is a 2D tensor with the same shape as Z. It's i, j entry holds an*
+                * *approximation to (d/dt)Z_j(t_0 + j Dt). We compute this approximation using self's stencil.*
 
 
 
+   .. py:method:: simulate(coefs: numpy.ndarray, z0: numpy.ndarray, t_grid: numpy.ndarray) -> numpy.ndarray
 
-   .. py:method:: export()
+      Time integrates the latent dynamics when it uses the coefficients specified in coefs and
+      starts from the (single) initial condition in z0.
+
+
+      -------------------------------------------------------------------------------------------
+      :Parameters: * **coefs** (*A one dimensional numpy.ndarray object representing the flattened copy of the array*)
+                   * **of latent dynamics coefficients that calibrate returns.**
+                   * **z0** (*A numpy ndarray object of shape nz representing the initial condition for the latent*)
+                   * **dynamics. Thus, the i'th component of this array should hold the i'th component of the**
+                   * **latent dynamics initial condition.**
+                   * **t_grid** (*A 1d numpy ndarray object whose i'th entry holds the value of the i'th time value*)
+                   * **where we want to compute the latent solution. The elements of this array should be in**
+                   * **ascending order.**
+
+      -------------------------------------------------------------------------------------------
+      :returns: * *A 2d numpy.ndarray object holding the solution to the latent dynamics at the time values*
+                * *specified in t_grid when we use the coefficients in coefs to characterize the latent*
+                * *dynamics model. Specifically, this is a 2d array of shape (nt, nz), where nt is the*
+                * *number of time steps (size of t_grid) and nz is the latent space dimension (self.dim).*
+                * *Thus, the i,j element of this matrix holds the j'th component of the latent solution at*
+                * *the time stored in the i'th element of t_grid.*
+
+
+
+   .. py:method:: export() -> dict
+
+      This function packages self's contents into a dictionary which it then returns. We can use
+      this dictionary to create a new SINDy object which has the same internal state as self.
+
+
+      -------------------------------------------------------------------------------------------
+      :Parameters: **None!**
+
+      -------------------------------------------------------------------------------------------
+      :returns: * **A dictionary with two keys** (*fd_type and coef_norm_order. The former specifies which finite*)
+                * *different scheme we use while the latter specifies which norm we want to use when computing*
+                * *the coefficient loss.*
+
 
 

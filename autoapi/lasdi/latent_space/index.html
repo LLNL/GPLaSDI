@@ -123,8 +123,8 @@
 <h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lasdi.latent_space.initial_condition_latent" title="lasdi.latent_space.initial_condition_latent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initial_condition_latent</span></code></a>(param_grid, physics, autoencoder)</p></td>
-<td><p>Outputs the initial condition in the latent space: Z0 = encoder(U0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lasdi.latent_space.initial_condition_latent" title="lasdi.latent_space.initial_condition_latent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initial_condition_latent</span></code></a>(→ list[numpy.ndarray])</p></td>
+<td><p>This function maps a set of initial conditions for the fom to initial conditions for the</p></td>
 </tr>
 </tbody>
 </table>
@@ -138,83 +138,103 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lasdi.latent_space.initial_condition_latent">
-<span class="sig-prename descclassname"><span class="pre">lasdi.latent_space.</span></span><span class="sig-name descname"><span class="pre">initial_condition_latent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">physics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">autoencoder</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_space.initial_condition_latent" title="Permalink to this definition"></a></dt>
-<dd><p>Outputs the initial condition in the latent space: Z0 = encoder(U0)</p>
+<span class="sig-prename descclassname"><span class="pre">lasdi.latent_space.</span></span><span class="sig-name descname"><span class="pre">initial_condition_latent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">physics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../physics/index.html#lasdi.physics.Physics" title="lasdi.physics.Physics"><span class="pre">lasdi.physics.Physics</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">autoencoder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.nn.Module</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#lasdi.latent_space.initial_condition_latent" title="Permalink to this definition"></a></dt>
+<dd><p>This function maps a set of initial conditions for the fom to initial conditions for the
+latent space dynamics. Specifically, we take in a set of possible parameter values. For each
+set of parameter values, we recover the fom IC (from physics), then map this fom IC to a
+latent space IC (by encoding it using the autoencoder). We do this for each parameter
+combination and then return a list housing the latent space ICs.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>combination of parameters.</strong></p></li>
+<li><p><strong>physics</strong> (<em>A “Physics” object that, among other things, stores the IC for each combination of</em>)</p></li>
+<li><p><strong>parameters.</strong></p></li>
+<li><p><strong>autoencoder</strong> (<em>The actual autoencoder object that we use to map the ICs into the latent space.</em>)</p></li>
+</ul>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><em>the i’th set of parameters, then the i’th element of the returned list is Z0_i = encoder(U0_i).</em></p></li>
+</ul>
+</div></blockquote>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lasdi.latent_space.</span></span><span class="sig-name descname"><span class="pre">MultiLayerPerceptron</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_sizes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">act_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sigmoid'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reshape_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reshape_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_heads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lasdi.latent_space.</span></span><span class="sig-name descname"><span class="pre">MultiLayerPerceptron</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">act_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'sigmoid'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reshape_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reshape_shape</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron.n_layers">
-<span class="sig-name descname"><span class="pre">n_layers</span></span><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.n_layers" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">n_layers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.n_layers" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron.layer_sizes">
-<span class="sig-name descname"><span class="pre">layer_sizes</span></span><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.layer_sizes" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">layer_sizes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.layer_sizes" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron.fcs">
-<span class="sig-name descname"><span class="pre">fcs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.fcs" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron.layers">
+<span class="sig-name descname"><span class="pre">layers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.nn.Module</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.layers" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron.reshape_index">
-<span class="sig-name descname"><span class="pre">reshape_index</span></span><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.reshape_index" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">reshape_index</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.reshape_index" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron.reshape_shape">
-<span class="sig-name descname"><span class="pre">reshape_shape</span></span><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.reshape_shape" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">reshape_shape</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.reshape_shape" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron.act_type">
-<span class="sig-name descname"><span class="pre">act_type</span></span><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.act_type" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron.use_multihead">
-<span class="sig-name descname"><span class="pre">use_multihead</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.use_multihead" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">act_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.act_type" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.forward" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron.apply_attention">
-<span class="sig-name descname"><span class="pre">apply_attention</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">act_idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.apply_attention" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.Tensor</span></span></span><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.forward" title="Permalink to this definition"></a></dt>
+<dd><p>This function defines the forward pass through self.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>elements, then the final k elements of x’s shape must match self.reshape_shape.</strong></p></li>
+</ul>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><em>of its shape match those of self.reshape_shape.</em></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron.init_weight">
-<span class="sig-name descname"><span class="pre">init_weight</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.init_weight" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">init_weight</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.init_weight" title="Permalink to this definition"></a></dt>
+<dd><p>This function initializes the weight matrices and bias vectors in self’s layers. It takes
+no arguments and returns nothing!</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lasdi.latent_space.Autoencoder">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lasdi.latent_space.</span></span><span class="sig-name descname"><span class="pre">Autoencoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">physics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_space.Autoencoder" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lasdi.latent_space.</span></span><span class="sig-name descname"><span class="pre">Autoencoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">physics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../physics/index.html#lasdi.physics.Physics" title="lasdi.physics.Physics"><span class="pre">lasdi.physics.Physics</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_space.Autoencoder" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.Autoencoder.qgrid_size">
-<span class="sig-name descname"><span class="pre">qgrid_size</span></span><a class="headerlink" href="#lasdi.latent_space.Autoencoder.qgrid_size" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">qgrid_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#lasdi.latent_space.Autoencoder.qgrid_size" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.Autoencoder.space_dim">
-<span class="sig-name descname"><span class="pre">space_dim</span></span><a class="headerlink" href="#lasdi.latent_space.Autoencoder.space_dim" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">space_dim</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="headerlink" href="#lasdi.latent_space.Autoencoder.space_dim" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.Autoencoder.n_z">
-<span class="sig-name descname"><span class="pre">n_z</span></span><a class="headerlink" href="#lasdi.latent_space.Autoencoder.n_z" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">n_z</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#lasdi.latent_space.Autoencoder.n_z" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -229,18 +249,31 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.latent_space.Autoencoder.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_space.Autoencoder.forward" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.Tensor</span></span></span><a class="headerlink" href="#lasdi.latent_space.Autoencoder.forward" title="Permalink to this definition"></a></dt>
+<dd><p>This function defines the forward pass through self.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.latent_space.Autoencoder.export">
-<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_space.Autoencoder.export" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#lasdi.latent_space.Autoencoder.export" title="Permalink to this definition"></a></dt>
+<dd><blockquote>
+<div><ul class="simple">
+<li><p><em>(that you initialized to have the same architecture as self) to make the other autoencoder</em></p></li>
+<li><p><em>identical to self.</em></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.latent_space.Autoencoder.load">
-<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_space.Autoencoder.load" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#lasdi.latent_space.Autoencoder.load" title="Permalink to this definition"></a></dt>
+<dd><p>This function loads self’s state dictionary.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>layer sizes) as self.</strong></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
 
 </dd></dl>
 

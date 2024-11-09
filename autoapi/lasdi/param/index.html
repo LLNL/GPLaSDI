@@ -120,14 +120,11 @@
 <h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lasdi.param.get_1dspace_from_list" title="lasdi.param.get_1dspace_from_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_1dspace_from_list</span></code></a>(config)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lasdi.param.get_1dspace_from_list" title="lasdi.param.get_1dspace_from_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_1dspace_from_list</span></code></a>(→ tuple[int, numpy.ndarray])</p></td>
+<td><p>This function generates the parameter range (set of possible parameter values) for a parameter</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lasdi.param.create_uniform_1dspace" title="lasdi.param.create_uniform_1dspace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_uniform_1dspace</span></code></a>(config)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lasdi.param.get_1dspace_for_exterior" title="lasdi.param.get_1dspace_for_exterior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_1dspace_for_exterior</span></code></a>(config)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lasdi.param.create_uniform_1dspace" title="lasdi.param.create_uniform_1dspace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_uniform_1dspace</span></code></a>(→ tuple[int, numpy.ndarray])</p></td>
+<td><p>This function generates the parameter range (set of possible parameter values) for a parameter</p></td>
 </tr>
 </tbody>
 </table>
@@ -136,107 +133,154 @@
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="lasdi.param.get_1dspace_from_list">
-<span class="sig-prename descclassname"><span class="pre">lasdi.param.</span></span><span class="sig-name descname"><span class="pre">get_1dspace_from_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.get_1dspace_from_list" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">lasdi.param.</span></span><span class="sig-name descname"><span class="pre">get_1dspace_from_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#lasdi.param.get_1dspace_from_list" title="Permalink to this definition"></a></dt>
+<dd><p>This function generates the parameter range (set of possible parameter values) for a parameter
+that uses the list type test space. That is, “test_space_type” should be a key for the
+parameter dictionary and the corresponding value should be “list”. The parameter dictionary
+should also have a “list” key whose value is a list of the possible parameter values.</p>
+<p>We parse this list and turn it into a numpy ndarray.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>floats.</strong></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lasdi.param.create_uniform_1dspace">
-<span class="sig-prename descclassname"><span class="pre">lasdi.param.</span></span><span class="sig-name descname"><span class="pre">create_uniform_1dspace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.create_uniform_1dspace" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="lasdi.param.get_1dspace_for_exterior">
-<span class="sig-prename descclassname"><span class="pre">lasdi.param.</span></span><span class="sig-name descname"><span class="pre">get_1dspace_for_exterior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.get_1dspace_for_exterior" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">lasdi.param.</span></span><span class="sig-name descname"><span class="pre">create_uniform_1dspace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#lasdi.param.create_uniform_1dspace" title="Permalink to this definition"></a></dt>
+<dd><p>This function generates the parameter range (set of possible parameter values) for a parameter
+that uses the uniform type test space. That is, “test_space_type” should be a key for the
+parameter dictionary and the corresponding value should be “uniform”. The parameter dictionary
+should also have the following keys:</p>
+<blockquote>
+<div><p>“min”
+“max”
+“sample_size”
+“log_scale”</p>
+</div></blockquote>
+<p>“min” and “max” specify the minimum and maximum value of the parameter, respectively.
+“sample_size” specifies the number of parameter values we generate. Finally, log_scale, if
+true, specifies if we should use a uniform or logarithmic spacing between samples of the
+parameter.</p>
+<p>The values corresponding to “min” and “max” should be floats while the values corresponding to
+“sample_size” and “log_scale” should be an int and a bool, respectively.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>keys (see above).</strong></p></li>
+</ul>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><em>paramRange[-1] = param_dict[“max”]). Nx is the length of paramRange or, equivalently</em></p></li>
+<li><p><em>param_dict[“sample_size”].</em></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="lasdi.param.getParam1DSpace">
-<span class="sig-prename descclassname"><span class="pre">lasdi.param.</span></span><span class="sig-name descname"><span class="pre">getParam1DSpace</span></span><a class="headerlink" href="#lasdi.param.getParam1DSpace" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">lasdi.param.</span></span><span class="sig-name descname"><span class="pre">getParam1DSpace</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">callable</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#lasdi.param.getParam1DSpace" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lasdi.param.</span></span><span class="sig-name descname"><span class="pre">ParameterSpace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lasdi.param.</span></span><span class="sig-name descname"><span class="pre">ParameterSpace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace" title="Permalink to this definition"></a></dt>
 <dd><dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.param_list">
-<span class="sig-name descname"><span class="pre">param_list</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.param.ParameterSpace.param_list" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">param_list</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.param.ParameterSpace.param_list" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.param_name">
-<span class="sig-name descname"><span class="pre">param_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.param.ParameterSpace.param_name" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">param_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.param.ParameterSpace.param_name" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.n_param">
-<span class="sig-name descname"><span class="pre">n_param</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#lasdi.param.ParameterSpace.n_param" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">n_param</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#lasdi.param.ParameterSpace.n_param" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.train_space">
-<span class="sig-name descname"><span class="pre">train_space</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#lasdi.param.ParameterSpace.train_space" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">train_space</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#lasdi.param.ParameterSpace.train_space" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.test_space">
-<span class="sig-name descname"><span class="pre">test_space</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#lasdi.param.ParameterSpace.test_space" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">test_space</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#lasdi.param.ParameterSpace.test_space" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.n_init">
-<span class="sig-name descname"><span class="pre">n_init</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#lasdi.param.ParameterSpace.n_init" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">n_init</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#lasdi.param.ParameterSpace.n_init" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.test_grid_sizes">
-<span class="sig-name descname"><span class="pre">test_grid_sizes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.param.ParameterSpace.test_grid_sizes" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">test_grid_sizes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.param.ParameterSpace.test_grid_sizes" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.test_meshgrid">
-<span class="sig-name descname"><span class="pre">test_meshgrid</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#lasdi.param.ParameterSpace.test_meshgrid" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">test_meshgrid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#lasdi.param.ParameterSpace.test_meshgrid" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.n_train">
-<span class="sig-name descname"><span class="pre">n_train</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace.n_train" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">n_train</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#lasdi.param.ParameterSpace.n_train" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the number of combinations of parameters in the training set.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.n_test">
-<span class="sig-name descname"><span class="pre">n_test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace.n_test" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">n_test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#lasdi.param.ParameterSpace.n_test" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the number of combinations of parameters in the testing set.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.createInitialTrainSpace">
-<span class="sig-name descname"><span class="pre">createInitialTrainSpace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace.createInitialTrainSpace" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="lasdi.param.ParameterSpace.createInitialTrainSpaceForHull">
-<span class="sig-name descname"><span class="pre">createInitialTrainSpaceForHull</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace.createInitialTrainSpaceForHull" title="Permalink to this definition"></a></dt>
-<dd><p>If test_space is ‘hull’, then the provided training parameters must be
-points on the exterior of our training space. So, we form the provided points
-into an array.</p>
+<span class="sig-name descname"><span class="pre">createInitialTrainSpace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="headerlink" href="#lasdi.param.ParameterSpace.createInitialTrainSpace" title="Permalink to this definition"></a></dt>
+<dd><p>Sets up a grid of parameter values to train at. Note that we only use the min and max value
+of each parameter when setting up this grid.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>name</p></li>
+<li><p>min</p></li>
+<li><p>max</p></li>
+</ul>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><em>the min and max value of each parameter as the argument. See “createHyperMeshGrid” for</em></p></li>
+<li><p><em>details.</em></p></li>
+<li><p><em>Specifically, we return exactly what “createHyperGridSpace” returns. See the doc-string</em></p></li>
+<li><p><em>for that function for further details.</em></p></li>
+</ul>
+</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.createTestGridSpace">
-<span class="sig-name descname"><span class="pre">createTestGridSpace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace.createTestGridSpace" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="lasdi.param.ParameterSpace.createTestGridSpaceForHull">
-<span class="sig-name descname"><span class="pre">createTestGridSpaceForHull</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace.createTestGridSpaceForHull" title="Permalink to this definition"></a></dt>
-<dd><p>This is similar to createTestGridSpace, but with some different variables.
-We take the min/max value of each parameter, and create a uniform rectangular grid
-over the parameter space with ‘sample_size’ points in each dimension.</p>
+<span class="sig-name descname"><span class="pre">createTestGridSpace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#lasdi.param.ParameterSpace.createTestGridSpace" title="Permalink to this definition"></a></dt>
+<dd><p>This function sets up a grid of parameter values to test at.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>respectively.</strong></p></li>
+</ul>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><em>parameter we consider (this is the length of the i’th element of “paramRanges” below).</em></p></li>
+<li><p><em>The second is a a tuple of k numpy ndarrays (where k = len(param_list)), the i’th one of</em></p></li>
+<li><p><em>which is a k-dimensional array with shape (N0, … , N{k - 1}), where Ni =</em></p></li>
+<li><p><em>param_list[i].size whose i(0), … , i(k - 1) element specifies the value of the i’th</em></p></li>
+<li><p><em>parameter in the i(0), … , i(k - 1)’th unique combination of parameter values.</em></p></li>
+<li><p><em>The third one is a 2d array of parameter values. It has shape (M, k), where</em></p></li>
+<li><p><em>M = prod_{i = 0}^{k - 1} param_list[i].size.</em></p></li>
+</ul>
+</div></blockquote>
 </dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="lasdi.param.ParameterSpace.createTestSpaceFromHull">
-<span class="sig-name descname"><span class="pre">createTestSpaceFromHull</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace.createTestSpaceFromHull" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.getParameter">
@@ -247,46 +291,98 @@ Physics class takes the dict for solve/initial_condition.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.createHyperMeshGrid">
-<span class="sig-name descname"><span class="pre">createHyperMeshGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_ranges</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace.createHyperMeshGrid" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>param_ranges: list of numpy 1d arrays, each corresponding to 1d parameter grid space.</dt><dd><p>The list size is equal to the number of parameters.</p>
-</dd>
-<dt>Output: paramSpaces</dt><dd><ul class="simple">
-<li><p>tuple of numpy nd arrays, corresponding to each parameter.
-Dimension of the array equals to the number of parameters</p></li>
+<span class="sig-name descname"><span class="pre">createHyperMeshGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_ranges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#lasdi.param.ParameterSpace.createHyperMeshGrid" title="Permalink to this definition"></a></dt>
+<dd><p>This function generates arrays of parameter values. Specifically, if there are k
+parameters (param_ranges has k elements), then we return k k-d arrays, the i’th one of
+which is a k-dimensional array whose i(0), … , i(k - 1) element specifies the value of
+the i’th variable in the i(0), … , i(k - 1)’th unique combination of parameter values.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>min value for the i’th parameter. The list size should equal the number of parameters.</strong></p></li>
 </ul>
-</dd>
-</dl>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><em>k parameters and if param_range[i].size = Ni, then the j’th return array has shape</em></p></li>
+<li><p><em>(N0, … , N{k - 1}) and the i(0), … , i(k - 1) element of this array houses the i(j)’th</em></p></li>
+<li><p><em>value of the j’th parameter.</em></p></li>
+<li><p><em>Thus, if there are k parameters, the returned tuple has k elements, each one of</em></p></li>
+<li><p><em>which is an array of shape (N0, … , N{k - 1}).</em></p></li>
+</ul>
+</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.createHyperGridSpace">
-<span class="sig-name descname"><span class="pre">createHyperGridSpace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_grids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace.createHyperGridSpace" title="Permalink to this definition"></a></dt>
-<dd><dl>
-<dt>mesh_grids: tuple of numpy nd arrays, corresponding to each parameter.</dt><dd><p>Dimension of the array equals to the number of parameters</p>
-</dd>
-<dt>Output: param_grid</dt><dd><ul class="simple">
-<li><p>numpy 2d array of size (grid size x number of parameters).</p></li>
+<span class="sig-name descname"><span class="pre">createHyperGridSpace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_grids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="headerlink" href="#lasdi.param.ParameterSpace.createHyperGridSpace" title="Permalink to this definition"></a></dt>
+<dd><p>Flattens the mesh_grid numpy.ndarray objects returned by createHyperMeshGrid and combines
+them into a single 2d array of shape (grid size, number of parameters) (see below).</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>function’s docstring for details.</strong></p></li>
 </ul>
-<p>grid size is the size of a numpy nd array.</p>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><em>N(k)) (k parameters), then (grid size) = N(1)*N(2)</em>…*N(k) and (number of parameters) = k.*</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lasdi.param.ParameterSpace.appendTrainSpace">
+<span class="sig-name descname"><span class="pre">appendTrainSpace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#lasdi.param.ParameterSpace.appendTrainSpace" title="Permalink to this definition"></a></dt>
+<dd><p>Adds a new parameter to self’s train space attribute.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lasdi.param.ParameterSpace.export">
+<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#lasdi.param.ParameterSpace.export" title="Permalink to this definition"></a></dt>
+<dd><p>This function packages the testing/training examples into a dictionary, which it returns.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul>
+<li><p><em>A dictionary with 4 keys. Below is a list of the keys with a short description of each</em></p></li>
+<li><p><em>corresponding value.</em> – train_space: self.train_space, a 2d array of shape (n_train, n_param) whose i,j element
+holds the value of the j’th parameter in the i’th training case.</p>
+<p>test_space: self.test_space, a 2d array of shape (n_test, n_param) whose i,j element
+holds the value of the j’th parameter in the i’th testing case.</p>
+<p>test_grid_sizes: A list whose i’th element specifies how many distinct parameter values
+we use for the i’th parameter.</p>
+<p>test_meshgrid: a tuple of n_param numpy.ndarray array objects whose i’th element is a
+n_param-dimensional array whose i(1), i(2), … , i(n_param) element holds the value of
+the i’th parameter in the i(1), … , i(n_param) combination of parameter values in the
+testing test.</p>
+<p>n_init: The number of combinations of training parameters in the training set.</p>
+</li>
+</ul>
+</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="lasdi.param.ParameterSpace.appendTrainSpace">
-<span class="sig-name descname"><span class="pre">appendTrainSpace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace.appendTrainSpace" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="lasdi.param.ParameterSpace.export">
-<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace.export" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.load">
-<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace.load" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#lasdi.param.ParameterSpace.load" title="Permalink to this definition"></a></dt>
+<dd><p>This function builds a parameter space object from a dictionary. This dictionary should
+be one that was returned by the export method, or a loaded copy of a dictionary that was
+returned by the export method.</p>
+<blockquote>
+<div><blockquote>
+<div><ul class="simple">
+<li><p>train_space</p></li>
+<li><p>test_space</p></li>
+<li><p>test_grid_sizes</p></li>
+<li><p>test_meshgrid</p></li>
+<li><p>n_init</p></li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><p><strong>This dictionary should have been returned by the export method. We use the values in this</strong></p></li>
+<li><p><strong>dictionary to set up self.</strong></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
 
 </dd></dl>
 

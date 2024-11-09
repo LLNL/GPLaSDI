@@ -111,7 +111,7 @@
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="lasdi.latent_dynamics.sindy.SINDy">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lasdi.latent_dynamics.sindy.</span></span><span class="sig-name descname"><span class="pre">SINDy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_dynamics.sindy.SINDy" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lasdi.latent_dynamics.sindy.</span></span><span class="sig-name descname"><span class="pre">SINDy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_dynamics.sindy.SINDy" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="../index.html#lasdi.latent_dynamics.LatentDynamics" title="lasdi.latent_dynamics.LatentDynamics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lasdi.latent_dynamics.LatentDynamics</span></code></a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_dynamics.sindy.SINDy.fd_type">
@@ -145,30 +145,82 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.latent_dynamics.sindy.SINDy.calibrate">
-<span class="sig-name descname"><span class="pre">calibrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numpy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_dynamics.sindy.SINDy.calibrate" title="Permalink to this definition"></a></dt>
-<dd><p>loop over all train cases, if Z dimension is 3</p>
+<span class="sig-name descname"><span class="pre">calibrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_loss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numpy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#lasdi.latent_dynamics.sindy.SINDy.calibrate" title="Permalink to this definition"></a></dt>
+<dd><p>This function computes the optimal SINDy coefficients using the current latent time
+series’. Specifically, let us consider the case when Z has two dimensions (the case when
+it has three is identical, just with different coefficients for each instance of the
+leading dimension of Z). In this case, we assume that the rows of Z correspond to a
+trajectory of latent states. Specifically, we assume the i’th row holds the latent state,
+z, at time t_0 + i*dt. We use SINDy to find the coefficients in the dynamical system
+z’(t) = C Phi(z(t)), where C is a matrix of coefficients and Phi(z(t)) represents a
+library of terms. We find the matrix C corresponding to the dynamical system that best
+agrees with the data in the rows of Z.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>latent space. In this case, the i,j entry of Z holds the j’th component of the latent state</strong></p></li>
+<li><p><strong>at the time t_0 + i*dt. If it is a 3d tensor, then it has shape (Np, Nt, Nz). In this case,</strong></p></li>
+<li><p><strong>we assume there at Np different combinations of parameter values. The i, j, k entry of Z in</strong></p></li>
+<li><p><strong>this case holds the k’th component of the latent encoding at time t_0 + j*dt when we use</strong></p></li>
+<li><p><strong>he i’th combination of parameter values.</strong></p></li>
+<li><p><strong>dt</strong> (<em>The time step between time steps. See the description of the “Z” argument.</em>)</p></li>
+<li><p><strong>compute_loss</strong> (<em>A boolean which, if true, will prompt us to calculate the sindy and</em>)</p></li>
+<li><p><strong>coefficient losses, which we will then return with the optimal SINDy coefficients. If not,</strong></p></li>
+<li><p><strong>we will only return the optimal SINDy coefficients.</strong></p></li>
+<li><p><strong>numpy</strong> (<em>A boolean. If True, we return the coefficient matrix as a numpy.ndarray object. If</em>)</p></li>
+<li><p><strong>False, we return it as a torch.Tensor object.</strong></p></li>
+</ul>
+</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.latent_dynamics.sindy.SINDy.compute_time_derivative">
-<span class="sig-name descname"><span class="pre">compute_time_derivative</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dt</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_dynamics.sindy.SINDy.compute_time_derivative" title="Permalink to this definition"></a></dt>
-<dd><p>Builds the SINDy dataset, assuming only linear terms in the SINDy dataset. The time derivatives are computed through
-finite difference.</p>
-<p>Z is the encoder output (2D tensor), with shape [time_dim, space_dim]
-Dt is the size of timestep (assumed to be a uniform scalar)</p>
-<p>The output dZdt is a 2D tensor with the same shape of Z.</p>
+<span class="sig-name descname"><span class="pre">compute_time_derivative</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.Tensor</span></span></span><a class="headerlink" href="#lasdi.latent_dynamics.sindy.SINDy.compute_time_derivative" title="Permalink to this definition"></a></dt>
+<dd><p>This function builds the SINDy dataset, assuming only linear terms in the SINDy dataset.
+The time derivatives are computed through finite difference.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>at time t_0 + i*Dt</strong></p></li>
+<li><p><strong>Dt</strong> (<em>The time step between latent frames (the time between Z[:, i] and Z[:, i + 1])</em>)</p></li>
+</ul>
+</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.latent_dynamics.sindy.SINDy.simulate">
-<span class="sig-name descname"><span class="pre">simulate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coefs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_grid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_dynamics.sindy.SINDy.simulate" title="Permalink to this definition"></a></dt>
-<dd><p>Integrates each system of ODEs corresponding to each training points, given the initial condition Z0 = encoder(U0)</p>
+<span class="sig-name descname"><span class="pre">simulate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coefs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="headerlink" href="#lasdi.latent_dynamics.sindy.SINDy.simulate" title="Permalink to this definition"></a></dt>
+<dd><p>Time integrates the latent dynamics when it uses the coefficients specified in coefs and
+starts from the (single) initial condition in z0.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>z0</strong> (<em>A numpy ndarray object of shape nz representing the initial condition for the latent</em>)</p></li>
+<li><p><strong>dynamics. Thus, the i’th component of this array should hold the i’th component of the</strong></p></li>
+<li><p><strong>latent dynamics initial condition.</strong></p></li>
+<li><p><strong>t_grid</strong> (<em>A 1d numpy ndarray object whose i’th entry holds the value of the i’th time value</em>)</p></li>
+<li><p><strong>where we want to compute the latent solution. The elements of this array should be in</strong></p></li>
+<li><p><strong>ascending order.</strong></p></li>
+</ul>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><em>dynamics model. Specifically, this is a 2d array of shape (nt, nz), where nt is the</em></p></li>
+<li><p><em>number of time steps (size of t_grid) and nz is the latent space dimension (self.dim).</em></p></li>
+<li><p><em>Thus, the i,j element of this matrix holds the j’th component of the latent solution at</em></p></li>
+<li><p><em>the time stored in the i’th element of t_grid.</em></p></li>
+</ul>
+</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.latent_dynamics.sindy.SINDy.export">
-<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_dynamics.sindy.SINDy.export" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#lasdi.latent_dynamics.sindy.SINDy.export" title="Permalink to this definition"></a></dt>
+<dd><p>This function packages self’s contents into a dictionary which it then returns. We can use
+this dictionary to create a new SINDy object which has the same internal state as self.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><em>the coefficient loss.</em></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
 
 </dd></dl>
 
