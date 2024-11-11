@@ -135,7 +135,7 @@ Module Contents
                      - max
                      - sample_size
                      - list
-                     - log_scale false
+                     - log_scale
                    * **-------------------------------------------------------------------------------------------**
 
       :returns: * *A three element tuple.*
@@ -170,7 +170,7 @@ Module Contents
                      - max
                      - sample_size
                      - list
-                     - log_scale false
+                     - log_scale
                    * **-------------------------------------------------------------------------------------------**
 
       :returns: * *A three element tuple.*
