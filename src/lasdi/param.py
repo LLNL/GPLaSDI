@@ -17,14 +17,8 @@ def create_uniform_1dspace(config):
         paramRange = np.linspace(minval, maxval, Nx)
     return Nx, paramRange
 
-def get_1dspace_for_exterior(config):
-    Nx = config['sample_size']
-    paramRange = np.array(config['list'])
-    return Nx, paramRange
-
 getParam1DSpace = {'list': get_1dspace_from_list,
-                   'uniform': create_uniform_1dspace,
-                   'exterior': get_1dspace_for_exterior}
+                   'uniform': create_uniform_1dspace}
 
 class ParameterSpace:
     param_list = []
@@ -88,20 +82,15 @@ class ParameterSpace:
 
         paramRanges = []
 
-        k = 0
-        for param in param_list:
-            assert (param['test_space_type'] == 'exterior'), ('test_space_type for all parameters must '
-                                                            'be \'exterior\' when test_space is \'hull\'. ')
+        for k, param in enumerate(param_list):
             
-            _, paramRange = getParam1DSpace[param['test_space_type']](param)
+            _, paramRange = getParam1DSpace['list'](param)
             paramRanges += [paramRange]
 
             if k > 0:
                 assert (len(paramRanges[k])==len(paramRanges[k - 1])), (f'Training parameters {k} and {k-1} have '
                                                             'different lengths. All training parameters '
                                                             'must have same length when test_space is \'hull\'.')
-            k = k + 1
-
 
         mesh_grids = np.vstack((paramRanges)).T
         return mesh_grids
@@ -129,11 +118,9 @@ class ParameterSpace:
         gridSizes = []
 
         for param in param_list:
-            Nx, _ = getParam1DSpace[param['test_space_type']](param)
-            minval = param['min']
-            maxval = param['max']
+            Nx, paramRange = getParam1DSpace['uniform'](param)
             gridSizes += [Nx]
-            paramRanges += [np.linspace(minval, maxval, Nx)]
+            paramRanges += [paramRange]
 
         mesh_grids = self.createHyperMeshGrid(paramRanges)
         return gridSizes, mesh_grids, self.createHyperGridSpace(mesh_grids)
@@ -149,6 +136,9 @@ class ParameterSpace:
         mask = cloud.find_simplex(test_space)>=0
         #Only keep points in convex Hull
         test_space = test_space[mask]
+
+        np.save('test_space',test_space)
+        np.save('train_space',self.train_space)
 
         return gridSizes, mesh_grids, test_space
     
