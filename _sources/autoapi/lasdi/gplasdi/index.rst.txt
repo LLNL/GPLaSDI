@@ -26,132 +26,33 @@ Functions
 Module Contents
 ---------------
 
-.. py:function:: average_rom(autoencoder: lasdi.latent_space.Autoencoder, physics: lasdi.physics.Physics, latent_dynamics: lasdi.latent_dynamics.LatentDynamics, gp_list: list[sklearn.gaussian_process.GaussianProcessRegressor], param_grid: numpy.ndarray)
+.. py:function:: average_rom(autoencoder, physics, latent_dynamics, gp_dictionary, param_grid)
 
-   This function simulates the latent dynamics for a collection of testing parameters by using
-   the mean of the posterior distribution for each coefficient's posterior distribution.
-   Specifically, for each parameter combination, we determine the mean of the posterior
-   distribution for each coefficient. We then use this mean to simulate the latent dynamics
-   forward in time (starting from the latent encoding of the fom initial condition for that
-   combination of coefficients).
+.. py:function:: sample_roms(autoencoder, physics, latent_dynamics, gp_dictionary, param_grid, n_samples)
 
+   Collect n_samples of ROM trajectories on param_grid.
+   gp_dictionary: list of Gaussian process regressors (size of n_test)
+   param_grid: numpy 2d array
+   n_samples: integer
+   assert(len(gp_dictionnary) == param_grid.shape[0])
 
-   -----------------------------------------------------------------------------------------------
-   :Parameters: * **autoencoder** (*The actual autoencoder object that we use to map the ICs into the latent space.*)
-                * **physics** (*A "Physics" object that stores the datasets for each parameter combination.*)
-                * **latent_dynamics** (*A LatentDynamics object which describes how we specify the dynamics in the*)
-                * **Autoencoder's latent space.**
-                * **gp_list** (*a list of trained GP regressor objects. The number of elements in this list should*)
-                * **match the number of columns in param_grid. The i'th element of this list is a GP regressor**
-                * **object that predicts the i'th coefficient.**
-                * **param_grid** (*A 2d numpy.ndarray object of shape (number of parameter combination) x (number of*)
-                * **parameters). The i,j element of this array holds the value of the j'th parameter in the i'th**
-                * **combination of parameters.**
-
-   -----------------------------------------------------------------------------------------------
-   :returns: * *A 3d numpy ndarray whose i, j, k element holds the k'th component of the j'th time step of*
-             * *the solution to the latent dynamics when we use the latent encoding of the initial condition*
-             * *from the i'th combination of parameter values*
+   output: np.array of size [n_test, n_samples, physics.nt, autoencoder.n_z]
 
 
-.. py:function:: sample_roms(autoencoder: lasdi.latent_space.Autoencoder, physics: lasdi.physics.Physics, latent_dynamics: lasdi.latent_dynamics.LatentDynamics, gp_list: list[sklearn.gaussian_process.GaussianProcessRegressor], param_grid: numpy.ndarray, n_samples: int) -> numpy.ndarray
+.. py:function:: get_fom_max_std(autoencoder, Zis)
 
-   This function samples the latent coefficients, solves the corresponding latent dynamics, and
-   then returns the resulting latent solutions.
-
-   Specifically, for each combination of parameter values in the param_grid, we draw n_samples
-   samples of the latent coefficients (from the coefficient posterior distributions evaluated at
-   that parameter value). This gives us a set of n_samples latent dynamics coefficients. For each
-   set of coefficients, we solve the corresponding latent dynamics forward in time and store the
-   resulting solution frames. We do this for each sample and each combination of parameter values,
-   resulting in an (n_param, n_sample, n_t, n_z) array of solution frames, which is what we
-   return.
+   Computes the maximum standard deviation accross the parameter space grid and finds the corresponding parameter location
 
 
-   -----------------------------------------------------------------------------------------------
-   :Parameters: * **autoencoder** (*An autoencoder. We use this to map the fom IC's (stored in Physics) to the*)
-                * **latent space using the autoencoder's encoder.**
-                * **physics** (*A "Physics" object that stores the ICs for each parameter combination.*)
-                * **latent_dynamics** (*A LatentDynamics object which describes how we specify the dynamics in the*)
-                * **Autoencoder's latent space. We use this to simulate the latent dynamics forward in time.**
-                * **gp_list** (*a list of trained GP regressor objects. The number of elements in this list should*)
-                * **match the number of columns in param_grid. The i'th element of this list is a GP regressor**
-                * **object that predicts the i'th coefficient.**
-                * **param_grid** (*A 2d numpy.ndarray object of shape (number of parameter combination) x (number of*)
-                * **parameters). The i,j element of this array holds the value of the j'th parameter in the i'th**
-                * **combination of parameters.**
-                * **n_samples** (*The number of samples we want to draw from each posterior distribution for each*)
-                * **coefficient evaluated at each combination of parameter values.**
 
-   -----------------------------------------------------------------------------------------------
-   :returns: * *A np.array of size [n_test, n_samples, physics.nt, autoencoder.n_z]. The i, j, k, l element*
-             * *holds the l'th component of the k'th frame of the solution to the latent dynamics when we use*
-             * *the j'th sample of latent coefficients drawn from the posterior distribution for the i'th*
-             * *combination of parameter values (i'th row of param_grid).*
+.. py:function:: optimizer_to(optim, device)
 
-
-.. py:function:: get_fom_max_std(autoencoder: lasdi.latent_space.Autoencoder, Zis: numpy.ndarray) -> int
-
-   Computes the maximum standard deviation across the trajectories in Zis and returns the
-   corresponding parameter index. Specifically, Zis is a 4d tensor of shape (n_test, n_samples,
-   n_t, n_z). The first axis specifies which parameter combination we're using. For each
-   combination of parameters, we assume that we drew n_samples of the posterior distribution of
-   the coefficients at that parameter value, simulated the corresponding dynamics for n_t time
-   steps, and then recorded the results in Zis[i]. Thus, Zis[i, j, k, :] represents the k'th
-   time step of the solution to the latent dynamics when we use the coefficients from the j'th
-   sample of the posterior distribution for the i'th set of parameters.
-
-   Let i \in {1, 2, ... , n_test} and k \in {1, 2, ... , n_t}. For each j, we map the k'th frame
-   of the j'th solution trajectory for the i'th parameter combination (Zi[i, j, k, :]) to a fom
-   frame. We do this for each j (the set of samples), which gives us a collection of n_sample
-   fom frames, representing samples of the distribution of fom frames at the k'th time step
-   when we use the posterior distribution for the i'th set of parameters. For each l \in {1, 2,
-   ... , n_fom}, we compute the STD of the set of l'th components of these n_sample fom frames.
-   We do this for each i and k and then figure out which i, k, l combination gives the largest
-   STD. We return the corresponding i index.
-
-
-   -----------------------------------------------------------------------------------------------
-   :Parameters: * **autoencoder** (*The autoencoder. We assume the solved dynamics (whose frames are stored in Zis)*)
-                * **take place in the autoencoder's latent space. We use this to decode the solution frames.**
-                * **Zis** (*A 4d numpy array of shape (n_test, n_samples, n_t, n_z) whose i, j, k, l element holds*)
-                * **the l'th component of the k'th frame of the solution to the latent dynamics when we use the**
-                * **j'th sample of latent coefficients drawn from the posterior distribution for the i'th testing**
-                * **parameter.**
-
-   -----------------------------------------------------------------------------------------------
-   Returns:
-   -----------------------------------------------------------------------------------------------
-
-   An integer. The index of the testing parameter that gives the largest standard deviation.
-   Specifically, for each testing parameter, we compute the STD of each component of the fom
-   solution at each frame generated by samples from the posterior coefficient distribution for
-   that parameter. We compute the maximum of these STDs and pair that number with the parameter.
-   We then return the index of the parameter whose corresponding maximum std (the number we pair
-   with it) is greatest.
-
-
-.. py:function:: optimizer_to(optim: torch.optim.Optimizer, device: str) -> None
-
-   This function moves an optimizer object to a specific device.
-
-
-   -----------------------------------------------------------------------------------------------
-   :Parameters: * **optim** (*The optimizer whose device we want to change.*)
-                * **device** (*The device we want to move optim onto.*)
-
-   -----------------------------------------------------------------------------------------------
-   :rtype: Nothing.
-
-
-.. py:class:: BayesianGLaSDI(physics: lasdi.physics.Physics, autoencoder: lasdi.latent_space.Autoencoder, latent_dynamics: lasdi.latent_dynamics.LatentDynamics, param_space: lasdi.param.ParameterSpace, config: dict)
+.. py:class:: BayesianGLaSDI(physics, autoencoder, latent_dynamics, param_space, config)
 
    .. py:attribute:: X_train
-      :type:  torch.Tensor
 
 
    .. py:attribute:: X_test
-      :type:  torch.Tensor
 
 
    .. py:attribute:: autoencoder
@@ -170,119 +71,60 @@ Module Contents
 
 
    .. py:attribute:: n_samples
-      :type:  int
 
 
    .. py:attribute:: lr
-      :type:  float
 
 
    .. py:attribute:: n_iter
-      :type:  int
 
 
    .. py:attribute:: max_iter
-      :type:  int
 
 
    .. py:attribute:: max_greedy_iter
-      :type:  int
 
 
    .. py:attribute:: ld_weight
-      :type:  float
 
 
    .. py:attribute:: coef_weight
-      :type:  float
 
 
    .. py:attribute:: optimizer
-      :type:  torch.optim.Optimizer
 
 
    .. py:attribute:: MSE
 
 
    .. py:attribute:: path_checkpoint
-      :type:  str
 
 
    .. py:attribute:: path_results
-      :type:  str
 
 
    .. py:attribute:: best_loss
-      :type:  float
 
 
    .. py:attribute:: best_coefs
-      :type:  numpy.ndarray
       :value: None
 
 
 
    .. py:attribute:: restart_iter
-      :type:  int
       :value: 0
 
 
 
-   .. py:method:: train() -> None
-
-      Runs a round of training on the autoencoder.
-
-      -------------------------------------------------------------------------------------------
-      :Parameters: **None!**
-
-      -------------------------------------------------------------------------------------------
-      :rtype: Nothing!
+   .. py:method:: train()
 
 
-
-   .. py:method:: get_new_sample_point() -> numpy.ndarray
-
-      This function uses a greedy process to sample a new parameter value. Specifically, it runs
-      through each combination of parameters in in self.param_space. For the i'th combination of
-      parameters, we generate a collection of samples of the coefficients in the latent dynamics.
-      We draw the k'th sample of the j'th coefficient from the posterior distribution for the
-      j'th coefficient at the i'th combination of parameters. We map the resulting solution back
-      into the real space and evaluate the standard deviation of the fom frames. We return the
-      combination of parameters which engenders the largest standard deviation (see the function
-      get_fom_max_std).
+   .. py:method:: get_new_sample_point()
 
 
-      -------------------------------------------------------------------------------------------
-      :Parameters: **None!**
-
-      -------------------------------------------------------------------------------------------
-      :returns: * *a 2d numpy ndarray object of shape (1, n_param) whose (0, j) element holds the value of*
-                * *the j'th parameter in the new sample.*
+   .. py:method:: export()
 
 
-
-   .. py:method:: export() -> dict
-
-      -------------------------------------------------------------------------------------------
-      :returns: * *A dictionary housing most of the internal variables in self. You can pass this dictionary*
-                * *to self (after initializing it using ParameterSpace, Autoencoder, and LatentDynamics*
-                * *objects) to make a GLaSDI object whose internal state matches that of self.*
-
-
-
-   .. py:method:: load(dict_: dict) -> None
-
-      Modifies self's internal state to match the one whose export method generated the dict_
-      dictionary.
-
-
-      -------------------------------------------------------------------------------------------
-      :Parameters: * **dict_** (*This should be a dictionary returned by calling the export method on another*)
-                   * **GLaSDI object. We use this to make self hav the same internal state as the object that**
-                   * **generated dict_.**
-
-      -------------------------------------------------------------------------------------------
-      :rtype: Nothing!
-
+   .. py:method:: load(dict_)
 
 

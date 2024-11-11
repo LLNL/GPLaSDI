@@ -25,24 +25,20 @@ Classes
 Package Contents
 ----------------
 
-.. py:class:: Physics(cfg: dict, param_name: list[str] = None)
+.. py:class:: Physics(cfg, param_name=None)
 
    .. py:attribute:: dim
-      :type:  int
 
 
    .. py:attribute:: qdim
-      :type:  int
 
 
    .. py:attribute:: grid_size
-      :type:  list[int]
       :value: []
 
 
 
    .. py:attribute:: qgrid_size
-      :type:  list[int]
       :value: []
 
 
@@ -54,110 +50,46 @@ Package Contents
 
 
    .. py:attribute:: x_grid
-      :type:  numpy.ndarray
 
 
    .. py:attribute:: nt
-      :type:  int
 
 
    .. py:attribute:: dt
-      :type:  float
 
 
    .. py:attribute:: t_grid
-      :type:  numpy.ndarray
 
 
    .. py:attribute:: offline
-      :type:  bool
       :value: False
 
 
 
    .. py:attribute:: param_name
-      :type:  list[str]
       :value: None
 
 
 
-   .. py:method:: initial_condition(param: numpy.ndarray) -> numpy.ndarray
-
-      The user should write an instance of this method for their specific Physics sub-class.
-      It should evaluate and return the initial condition along the spatial grid.
+   .. py:method:: initial_condition(param)
 
 
-      -------------------------------------------------------------------------------------------
-      :Parameters: * **param** (*A 1d numpy.ndarray object holding the value of self's parameters (necessary to*)
-                   * **specify the IC).**
-
-      -------------------------------------------------------------------------------------------
-      :returns: * *A d-dimensional numpy.ndarray object of shape self.grid_size, where*
-                * *d = len(self.grid_size). This should hold the IC evaluated on self's spatial grid*
-                * *(self.x_grid)*
+   .. py:method:: solve(param)
 
 
-
-   .. py:method:: solve(param: numpy.ndarray) -> torch.Tensor
-
-      The user should write an instance of this method for their specific Physics sub-class.
-      This function should solve the underlying equation when the IC uses the parameters in
-      param.
+   .. py:method:: export()
 
 
-      -------------------------------------------------------------------------------------------
-      :Parameters: * **param** (*A 1d numpy.ndarray object with two elements corresponding to the values of the*)
-                   * **initial condition parameters.**
+   .. py:method:: generate_solutions(params)
 
-      -------------------------------------------------------------------------------------------
-      :returns: * *A (ns + 2)-dimensional torch.Tensor object of shape (1, nt, nx[0], .. , nx[ns - 1]),*
-                * *where nt is the number of points along the temporal grid and nx = self.grid_size specifies*
-                * *the number of grid points along the axes in the spatial grid.*
+      Given 2d-array of params,
+      generate solutions of size params.shape[0].
+      params.shape[1] must match the required size of
+      parameters for the specific physics.
 
 
 
-   .. py:method:: export() -> dict
-
-      This function should return a dictionary that houses self's state. I
-
-
-
-   .. py:method:: generate_solutions(params: numpy.ndarray) -> torch.Tensor
-
-      Given 2d-array of params, generate solutions of size params.shape[0]. params.shape[1] must
-      match the required size of parameters for the specific physics.
-
-
-      -------------------------------------------------------------------------------------------
-      :Parameters: * **param** (*a 2d numpy.ndarray object of shape (np, n), where np is the number of combinations*)
-                   * **of parameters we want to test and n denotes the number of parameters in self's initial**
-                   * **condition function.**
-
-      -------------------------------------------------------------------------------------------
-      :returns: * *A torch.Tensor object of shape (np, nt, nx[0], .. , nx[ns - 1]), where nt is the number of*
-                * *points along the temporal grid and nx = self.grid_size specifies the number of grid points*
-                * *along the axes in the spatial grid.*
-
-
-
-   .. py:method:: residual(Xhist: numpy.ndarray) -> tuple[numpy.ndarray, float]
-
-      The user should write an instance of this method for their specific Physics sub-class.
-      This function should compute the PDE residual (difference between the left and right hand
-      side of of the underlying physics equation when we substitute in the solution in Xhist).
-
-
-      -------------------------------------------------------------------------------------------
-      :Parameters: * **Xhist** (*A (ns + 1)-dimensional numpy.ndarray object of shape self.grid_size  = (nt, nx[0],*)
-                   * **... , nx[ns - 1]), where nt is the number of points along the temporal grid and nx =**
-                   * **self.grid_size specifies the number of grid points along the axes in the spatial grid.**
-                   * **The i,j(0), ... , j(ns - 1) element of this array should hold the value of the solution at**
-                   * **the i'th time step and the spatial grid point with index (j(0), ... , j(ns - 1)).**
-
-      -------------------------------------------------------------------------------------------
-      :returns: * *A two element tuple. The first is a numpy.ndarray object holding the residual on the*
-                * *spatial and temporal grid. The second should be a float holding the norm of the residual.*
-
+   .. py:method:: residual(Xhist)
 
 
 .. py:class:: OfflineFOM(cfg, param_name=None)
@@ -204,25 +136,13 @@ Package Contents
 
    .. py:method:: generate_solutions(params)
 
-      Given 2d-array of params, generate solutions of size params.shape[0]. params.shape[1] must
-      match the required size of parameters for the specific physics.
-
-
-      -------------------------------------------------------------------------------------------
-      :Parameters: * **param** (*a 2d numpy.ndarray object of shape (np, n), where np is the number of combinations*)
-                   * **of parameters we want to test and n denotes the number of parameters in self's initial**
-                   * **condition function.**
-
-      -------------------------------------------------------------------------------------------
-      :returns: * *A torch.Tensor object of shape (np, nt, nx[0], .. , nx[ns - 1]), where nt is the number of*
-                * *points along the temporal grid and nx = self.grid_size specifies the number of grid points*
-                * *along the axes in the spatial grid.*
+      Given 2d-array of params,
+      generate solutions of size params.shape[0].
+      params.shape[1] must match the required size of
+      parameters for the specific physics.
 
 
 
    .. py:method:: export()
-
-      This function should return a dictionary that houses self's state. I
-
 
 

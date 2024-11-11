@@ -17,73 +17,27 @@ Functions
 Module Contents
 ---------------
 
-.. py:function:: fit_gps(X: numpy.ndarray, Y: numpy.ndarray) -> list[sklearn.gaussian_process.GaussianProcessRegressor]
+.. py:function:: fit_gps(X, Y)
 
-   Trains a GP for each column of Y. If Y has shape N x k, then we train k GP regressors. In this
-   case, we assume that X has shape N x M. Thus, the Input to the GP is in \mathbb{R}^M. For each
-   k, we train a GP where the i'th row of X is the input and the i,k component of Y is the
-   corresponding target. Thus, we return a list of k GP Regressor objects, the k'th one of which
-   makes predictions for the k'th coefficient in the latent dynamics.
-
+   Trains each GP given the interpolation dataset.
+   X: (n_train, n_param) numpy 2d array
+   Y: (n_train, n_coef) numpy 2d array
    We assume each target coefficient is independent with each other.
+   gp_dictionnary is a dataset containing the trained GPs (as sklearn objects)
 
 
-   -----------------------------------------------------------------------------------------------
-   :Parameters: * **X** (*A 2d numpy array of shape (n_train, input_dim), where n_train is the number of training*)
-                * **examples and input_dim is the number of components in each input (e.g., the number of**
-                * **parameters)**
-                * **Y** (*A 2d numpy array of shape (n_train, n_coef), where n_train is the number of training*)
-                * **examples and n_coef is the number of coefficients in the latent dynamics.**
 
-   -----------------------------------------------------------------------------------------------
-   :returns: * *A list of trained GP regressor objects. If Y has k columns, then the returned list has k*
-             * *elements. It's i'th element holds a trained GP regressor object whose training inputs are the*
-             * *columns of X and whose corresponding target values are the elements of the i'th column of Y.*
-
-
-.. py:function:: eval_gp(gp_list: list[sklearn.gaussian_process.GaussianProcessRegressor], param_grid: numpy.ndarray) -> tuple[numpy.ndarray, numpy.ndarray]
+.. py:function:: eval_gp(gp_dictionnary, param_grid)
 
    Computes the GPs predictive mean and standard deviation for points of the parameter space grid
 
 
-   -----------------------------------------------------------------------------------------------
-   :Parameters: * **gp_list** (*a list of trained GP regressor objects. The number of elements in this list should*)
-                * **match the number of columns in param_grid. The i'th element of this list is a GP regressor**
-                * **object that predicts the i'th coefficient.**
-                * **param_grid** (*A 2d numpy.ndarray object of shape (number of parameter combination, number of*)
-                * **parameters). The i,j element of this array specifies the value of the j'th parameter in the**
-                * **i'th combination of parameters. We use this as the testing set for the GP evaluation.**
 
-   -----------------------------------------------------------------------------------------------
-   :returns: * *A two element tuple. Both are 2d numpy arrays of shape (number of parameter combinations,*
-             * *number of coefficients). The two arrays hold the predicted means and std's for each parameter*
-             * *at each training example, respectively.*
-             * *Thus, the i,j element of the first return variable holds the predicted mean of the j'th*
-             * *coefficient in the latent dynamics at the i'th training example. Likewise, the i,j element of*
-             * *the second return variable holds the standard deviation in the predicted distribution for the*
-             * *j'th coefficient in the latent dynamics at the i'th combination of parameter values.*
+.. py:function:: sample_coefs(gp_dictionnary, param, n_samples)
 
+   Generates sample sets of ODEs for one given parameter.
+   coef_samples is a list of length n_samples, where each terms is a matrix of SINDy coefficients sampled from the GP predictive
+   distributions
 
-.. py:function:: sample_coefs(gp_list: list[sklearn.gaussian_process.GaussianProcessRegressor], param: numpy.ndarray, n_samples: int)
-
-   Generates sets of ODE (SINDy) coefficients sampled from the predictive distribution for those
-   coefficients at the specified parameter value (parma). Specifically, for the k'th SINDy
-   coefficient, we draw n_samples samples of the predictive distribution for the k'th coefficient
-   when param is the parameter.
-
-
-   -----------------------------------------------------------------------------------------------
-   :Parameters: * **gp_list** (*a list of trained GP regressor objects. The number of elements in this list should*)
-                * **match the number of columns in param_grid. The i'th element of this list is a GP regressor**
-                * **object that predicts the i'th coefficient.**
-                * **param** (*A combination of parameter values. i.e., a single test example. We evaluate each GP in*)
-                * **the gp_list at this parameter value (getting a prediction for each coefficient).**
-                * **n_samples** (*Number of samples of the predicted latent dynamics used to build ensemble of fom*)
-                * **predictions. N_s in the paper.**
-
-   -----------------------------------------------------------------------------------------------
-   :returns: * *A 2d numpy ndarray object called coef_samples. It has shape (n_samples, n_coef), where n_coef*
-             * *is the number of coefficients (length of gp_list). The i,j element of this list is the i'th*
-             * *sample of the j'th SINDy coefficient.*
 
 

@@ -3,6 +3,12 @@ lasdi.timing
 
 .. py:module:: lasdi.timing
 
+.. autoapi-nested-parse::
+
+   .. _NumPy docstring standard:
+      https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard
+
+
 
 Classes
 -------
@@ -17,107 +23,114 @@ Module Contents
 
 .. py:class:: Timer
 
+   A light-weight timer class.
+
+
+
    .. py:attribute:: names
-      :type:  dict
+
+      Dictionary that maps job names to job indices.
+
+      :type: :obj:`dict(str:int)`
 
 
    .. py:attribute:: calls
-      :type:  list
       :value: []
 
+
+      List that stores the number of calls for each job.
+
+      :type: :obj:`list(int)`
 
 
    .. py:attribute:: times
-      :type:  list
       :value: []
 
+
+      List that stores the total time for each job.
+
+      :type: :obj:`list(float)`
 
 
    .. py:attribute:: starts
-      :type:  list
       :value: []
 
 
+      List that stores the start time for each job.
+      If the job is not running, :obj:`None` is stored instead.
 
-   .. py:method:: start(name: str) -> None
-
-      Starts a specific timer. The user must specify the name of the timer they want to start.
-      The specified timer can not already be running!
-
-
-      -------------------------------------------------------------------------------------------
-      :Parameters: **name** (*A string specifying the name of the timer you want to start.*)
-
-      -------------------------------------------------------------------------------------------
-      :rtype: Nothing!
+      :type: :obj:`list(float)`
 
 
+   .. py:method:: start(name)
 
-   .. py:method:: end(name: str) -> None
+      Start a job named :obj:`name`.
+      If the job is not listed, register the job in the job list.
 
-      Stops a specific timer. The user must specify the name of the timer they want to stop.
+      Args:
+          name (:obj:`str`): Name of the job to be started.
 
+      Note:
+          The job must not have started before calling this method.
 
-      -------------------------------------------------------------------------------------------
-      :Parameters: **name** (*A string specifying the name of the timer you want to stop.*)
-
-      -------------------------------------------------------------------------------------------
-      :rtype: Nothing!
+      Returns:
+          Does not return a value.
 
 
 
-   .. py:method:: print() -> None
 
-      This function reports information on every timer in self. It has no arguments and returns
-      nothing.
+   .. py:method:: end(name)
 
+      End a job named :obj:`name`.
+      Increase the number of calls and the runtime for the job.
 
+      Args:
+          name (:obj:`str`): Name of the job to be ended.
 
-   .. py:method:: export() -> dict
+      Note:
+          The job must have started before calling this method.
 
-      This function extracts the names, calls, and times attributes of self, stores them in a
-      dictionary, and then returns that dictionary. If you have another dictionary object,
-      you can passed the returned dictionary to that object's load method to make that object
-      into an identical copy of self.
-
-
-      -------------------------------------------------------------------------------------------
-      :Parameters: **None!**
-
-      -------------------------------------------------------------------------------------------
-      :returns: * *A dictionary housing the names, calls, and times attributes of self. The returned*
-                * *dictionary has three keys* --
-
-                  - names
-                  - calls
-                  - times
-                * *names is a dictionary with string keys whose corresponding values are integer indexes. If a*
-                * *particular timer was the k'th one added to self, then it's value in names will be k.*
-                * *calls is a list whose k'th element specifies how many times the k'th timer was stopped.*
-                * *times is a list whose k'th element specifies the total time recorded on the k'th timer.*
+      Returns:
+          Does not return a value.
 
 
 
-   .. py:method:: load(dict_: dict) -> None
 
-      This function de-serializes a timer object, making self into an identical copy of a
-      previously serialized timer object. Specifically, we replace self's names, calls, and
-      times attributes using those in the passed dict_. We use this function to restore a
-      timer object's state after loading from a checkpoint.
+   .. py:method:: print()
+
+      Print the list of jobs and their number of calls, total time and time per each call.
+
+      Returns:
+          Does not return a value.
 
 
-      -------------------------------------------------------------------------------------------
-      :Parameters: * **dict_** (*This should be a dictionary with three keys:*) --
 
-                     - names
-                     - calls
-                     - times
-                   * **the corresponding values should be the names, calls, and times attributes of another timer**
-                   * **object, respectively. We replace self's attributes with those the values in dict_. dict_**
-                   * **should be the dictionary returned by calling export on a timer object.**
+   .. py:method:: export()
 
-      -------------------------------------------------------------------------------------------
-      :rtype: Nothing!
+      Export the list of jobs and their number of calls and total time
+      into a dictionary.
+
+      Note:
+          All jobs must be ended before calling this method.
+
+      Returns:
+          :obj:`dict` that contains "names", "calls", and "times" as keys
+
+
+
+   .. py:method:: load(dict_)
+
+      Load the list of jobs and their number of calls and total time
+      from a dictionary.
+
+      Args:
+          `dict_` (:obj:`dict`): Dictionary that contains the list of jobs and their calls and times.
+
+      Note:
+          :obj:`dict_['names']`, :obj:`dict_['calls']` and :obj:`dict_['times']` must have the same size.
+
+      Returns:
+          Does not return a value
 
 
 

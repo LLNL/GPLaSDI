@@ -121,25 +121,25 @@
 <h2>Package Contents<a class="headerlink" href="#package-contents" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="lasdi.physics.Physics">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lasdi.physics.</span></span><span class="sig-name descname"><span class="pre">Physics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.physics.Physics" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lasdi.physics.</span></span><span class="sig-name descname"><span class="pre">Physics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.physics.Physics" title="Permalink to this definition"></a></dt>
 <dd><dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.physics.Physics.dim">
-<span class="sig-name descname"><span class="pre">dim</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#lasdi.physics.Physics.dim" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">dim</span></span><a class="headerlink" href="#lasdi.physics.Physics.dim" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.physics.Physics.qdim">
-<span class="sig-name descname"><span class="pre">qdim</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#lasdi.physics.Physics.qdim" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">qdim</span></span><a class="headerlink" href="#lasdi.physics.Physics.qdim" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.physics.Physics.grid_size">
-<span class="sig-name descname"><span class="pre">grid_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.physics.Physics.grid_size" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">grid_size</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.physics.Physics.grid_size" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.physics.Physics.qgrid_size">
-<span class="sig-name descname"><span class="pre">qgrid_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.physics.Physics.qgrid_size" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">qgrid_size</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.physics.Physics.qgrid_size" title="Permalink to this definition"></a></dt>
 <dd><p>numpy nd-array, assuming the shape of:
 - 1d: (space_dim[0],)
 - 2d: (2, space_dim[0], space_dim[1])
@@ -149,96 +149,62 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.physics.Physics.x_grid">
-<span class="sig-name descname"><span class="pre">x_grid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="headerlink" href="#lasdi.physics.Physics.x_grid" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">x_grid</span></span><a class="headerlink" href="#lasdi.physics.Physics.x_grid" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.physics.Physics.nt">
-<span class="sig-name descname"><span class="pre">nt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#lasdi.physics.Physics.nt" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">nt</span></span><a class="headerlink" href="#lasdi.physics.Physics.nt" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.physics.Physics.dt">
-<span class="sig-name descname"><span class="pre">dt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#lasdi.physics.Physics.dt" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">dt</span></span><a class="headerlink" href="#lasdi.physics.Physics.dt" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.physics.Physics.t_grid">
-<span class="sig-name descname"><span class="pre">t_grid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="headerlink" href="#lasdi.physics.Physics.t_grid" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">t_grid</span></span><a class="headerlink" href="#lasdi.physics.Physics.t_grid" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.physics.Physics.offline">
-<span class="sig-name descname"><span class="pre">offline</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#lasdi.physics.Physics.offline" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">offline</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#lasdi.physics.Physics.offline" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.physics.Physics.param_name">
-<span class="sig-name descname"><span class="pre">param_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#lasdi.physics.Physics.param_name" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">param_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#lasdi.physics.Physics.param_name" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.physics.Physics.initial_condition">
-<span class="sig-name descname"><span class="pre">initial_condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="headerlink" href="#lasdi.physics.Physics.initial_condition" title="Permalink to this definition"></a></dt>
-<dd><p>The user should write an instance of this method for their specific Physics sub-class.
-It should evaluate and return the initial condition along the spatial grid.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><em>(self.x_grid)</em></p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
+<span class="sig-name descname"><span class="pre">initial_condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.physics.Physics.initial_condition" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.physics.Physics.solve">
-<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.Tensor</span></span></span><a class="headerlink" href="#lasdi.physics.Physics.solve" title="Permalink to this definition"></a></dt>
-<dd><p>The user should write an instance of this method for their specific Physics sub-class.
-This function should solve the underlying equation when the IC uses the parameters in
-param.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><em>the number of grid points along the axes in the spatial grid.</em></p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.physics.Physics.solve" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.physics.Physics.export">
-<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#lasdi.physics.Physics.export" title="Permalink to this definition"></a></dt>
-<dd><p>This function should return a dictionary that houses self’s state. I</p>
-</dd></dl>
+<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.physics.Physics.export" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.physics.Physics.generate_solutions">
-<span class="sig-name descname"><span class="pre">generate_solutions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.Tensor</span></span></span><a class="headerlink" href="#lasdi.physics.Physics.generate_solutions" title="Permalink to this definition"></a></dt>
-<dd><p>Given 2d-array of params, generate solutions of size params.shape[0]. params.shape[1] must
-match the required size of parameters for the specific physics.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><strong>condition function.</strong></p></li>
-</ul>
-</div></blockquote>
-<blockquote>
-<div><ul class="simple">
-<li><p><em>along the axes in the spatial grid.</em></p></li>
-</ul>
-</div></blockquote>
+<span class="sig-name descname"><span class="pre">generate_solutions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.physics.Physics.generate_solutions" title="Permalink to this definition"></a></dt>
+<dd><p>Given 2d-array of params,
+generate solutions of size params.shape[0].
+params.shape[1] must match the required size of
+parameters for the specific physics.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.physics.Physics.residual">
-<span class="sig-name descname"><span class="pre">residual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Xhist</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#lasdi.physics.Physics.residual" title="Permalink to this definition"></a></dt>
-<dd><p>The user should write an instance of this method for their specific Physics sub-class.
-This function should compute the PDE residual (difference between the left and right hand
-side of of the underlying physics equation when we substitute in the solution in Xhist).</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><strong>self.grid_size specifies the number of grid points along the axes in the spatial grid.</strong></p></li>
-<li><p><strong>The i,j(0), … , j(ns - 1) element of this array should hold the value of the solution at</strong></p></li>
-<li><p><strong>the i’th time step and the spatial grid point with index (j(0), … , j(ns - 1)).</strong></p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
+<span class="sig-name descname"><span class="pre">residual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Xhist</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.physics.Physics.residual" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -299,25 +265,16 @@ side of of the underlying physics equation when we substitute in the solution in
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.physics.OfflineFOM.generate_solutions">
 <span class="sig-name descname"><span class="pre">generate_solutions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.physics.OfflineFOM.generate_solutions" title="Permalink to this definition"></a></dt>
-<dd><p>Given 2d-array of params, generate solutions of size params.shape[0]. params.shape[1] must
-match the required size of parameters for the specific physics.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><strong>condition function.</strong></p></li>
-</ul>
-</div></blockquote>
-<blockquote>
-<div><ul class="simple">
-<li><p><em>along the axes in the spatial grid.</em></p></li>
-</ul>
-</div></blockquote>
+<dd><p>Given 2d-array of params,
+generate solutions of size params.shape[0].
+params.shape[1] must match the required size of
+parameters for the specific physics.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.physics.OfflineFOM.export">
 <span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.physics.OfflineFOM.export" title="Permalink to this definition"></a></dt>
-<dd><p>This function should return a dictionary that houses self’s state. I</p>
-</dd></dl>
+<dd></dd></dl>
 
 </dd></dl>
 

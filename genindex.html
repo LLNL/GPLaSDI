@@ -106,9 +106,11 @@
 </li>
       <li><a href="autoapi/lasdi/latent_space/index.html#lasdi.latent_space.MultiLayerPerceptron.act_type">act_type (lasdi.latent_space.MultiLayerPerceptron attribute)</a>
 </li>
+      <li><a href="autoapi/lasdi/param/index.html#lasdi.param.ParameterSpace.appendTrainSpace">appendTrainSpace() (lasdi.param.ParameterSpace method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="autoapi/lasdi/param/index.html#lasdi.param.ParameterSpace.appendTrainSpace">appendTrainSpace() (lasdi.param.ParameterSpace method)</a>
+      <li><a href="autoapi/lasdi/latent_space/index.html#lasdi.latent_space.MultiLayerPerceptron.apply_attention">apply_attention() (lasdi.latent_space.MultiLayerPerceptron method)</a>
 </li>
       <li><a href="autoapi/lasdi/latent_space/index.html#lasdi.latent_space.Autoencoder">Autoencoder (class in lasdi.latent_space)</a>
 </li>
@@ -158,10 +160,10 @@
 </li>
       <li><a href="autoapi/lasdi/enums/index.html#lasdi.enums.Result.Complete">Complete (lasdi.enums.Result attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/lasdi/postprocess/index.html#lasdi.postprocess.compute_errors">compute_errors() (in module lasdi.postprocess)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/lasdi/latent_dynamics/sindy/index.html#lasdi.latent_dynamics.sindy.SINDy.compute_time_derivative">compute_time_derivative() (lasdi.latent_dynamics.sindy.SINDy method)</a>
 </li>
       <li><a href="autoapi/lasdi/physics/burgers1d/index.html#lasdi.physics.burgers1d.Burgers1D.convergence_threshold">convergence_threshold (lasdi.physics.burgers1d.Burgers1D attribute)</a>
@@ -176,7 +178,13 @@
 </li>
       <li><a href="autoapi/lasdi/param/index.html#lasdi.param.ParameterSpace.createInitialTrainSpace">createInitialTrainSpace() (lasdi.param.ParameterSpace method)</a>
 </li>
+      <li><a href="autoapi/lasdi/param/index.html#lasdi.param.ParameterSpace.createInitialTrainSpaceForHull">createInitialTrainSpaceForHull() (lasdi.param.ParameterSpace method)</a>
+</li>
       <li><a href="autoapi/lasdi/param/index.html#lasdi.param.ParameterSpace.createTestGridSpace">createTestGridSpace() (lasdi.param.ParameterSpace method)</a>
+</li>
+      <li><a href="autoapi/lasdi/param/index.html#lasdi.param.ParameterSpace.createTestGridSpaceForHull">createTestGridSpaceForHull() (lasdi.param.ParameterSpace method)</a>
+</li>
+      <li><a href="autoapi/lasdi/param/index.html#lasdi.param.ParameterSpace.createTestSpaceFromHull">createTestSpaceFromHull() (lasdi.param.ParameterSpace method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -250,14 +258,16 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/lasdi/enums/index.html#lasdi.enums.Result.Fail">Fail (lasdi.enums.Result attribute)</a>
 </li>
+      <li><a href="autoapi/lasdi/latent_space/index.html#lasdi.latent_space.MultiLayerPerceptron.fcs">fcs (lasdi.latent_space.MultiLayerPerceptron attribute)</a>
+</li>
       <li><a href="autoapi/lasdi/latent_dynamics/sindy/index.html#lasdi.latent_dynamics.sindy.SINDy.fd">fd (lasdi.latent_dynamics.sindy.SINDy attribute)</a>
 </li>
       <li><a href="autoapi/lasdi/latent_dynamics/sindy/index.html#lasdi.latent_dynamics.sindy.SINDy.fd_oper">fd_oper (lasdi.latent_dynamics.sindy.SINDy attribute)</a>
 </li>
-      <li><a href="autoapi/lasdi/latent_dynamics/sindy/index.html#lasdi.latent_dynamics.sindy.SINDy.fd_type">fd_type (lasdi.latent_dynamics.sindy.SINDy attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="autoapi/lasdi/latent_dynamics/sindy/index.html#lasdi.latent_dynamics.sindy.SINDy.fd_type">fd_type (lasdi.latent_dynamics.sindy.SINDy attribute)</a>
+</li>
       <li><a href="autoapi/lasdi/fd/index.html#lasdi.fd.FDdict">FDdict (in module lasdi.fd)</a>
 </li>
       <li><a href="autoapi/lasdi/gp/index.html#lasdi.gp.fit_gps">fit_gps() (in module lasdi.gp)</a>
@@ -286,10 +296,12 @@
 </li>
       <li><a href="autoapi/lasdi/gplasdi/index.html#lasdi.gplasdi.BayesianGLaSDI.get_new_sample_point">get_new_sample_point() (lasdi.gplasdi.BayesianGLaSDI method)</a>
 </li>
-      <li><a href="autoapi/lasdi/inputs/index.html#lasdi.inputs.InputParser.getInput">getInput() (lasdi.inputs.InputParser method)</a>
+      <li><a href="autoapi/lasdi/inputs/index.html#lasdi.inputs.getDictFromList">getDictFromList() (in module lasdi.inputs)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="autoapi/lasdi/inputs/index.html#lasdi.inputs.InputParser.getInput">getInput() (lasdi.inputs.InputParser method)</a>
+</li>
       <li><a href="autoapi/lasdi/fd/index.html#lasdi.fd.Stencil.getOperators">getOperators() (lasdi.fd.Stencil method)</a>
 </li>
       <li><a href="autoapi/lasdi/param/index.html#lasdi.param.getParam1DSpace">getParam1DSpace (in module lasdi.param)</a>
@@ -490,8 +502,6 @@
       <li><a href="autoapi/lasdi/latent_dynamics/index.html#lasdi.latent_dynamics.LatentDynamics">LatentDynamics (class in lasdi.latent_dynamics)</a>
 </li>
       <li><a href="autoapi/lasdi/latent_space/index.html#lasdi.latent_space.MultiLayerPerceptron.layer_sizes">layer_sizes (lasdi.latent_space.MultiLayerPerceptron attribute)</a>
-</li>
-      <li><a href="autoapi/lasdi/latent_space/index.html#lasdi.latent_space.MultiLayerPerceptron.layers">layers (lasdi.latent_space.MultiLayerPerceptron attribute)</a>
 </li>
       <li><a href="autoapi/lasdi/workflow/index.html#lasdi.workflow.ld_dict">ld_dict (in module lasdi.workflow)</a>
 </li>
@@ -881,6 +891,10 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/lasdi/enums/index.html#lasdi.enums.Result.Unexecuted">Unexecuted (lasdi.enums.Result attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="autoapi/lasdi/latent_space/index.html#lasdi.latent_space.MultiLayerPerceptron.use_multihead">use_multihead (lasdi.latent_space.MultiLayerPerceptron attribute)</a>
 </li>
   </ul></td>
 </tr></table>

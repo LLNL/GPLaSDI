@@ -26,7 +26,7 @@ Functions
 Module Contents
 ---------------
 
-.. py:class:: Burgers1D(cfg: dict, param_name: list[str] = None)
+.. py:class:: Burgers1D(cfg, param_name=None)
 
    Bases: :py:obj:`lasdi.physics.Physics`
 
@@ -42,31 +42,25 @@ Module Contents
 
 
    .. py:attribute:: qdim
-      :type:  int
       :value: 1
 
 
 
    .. py:attribute:: dim
-      :type:  int
       :value: 1
 
 
 
    .. py:attribute:: offline
-      :type:  bool
 
 
    .. py:attribute:: nt
-      :type:  int
 
 
    .. py:attribute:: grid_size
-      :type:  list[int]
 
 
    .. py:attribute:: qgrid_size
-      :type:  list[int]
 
       numpy nd-array, assuming the shape of:
       - 1d: (space_dim[0],)
@@ -85,87 +79,33 @@ Module Contents
 
 
    .. py:attribute:: tmax
-      :type:  float
 
 
    .. py:attribute:: dt
-      :type:  float
 
 
    .. py:attribute:: x_grid
-      :type:  numpy.ndarray
 
 
    .. py:attribute:: t_grid
-      :type:  numpy.ndarray
 
 
    .. py:attribute:: maxk
-      :type:  int
 
 
    .. py:attribute:: convergence_threshold
-      :type:  float
 
 
-   .. py:method:: initial_condition(param: numpy.ndarray) -> numpy.ndarray
-
-      Evaluates the initial condition along the spatial grid. For this class, we use the
-      following initial condition:
-          u(x, 0) = a*exp(-x^2 / (2*w^2))
-      where a and w are the corresponding parameter values.
+   .. py:method:: initial_condition(param)
 
 
-      -------------------------------------------------------------------------------------------
-      :Parameters: * **param** (*A 1d numpy.ndarray object with two elements corresponding to the values of the w*)
-                   * **and a parameters. self.a_idx and self.w_idx tell us which index corresponds to which**
-                   * **variable.**
-
-      -------------------------------------------------------------------------------------------
-      :returns: * *A 1d numpy.ndarray object of length self.grid_size[0] (the number of grid points along the*
-                * *spatial axis).*
+   .. py:method:: solve(param)
 
 
-
-   .. py:method:: solve(param: numpy.ndarray) -> torch.Tensor
-
-      Solves the 1d burgers equation when the IC uses the parameters in the param array.
+   .. py:method:: export()
 
 
-      -------------------------------------------------------------------------------------------
-      :Parameters: * **param** (*A 1d numpy.ndarray object with two elements corresponding to the values of the w*)
-                   * **and a parameters. self.a_idx and self.w_idx tell us which index corresponds to which**
-                   * **variable.**
-
-      -------------------------------------------------------------------------------------------
-      :returns: * *A 3d torch.Tensor object of shape (1, nt, nx), where nt is the number of points along the*
-                * *temporal grid and nx is the number along the spatial grid.*
-
-
-
-   .. py:method:: export() -> dict
-
-      Returns a dictionary housing self's internal state. You can use this dictionary to
-      effectively serialize self.
-
-
-
-   .. py:method:: residual(Xhist: numpy.ndarray) -> tuple[numpy.ndarray, float]
-
-      This function computes the PDE residual (difference between the left and right hand side
-      of Burgers' equation when we substitute in the solution in Xhist).
-
-
-      -------------------------------------------------------------------------------------------
-      :Parameters: * **Xhist** (*A 2d numpy.ndarray object of shape (nt, nx), where nt is the number of points along*)
-                   * **the temporal axis and nx is the number of points along the spatial axis. The i,j element of**
-                   * **this array should have the j'th component of the solution at the i'th time step.**
-
-      -------------------------------------------------------------------------------------------
-      :returns: * *A two element tuple. The first is a numpy.ndarray object of shape (nt - 2, nx - 2) whose*
-                * *i, j element holds the residual at the i + 1'th temporal grid point and the j + 1'th*
-                * *spatial grid point.*
-
+   .. py:method:: residual(Xhist)
 
 
 .. py:function:: residual_burgers(un, uw, c, idxn1)

@@ -24,117 +24,45 @@ Classes
 Package Contents
 ----------------
 
-.. py:class:: LatentDynamics(dim_: int, nt_: int)
+.. py:class:: LatentDynamics(dim_, nt_)
 
    .. py:attribute:: dim
-      :type:  int
 
 
    .. py:attribute:: nt
-      :type:  int
 
 
    .. py:attribute:: ncoefs
-      :type:  int
 
 
    .. py:attribute:: coefs
-      :type:  torch.Tensor
 
 
-   .. py:method:: calibrate(Z: torch.Tensor, dt: int, compute_loss: bool = True, numpy: bool = False) -> numpy.ndarray
+   .. py:method:: calibrate(Z, dt, compute_loss=True, numpy=False)
 
-      The user must implement this class on any latent dynamics sub-class. Each latent dynamics
-      object should parameterize a model for the dynamics in the latent space. Thus, to specify
-      the latent dynamics, we need to find a set of coefficients that parameterize the equations
-      in the latent dynamics model. The calibrate function is supposed to do that.
+      calibrate coefficients of the latent dynamics and compute loss
+      for one given time series Z.
 
-      Specifically, this function should take in a sequence (or sequences) of latent states, a
-      time step, dt, which specifies the time step between successive terms in the sequence(s) of
-      latent states, and some optional booleans which control what information we return.
-
-      The function should always return at least one argument: a numpy.ndarray object holding the
-      optimal coefficients in the latent dynamics model using the data contained in Z.
-
-
-      -------------------------------------------------------------------------------------------
-      :Parameters: * **Z** (*A 2d or 3d tensor. If Z is a 2d tensor, then it has shape (Nt, Nz), where Nt specifies*)
-                   * **the number of time steps in each sequence of latent states and Nz is the dimension of the**
-                   * **latent space. In this case, the i,j entry of Z holds the j'th component of the latent state**
-                   * **at the time t_0 + i*dt. If it is a 3d tensor, then it has shape (Np, Nt, Nz). In this case,**
-                   * **we assume there at Np different combinations of parameter values. The i, j, k entry of Z in**
-                   * **this case holds the k'th component of the latent encoding at time t_0 + j*dt when we use**
-                   * **he i'th combination of parameter values.**
-                   * **dt** (*The time step between time steps. See the description of the "Z" argument.*)
-                   * **compute_loss** (*A boolean which, if True, this function should return the coefficients and*)
-                   * **additional losses based on the set of coefficients we learn. If False, this function should**
-                   * **only return the optimal coefficients for the latent dynamics model using the data in Z.**
-                   * **numpy** (*A boolean. If True, this function should return the coefficient matrix as a*)
-                   * **numpy.ndarray object. If False, this function should return it as a torch.Tensor object.**
-
-      -------------------------------------------------------------------------------------------
-      :returns: * *A tensor or ndarray (depending on the value of the "numpy" argument) holding the optimal*
-                * *coefficients for the latent space dynamics given the data stored in Z. If Z is 2d, then*
-                * *the returned tensor will only contain one set of coefficients. If Z is 3d, with a leading*
-                * *dimension size of Np (number of combinations of parameter values) then we will return*
-                * *an array/tensor with a leading dimension of size Np whose i'th entry holds the coefficients*
-                * **for the sequence of latent states stored in Z[** (*, ...].*)
+      Z is the encoder output (2D/3D tensor), with shape [time_dim, space_dim] or [n_train, time_dim, space_dim]
 
 
 
-   .. py:method:: simulate(coefs: numpy.ndarray, z0: numpy.ndarray, t_grid: numpy.ndarray) -> numpy.ndarray
+   .. py:method:: simulate(coefs, z0, t_grid)
 
-      Time integrates the latent dynamics when it uses the coefficients specified in coefs and
-      starts from the (single) initial condition in z0.
-
-
-      -------------------------------------------------------------------------------------------
-      :Parameters: * **coefs** (*A one dimensional numpy.ndarray object holding the coefficients we want to use*)
-                   * **to solve the latent dynamics forward in time.**
-                   * **z0** (*A numpy ndarray object of shape nz representing the initial condition for the latent*)
-                   * **dynamics. Thus, the i'th component of this array should hold the i'th component of the**
-                   * **latent dynamics initial condition.**
-                   * **t_grid** (*A 1d numpy ndarray object whose i'th entry holds the value of the i'th time value*)
-                   * **where we want to compute the latent solution. The elements of this array should be in**
-                   * **ascending order.**
-
-      -------------------------------------------------------------------------------------------
-      :returns: * *A 2d numpy.ndarray object holding the solution to the latent dynamics at the time values*
-                * *specified in t_grid when we use the coefficients in coefs to characterize the latent*
-                * *dynamics model. Specifically, this is a 2d array of shape (nt, nz), where nt is the*
-                * *number of time steps (size of t_grid) and nz is the latent space dimension (self.dim).*
-                * *Thus, the i,j element of this matrix holds the j'th component of the latent solution at*
-                * *the time stored in the i'th element of t_grid.*
+      time-integrate with one initial condition z0 at time points t_grid,
+      for one given set of coefficients
 
 
 
-   .. py:method:: sample(coefs_sample: numpy.ndarray, z0_sample: numpy.ndarray, t_grid: numpy.ndarray) -> numpy.ndarray
+   .. py:method:: sample(coefs_sample, z0_sample, t_grid)
 
-      simulate's the latent dynamics for a set of coefficients/initial conditions.
-
-
-      -------------------------------------------------------------------------------------------
-      :Parameters: * **coefs_sample** (*A numpy.ndarray object whose leading dimension has size ns (the number of*)
-                   * **sets of coefficients/initial conditions/simulations we run).**
-                   * **z0_sample** (*A 2d numpy.ndarray object of shape (ns, nz) (where ns is the number of samples*)
-                   * **and nz is the dimensionality of the latent space). The i,j entry of z0_sample should hold**
-                   * **the j'th component of the i'th initial condition.**
-                   * **t_grid** (*A 1d numpy ndarray object whose i'th entry holds the value of the i'th time value*)
-                   * **where we want to compute each latent solution. The elements of this array should be in**
-                   * **ascending order. We use the same array for each set of coefficients.**
-
-      -------------------------------------------------------------------------------------------
-      :returns: * *A 3d numpy ndarray object of shape (ns, nt, nz), where ns = the number of samples (the*
-                * *leading dimension of z0_sample and coefs_sample), nt = the number of time steps (size of*
-                * *t_grid) and nz is the dimension of the latent space. The i, j, k element of this array*
-                * *holds the k'th component of the solution of the latent dynamics at the j'th time step (j'th*
-                * *element of t_grid) when we use the i'th set of coefficients/initial conditions.*
+      Sample time series for given sample initial conditions and coefficients.
 
 
 
-   .. py:method:: export() -> dict
+   .. py:method:: export()
 
 
-   .. py:method:: load(dict_: dict) -> None
+   .. py:method:: load(dict_)
 
 

@@ -100,14 +100,14 @@
 <h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lasdi.gp.fit_gps" title="lasdi.gp.fit_gps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_gps</span></code></a>(...)</p></td>
-<td><p>Trains a GP for each column of Y. If Y has shape N x k, then we train k GP regressors. In this</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lasdi.gp.fit_gps" title="lasdi.gp.fit_gps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_gps</span></code></a>(X, Y)</p></td>
+<td><p>Trains each GP given the interpolation dataset.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lasdi.gp.eval_gp" title="lasdi.gp.eval_gp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eval_gp</span></code></a>(→ tuple[numpy.ndarray, numpy.ndarray])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lasdi.gp.eval_gp" title="lasdi.gp.eval_gp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eval_gp</span></code></a>(gp_dictionnary, param_grid)</p></td>
 <td><p>Computes the GPs predictive mean and standard deviation for points of the parameter space grid</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lasdi.gp.sample_coefs" title="lasdi.gp.sample_coefs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_coefs</span></code></a>(gp_list, param, n_samples)</p></td>
-<td><p>Generates sets of ODE (SINDy) coefficients sampled from the predictive distribution for those</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lasdi.gp.sample_coefs" title="lasdi.gp.sample_coefs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_coefs</span></code></a>(gp_dictionnary, param, n_samples)</p></td>
+<td><p>Generates sample sets of ODEs for one given parameter.</p></td>
 </tr>
 </tbody>
 </table>
@@ -116,71 +116,26 @@
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="lasdi.gp.fit_gps">
-<span class="sig-prename descclassname"><span class="pre">lasdi.gp.</span></span><span class="sig-name descname"><span class="pre">fit_gps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">sklearn.gaussian_process.GaussianProcessRegressor</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#lasdi.gp.fit_gps" title="Permalink to this definition"></a></dt>
-<dd><p>Trains a GP for each column of Y. If Y has shape N x k, then we train k GP regressors. In this
-case, we assume that X has shape N x M. Thus, the Input to the GP is in mathbb{R}^M. For each
-k, we train a GP where the i’th row of X is the input and the i,k component of Y is the
-corresponding target. Thus, we return a list of k GP Regressor objects, the k’th one of which
-makes predictions for the k’th coefficient in the latent dynamics.</p>
-<p>We assume each target coefficient is independent with each other.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><strong>parameters)</strong></p></li>
-<li><p><strong>Y</strong> (<em>A 2d numpy array of shape (n_train, n_coef), where n_train is the number of training</em>)</p></li>
-<li><p><strong>examples and n_coef is the number of coefficients in the latent dynamics.</strong></p></li>
-</ul>
-</div></blockquote>
-<blockquote>
-<div><ul class="simple">
-<li><p><em>columns of X and whose corresponding target values are the elements of the i’th column of Y.</em></p></li>
-</ul>
-</div></blockquote>
+<span class="sig-prename descclassname"><span class="pre">lasdi.gp.</span></span><span class="sig-name descname"><span class="pre">fit_gps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.gp.fit_gps" title="Permalink to this definition"></a></dt>
+<dd><p>Trains each GP given the interpolation dataset.
+X: (n_train, n_param) numpy 2d array
+Y: (n_train, n_coef) numpy 2d array
+We assume each target coefficient is independent with each other.
+gp_dictionnary is a dataset containing the trained GPs (as sklearn objects)</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lasdi.gp.eval_gp">
-<span class="sig-prename descclassname"><span class="pre">lasdi.gp.</span></span><span class="sig-name descname"><span class="pre">eval_gp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gp_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">sklearn.gaussian_process.GaussianProcessRegressor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#lasdi.gp.eval_gp" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">lasdi.gp.</span></span><span class="sig-name descname"><span class="pre">eval_gp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gp_dictionnary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_grid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.gp.eval_gp" title="Permalink to this definition"></a></dt>
 <dd><p>Computes the GPs predictive mean and standard deviation for points of the parameter space grid</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><strong>object that predicts the i’th coefficient.</strong></p></li>
-<li><p><strong>param_grid</strong> (<em>A 2d numpy.ndarray object of shape (number of parameter combination, number of</em>)</p></li>
-<li><p><strong>parameters). The i,j element of this array specifies the value of the j’th parameter in the</strong></p></li>
-<li><p><strong>i’th combination of parameters. We use this as the testing set for the GP evaluation.</strong></p></li>
-</ul>
-</div></blockquote>
-<blockquote>
-<div><ul class="simple">
-<li><p><em>at each training example, respectively.</em></p></li>
-<li><p><em>Thus, the i,j element of the first return variable holds the predicted mean of the j’th</em></p></li>
-<li><p><em>coefficient in the latent dynamics at the i’th training example. Likewise, the i,j element of</em></p></li>
-<li><p><em>the second return variable holds the standard deviation in the predicted distribution for the</em></p></li>
-<li><p><em>j’th coefficient in the latent dynamics at the i’th combination of parameter values.</em></p></li>
-</ul>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lasdi.gp.sample_coefs">
-<span class="sig-prename descclassname"><span class="pre">lasdi.gp.</span></span><span class="sig-name descname"><span class="pre">sample_coefs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gp_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">sklearn.gaussian_process.GaussianProcessRegressor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.gp.sample_coefs" title="Permalink to this definition"></a></dt>
-<dd><p>Generates sets of ODE (SINDy) coefficients sampled from the predictive distribution for those
-coefficients at the specified parameter value (parma). Specifically, for the k’th SINDy
-coefficient, we draw n_samples samples of the predictive distribution for the k’th coefficient
-when param is the parameter.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><strong>object that predicts the i’th coefficient.</strong></p></li>
-<li><p><strong>param</strong> (<em>A combination of parameter values. i.e., a single test example. We evaluate each GP in</em>)</p></li>
-<li><p><strong>the gp_list at this parameter value (getting a prediction for each coefficient).</strong></p></li>
-<li><p><strong>n_samples</strong> (<em>Number of samples of the predicted latent dynamics used to build ensemble of fom</em>)</p></li>
-<li><p><strong>predictions. N_s in the paper.</strong></p></li>
-</ul>
-</div></blockquote>
-<blockquote>
-<div><ul class="simple">
-<li><p><em>sample of the j’th SINDy coefficient.</em></p></li>
-</ul>
-</div></blockquote>
+<span class="sig-prename descclassname"><span class="pre">lasdi.gp.</span></span><span class="sig-name descname"><span class="pre">sample_coefs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gp_dictionnary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.gp.sample_coefs" title="Permalink to this definition"></a></dt>
+<dd><p>Generates sample sets of ODEs for one given parameter.
+coef_samples is a list of length n_samples, where each terms is a matrix of SINDy coefficients sampled from the GP predictive
+distributions</p>
 </dd></dl>
 
 </section>

@@ -111,7 +111,17 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lasdi.inputs.InputParser" title="lasdi.inputs.InputParser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InputParser</span></code></a></p></td>
-<td><p>A InputParser objects acts as a wrapper around a dictionary of settings. Thus, each setting is</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lasdi.inputs.getDictFromList" title="lasdi.inputs.getDictFromList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getDictFromList</span></code></a>(list_, inputDict)</p></td>
+<td><p>get a dict with {key: val} from a list of dicts</p></td>
 </tr>
 </tbody>
 </table>
@@ -120,61 +130,39 @@
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading"></a></h2>
 <dl class="py data">
 <dt class="sig sig-object py" id="lasdi.inputs.verbose">
-<span class="sig-prename descclassname"><span class="pre">lasdi.inputs.</span></span><span class="sig-name descname"><span class="pre">verbose</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#lasdi.inputs.verbose" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">lasdi.inputs.</span></span><span class="sig-name descname"><span class="pre">verbose</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#lasdi.inputs.verbose" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lasdi.inputs.InputParser">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lasdi.inputs.</span></span><span class="sig-name descname"><span class="pre">InputParser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.inputs.InputParser" title="Permalink to this definition"></a></dt>
-<dd><p>A InputParser objects acts as a wrapper around a dictionary of settings. Thus, each setting is
-a key and the corresponding value is the setting’s value. Because one setting may itself be
-a dictionary (we often group settings; each group has a name but several constituent settings),
-the underlying dictionary is structured as a sequence of nested dictionaries. This class allows
-the user to select a specific setting from that structure by specifying (via a list of strings)
-where in that nested structure the desired setting lives.</p>
-<dl class="py attribute">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lasdi.inputs.</span></span><span class="sig-name descname"><span class="pre">InputParser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.inputs.InputParser" title="Permalink to this definition"></a></dt>
+<dd><dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.inputs.InputParser.dict_">
-<span class="sig-name descname"><span class="pre">dict_</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#lasdi.inputs.InputParser.dict_" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">dict_</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#lasdi.inputs.InputParser.dict_" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.inputs.InputParser.name">
-<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#lasdi.inputs.InputParser.name" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#lasdi.inputs.InputParser.name" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.inputs.InputParser.getInput">
-<span class="sig-name descname"><span class="pre">getInput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fallback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datatype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.inputs.InputParser.getInput" title="Permalink to this definition"></a></dt>
-<dd><p>A InputParser object acts as a wrapper around a dictionary of settings. That is, <a href="#id1"><span class="problematic" id="id2">self.dict_</span></a>
-is structured as a nested family of dictionaries. Each setting corresponds to a key in
-<a href="#id3"><span class="problematic" id="id4">self.dict_</span></a>. The setting’s value is the corresponding value in <a href="#id5"><span class="problematic" id="id6">self.dict_</span></a>. In many cases,
-a particular setting may be nested within others. That is, a setting’s value may itself be
-another dictionary housing various sub-settings. This function allows us to fetch a
-specific setting from this nested structure.</p>
-<p>Specifically, we specify a list of strings. keys[0] should be a key in <a href="#id7"><span class="problematic" id="id8">self.dict_</span></a>
-If so, we set val = self.dict_[keys[0]]. If there are more keys, then val should be a
-dictionary and keys[1] should be a key in this dictionary. In this case, we replace val
-with val[key[1]] and so on. This continues until we have exhausted all keys. There is one
-important exception:</p>
-<blockquote>
-<div><p>If at some point in the process, there are more keys but val is not a dictionary, or if
-there are more keys and val is a dictionary but the next key is not a key in that
-dictionary, then we return the fallback value. If the fallback value does not exist,
-returns an error.</p>
-</div></blockquote>
-<blockquote>
-<div><ul class="simple">
-<li><p><strong>dictionary and keys[1] should be a key in this dictionary. In this case, we replace val</strong></p></li>
-<li><p><strong>with val[key[1]] and so on. This continues until we have exhausted all keys.</strong></p></li>
-<li><p><strong>fallback</strong> (<em>A sort of default value. If at some point, val is not a dictionary (and there are</em>)</p></li>
-<li><p><strong>more keys) or val is a dictionary but the next key is not a valid key in that dictionary,</strong></p></li>
-<li><p><strong>then we return the fallback value.</strong></p></li>
-<li><p><strong>datatype</strong> (<em>If not None, then we require that the final val has this datatype. If the final</em>)</p></li>
-<li><p><strong>val does not have the desired datatype, we raise an exception.</strong></p></li>
-</ul>
-</div></blockquote>
+<span class="sig-name descname"><span class="pre">getInput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fallback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datatype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.inputs.InputParser.getInput" title="Permalink to this definition"></a></dt>
+<dd><p>Find the value corresponding to the list of keys.
+If the specified keys do not exist, use the fallback value.
+If the fallback value does not exist, returns an error.
+If the datatype is specified, enforce the output value has the right datatype.</p>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lasdi.inputs.getDictFromList">
+<span class="sig-prename descclassname"><span class="pre">lasdi.inputs.</span></span><span class="sig-name descname"><span class="pre">getDictFromList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputDict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.inputs.getDictFromList" title="Permalink to this definition"></a></dt>
+<dd><p>get a dict with {key: val} from a list of dicts
+NOTE: it returns only the first item in the list,
+even if the list has more than one dict with {key: val}.</p>
 </dd></dl>
 
 </section>
