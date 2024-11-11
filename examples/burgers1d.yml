@@ -1,24 +1,10 @@
-# lasdi:
-#   type: gplasdi
-#   gplasdi:
-#     # device: mps
-#     n_samples: 20
-#     lr: 0.001
-#     max_iter: 28000
-#     n_iter: 2000
-#     max_greedy_iter: 8000
-#     ld_weight: 0.1
-#     coef_weight: 1.e-6
-#     path_checkpoint: checkpoint
-#     path_results: results
-
 lasdi:
   type: gplasdi
   gplasdi:
     # device: mps
     n_samples: 20
     lr: 0.001
-    max_iter: 10000
+    max_iter: 28000
     n_iter: 2000
     max_greedy_iter: 8000
     ld_weight: 0.1
