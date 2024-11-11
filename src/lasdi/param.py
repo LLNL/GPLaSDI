@@ -155,7 +155,7 @@ class ParameterSpace:
             - max
             - sample_size
             - list
-            - log_scale false
+            - log_scale
             
         -------------------------------------------------------------------------------------------
         Returns
@@ -208,7 +208,7 @@ class ParameterSpace:
             - max
             - sample_size
             - list
-            - log_scale false
+            - log_scale
             
         -------------------------------------------------------------------------------------------
         Returns
