@@ -74,41 +74,20 @@ class ParameterSpace:
         return self.createHyperGridSpace(mesh_grids)
     
     def createInitialTrainSpaceForHull(self, param_list):
+        '''
+        Concatenates the provided lists of training points into a 2D array.
+        param_list: A list of parameter dictionaries
+    
+        output: mesh_grid
+            - np.array of size [d, k], where d is the number of points provided on the exterior of
+              the training space and k is the number of parameters (k == len(param_list)).
+        '''
 
-        """
-        If test_space is 'hull', then the provided training parameters must be 
-        points on the exterior of our training space. This function concatenates the provided 
-        training points into a 2D array.
-
-        -------------------------------------------------------------------------------------------
-        Arguments
-        -------------------------------------------------------------------------------------------
-        
-        param_list: A list of parameter dictionaries. Each entry should be a dictionary with the 
-        following keys:
-            - name
-            - min
-            - max
-            - sample_size
-            - list
-            - log_scale false
-            
-        -------------------------------------------------------------------------------------------
-        Returns
-        -------------------------------------------------------------------------------------------
-        
-        A 2d array of shape (d, k), where d is the number of points provided on the exterior of
-        the training space and k is the number of parameters (k == len(param_list)).
-        """
-
-        #A list we will use to store all of the provided training points.
         paramRanges = []
 
         for k, param in enumerate(param_list):
 
-            # Fetch the training points associated with each parameter which are given by a list.
             _, paramRange = getParam1DSpace['list'](param)
-            # Store the training points into the list.
             paramRanges += [paramRange]
 
             if k > 0:
@@ -117,7 +96,6 @@ class ParameterSpace:
                                                             'must have same length when test_space is \'hull\'.')
                 
         
-        # Stack all the provided training points into an array.
         mesh_grids = np.vstack((paramRanges)).T
         return mesh_grids
     
@@ -134,46 +112,12 @@ class ParameterSpace:
         return gridSizes, mesh_grids, self.createHyperGridSpace(mesh_grids)
     
     def createTestGridSpaceForHull(self, param_list):
-        """
-        This function sets up an initial grid for the testing parameters when the test_space is 
-        'hull'. Here, we form a uniform grid over the given training parameters based on the 
-        provided min and max values of each parameter and specified number of samples. The function
-        'createTestSpaceFromHull' will later be used to keep testing point which are in the
-        convex hull of training points.
-
-        This function is similar to the function 'createTestGridSpace', except we do not specify 
-        the 'test_space_type' value for any parameter.
-
-        -------------------------------------------------------------------------------------------
-        Arguments
-        -------------------------------------------------------------------------------------------
-        
-        param_list: A list of parameter dictionaries. Each entry should be a dictionary with the 
-        following keys:
-            - name
-            - min
-            - max
-            - sample_size
-            - list
-            - log_scale
-            
-        -------------------------------------------------------------------------------------------
-        Returns
-        -------------------------------------------------------------------------------------------
-        
-        A three element tuple. 
-        
-        The first is a list whose i'th element specifies the number of distinct values of the i'th 
-        parameter we consider (this is the length of the i'th element of "paramRanges" below).
-
-        The second is a a tuple of k numpy ndarrays (where k = len(param_list)), the i'th one of 
-        which is a k-dimensional array with shape (N0, ... , N{k - 1}), where Ni = 
-        param_list[i].size whose i(0), ... , i(k - 1) element specifies the value of the i'th 
-        parameter in the i(0), ... , i(k - 1)'th unique combination of parameter values.
-
-        The third one is a 2d array of parameter values. It has shape (M, k), where 
-        M = \prod_{i = 0}^{k - 1} param_list[i].size. 
-        """
+        '''
+        Builds an initial uniform grid for the testing parameters when the test_space is 'hull'. 
+        param_list: A list of parameter dictionaries
+    
+        output: gridSizes, mesh_grids, param_grid
+        '''
 
         paramRanges = []
         gridSizes = []
@@ -187,47 +131,14 @@ class ParameterSpace:
         return gridSizes, mesh_grids, self.createHyperGridSpace(mesh_grids)
     
     def createTestHullSpace(self, param_list):
-        """
-        This function sets up an initial grid for the testing parameters when the test_space is 
-        'hull'. Here, we form a uniform grid over the giving training parameters based on the 
-        provided min and max values of each parameter and specified number of samples. The function
-        'createTestSpaceFromHull' will later be used to only keep values of this grid which are in
-        the convex hull of our training parameters.
-
-        This function is similar to the function 'createTestGridSpace', except we do not specify 
-        the 'test_space_type' value for any parameter.
-
-        -------------------------------------------------------------------------------------------
-        Arguments
-        -------------------------------------------------------------------------------------------
-        
-        param_list: A list of parameter dictionaries. Each entry should be a dictionary with the 
-        following keys:
-            - name
-            - min
-            - max
-            - sample_size
-            - list
-            - log_scale
-            
-        -------------------------------------------------------------------------------------------
-        Returns
-        -------------------------------------------------------------------------------------------
-        
-        A three element tuple. 
-        
-        The first is a list whose i'th element specifies the number of distinct values of the i'th 
-        parameter we consider (this is the length of the i'th element of "paramRanges" below).
-
-        The second is a a tuple of k numpy ndarrays (where k = len(param_list)), the i'th one of 
-        which is a k-dimensional array with shape (N0, ... , N{k - 1}), where Ni = 
-        param_list[i].size whose i(0), ... , i(k - 1) element specifies the value of the i'th 
-        parameter in the i(0), ... , i(k - 1)'th unique combination of parameter values.
-
-        The third one is a 2d array of parameter values. It has shape (M, k), where M is the
-        number of testing points after removing points outside the convex hull of training 
-        parameters. 
-        """
+        '''
+        This function builds an initial uniform grid for the testing parameters, and then
+        returns any testing points which are within the convex hull of the provided
+        training parameters.
+        param_list: A list of parameter dictionaries
+    
+        output: gridSizes, mesh_grids, test_space
+        '''
 
         # Get the initial uniform grid over the training parameters
         gridSizes, mesh_grids, test_space = self.createTestGridSpaceForHull(param_list)
