@@ -207,13 +207,15 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.createInitialTrainSpaceForHull">
 <span class="sig-name descname"><span class="pre">createInitialTrainSpaceForHull</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace.createInitialTrainSpaceForHull" title="Permalink to this definition"></a></dt>
-<dd><p>Concatenates the provided lists of training points into a 2D array.
-param_list: A list of parameter dictionaries</p>
+<dd><dl>
+<dt>Concatenates the provided lists of training points into a 2D array.</dt><dd><p>param_list: A list of parameter dictionaries</p>
 <dl class="simple">
-<dt>output: mesh_grid</dt><dd><ul class="simple">
+<dt>Output: mesh_grid</dt><dd><ul class="simple">
 <li><p>np.array of size [d, k], where d is the number of points provided on the exterior of
 the training space and k is the number of parameters (k == len(param_list)).</p></li>
 </ul>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -226,9 +228,11 @@ the training space and k is the number of parameters (k == len(param_list)).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.createTestGridSpaceForHull">
 <span class="sig-name descname"><span class="pre">createTestGridSpaceForHull</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace.createTestGridSpaceForHull" title="Permalink to this definition"></a></dt>
-<dd><p>Builds an initial uniform grid for the testing parameters when the test_space is ‘hull’.
-param_list: A list of parameter dictionaries</p>
-<p>output: gridSizes, mesh_grids, param_grid</p>
+<dd><dl>
+<dt>Builds an initial uniform grid for the testing parameters when the test_space is ‘hull’.</dt><dd><p>param_list: A list of parameter dictionaries</p>
+<p>Output: gridSizes, mesh_grids, param_grid</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -236,9 +240,11 @@ param_list: A list of parameter dictionaries</p>
 <span class="sig-name descname"><span class="pre">createTestHullSpace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace.createTestHullSpace" title="Permalink to this definition"></a></dt>
 <dd><p>This function builds an initial uniform grid for the testing parameters, and then
 returns any testing points which are within the convex hull of the provided
-training parameters.
-param_list: A list of parameter dictionaries</p>
-<p>output: gridSizes, mesh_grids, test_space</p>
+training parameters.</p>
+<blockquote>
+<div><p>param_list: A list of parameter dictionaries</p>
+<p>Output: gridSizes, mesh_grids, test_space</p>
+</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
