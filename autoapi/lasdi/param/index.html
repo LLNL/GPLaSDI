@@ -207,31 +207,13 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.createInitialTrainSpaceForHull">
 <span class="sig-name descname"><span class="pre">createInitialTrainSpaceForHull</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace.createInitialTrainSpaceForHull" title="Permalink to this definition"></a></dt>
-<dd><p>If test_space is ‘hull’, then the provided training parameters must be
-points on the exterior of our training space. This function concatenates the provided
-training points into a 2D array.</p>
-<blockquote>
-<div><blockquote>
-<div><ul class="simple">
-<li><p>name</p></li>
-<li><p>min</p></li>
-<li><p>max</p></li>
-<li><p>sample_size</p></li>
-<li><p>list</p></li>
-<li><p>log_scale false</p></li>
+<dd><p>Concatenates the provided lists of training points into a 2D array.
+param_list: A list of parameter dictionaries</p>
+<dl class="simple">
+<dt>output: mesh_grid</dt><dd><ul class="simple">
+<li><p>np.array of size [d, k], where d is the number of points provided on the exterior of
+the training space and k is the number of parameters (k == len(param_list)).</p></li>
 </ul>
-</div></blockquote>
-<ul class="simple">
-<li><p><strong>——————————————————————————————-</strong></p></li>
-</ul>
-</div></blockquote>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><em>A 2d array of shape (d, k), where d is the number of points provided on the exterior of</em></p></li>
-<li><p><em>the training space and k is the number of parameters (k == len(param_list)).</em></p></li>
-</ul>
-</p>
 </dd>
 </dl>
 </dd></dl>
@@ -244,88 +226,19 @@ training points into a 2D array.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.createTestGridSpaceForHull">
 <span class="sig-name descname"><span class="pre">createTestGridSpaceForHull</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace.createTestGridSpaceForHull" title="Permalink to this definition"></a></dt>
-<dd><p>This function sets up an initial grid for the testing parameters when the test_space is
-‘hull’. Here, we form a uniform grid over the given training parameters based on the
-provided min and max values of each parameter and specified number of samples. The function
-‘createTestSpaceFromHull’ will later be used to keep testing point which are in the
-convex hull of training points.</p>
-<p>This function is similar to the function ‘createTestGridSpace’, except we do not specify
-the ‘test_space_type’ value for any parameter.</p>
-<blockquote>
-<div><blockquote>
-<div><ul class="simple">
-<li><p>name</p></li>
-<li><p>min</p></li>
-<li><p>max</p></li>
-<li><p>sample_size</p></li>
-<li><p>list</p></li>
-<li><p>log_scale</p></li>
-</ul>
-</div></blockquote>
-<ul class="simple">
-<li><p><strong>——————————————————————————————-</strong></p></li>
-</ul>
-</div></blockquote>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><em>A three element tuple.</em></p></li>
-<li><p><em>The first is a list whose i’th element specifies the number of distinct values of the i’th</em></p></li>
-<li><p><em>parameter we consider (this is the length of the i’th element of “paramRanges” below).</em></p></li>
-<li><p><em>The second is a a tuple of k numpy ndarrays (where k = len(param_list)), the i’th one of</em></p></li>
-<li><p><em>which is a k-dimensional array with shape (N0, … , N{k - 1}), where Ni =</em></p></li>
-<li><p><em>param_list[i].size whose i(0), … , i(k - 1) element specifies the value of the i’th</em></p></li>
-<li><p><em>parameter in the i(0), … , i(k - 1)’th unique combination of parameter values.</em></p></li>
-<li><p><em>The third one is a 2d array of parameter values. It has shape (M, k), where</em></p></li>
-<li><p><em>M = prod_{i = 0}^{k - 1} param_list[i].size.</em></p></li>
-</ul>
-</p>
-</dd>
-</dl>
+<dd><p>Builds an initial uniform grid for the testing parameters when the test_space is ‘hull’.
+param_list: A list of parameter dictionaries</p>
+<p>output: gridSizes, mesh_grids, param_grid</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.createTestHullSpace">
 <span class="sig-name descname"><span class="pre">createTestHullSpace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace.createTestHullSpace" title="Permalink to this definition"></a></dt>
-<dd><p>This function sets up an initial grid for the testing parameters when the test_space is
-‘hull’. Here, we form a uniform grid over the giving training parameters based on the
-provided min and max values of each parameter and specified number of samples. The function
-‘createTestSpaceFromHull’ will later be used to only keep values of this grid which are in
-the convex hull of our training parameters.</p>
-<p>This function is similar to the function ‘createTestGridSpace’, except we do not specify
-the ‘test_space_type’ value for any parameter.</p>
-<blockquote>
-<div><blockquote>
-<div><ul class="simple">
-<li><p>name</p></li>
-<li><p>min</p></li>
-<li><p>max</p></li>
-<li><p>sample_size</p></li>
-<li><p>list</p></li>
-<li><p>log_scale</p></li>
-</ul>
-</div></blockquote>
-<ul class="simple">
-<li><p><strong>——————————————————————————————-</strong></p></li>
-</ul>
-</div></blockquote>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><em>A three element tuple.</em></p></li>
-<li><p><em>The first is a list whose i’th element specifies the number of distinct values of the i’th</em></p></li>
-<li><p><em>parameter we consider (this is the length of the i’th element of “paramRanges” below).</em></p></li>
-<li><p><em>The second is a a tuple of k numpy ndarrays (where k = len(param_list)), the i’th one of</em></p></li>
-<li><p><em>which is a k-dimensional array with shape (N0, … , N{k - 1}), where Ni =</em></p></li>
-<li><p><em>param_list[i].size whose i(0), … , i(k - 1) element specifies the value of the i’th</em></p></li>
-<li><p><em>parameter in the i(0), … , i(k - 1)’th unique combination of parameter values.</em></p></li>
-<li><p><em>The third one is a 2d array of parameter values. It has shape (M, k), where M is the</em></p></li>
-<li><p><em>number of testing points after removing points outside the convex hull of training</em></p></li>
-<li><p><em>parameters.</em></p></li>
-</ul>
-</p>
-</dd>
-</dl>
+<dd><p>This function builds an initial uniform grid for the testing parameters, and then
+returns any testing points which are within the convex hull of the provided
+training parameters.
+param_list: A list of parameter dictionaries</p>
+<p>output: gridSizes, mesh_grids, test_space</p>
 </dd></dl>
 
 <dl class="py method">
