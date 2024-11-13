@@ -128,7 +128,7 @@ class ParameterSpace:
     
             Returns
             -------
-            gridSizes : :obj:`list(Nx)`
+            gridSizes : :obj:`list(int)`
                 A list containing the number of elements on the grid in each parameter.
             mesh_grids : :obj:`numpy.array`
                 tuple of numpy nd arrays, corresponding to each parameter.
@@ -161,7 +161,7 @@ class ParameterSpace:
     
             Returns
             -------
-            gridSizes : :obj:`list(Nx)`
+            gridSizes : :obj:`list(int)`
                 A list containing the number of elements on the grid in each parameter.
             mesh_grids : :obj:`numpy.array`
                 tuple of numpy nd arrays, corresponding to each parameter.
