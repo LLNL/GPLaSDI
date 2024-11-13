@@ -92,11 +92,12 @@ Module Contents
    .. py:method:: createInitialTrainSpaceForHull(param_list)
 
       Concatenates the provided lists of training points into a 2D array.
-          param_list: A list of parameter dictionaries
 
-          Output: mesh_grid
-              - np.array of size [d, k], where d is the number of points provided on the exterior of
-                the training space and k is the number of parameters (k == len(param_list)).
+      param_list: A list of parameter dictionaries
+
+      Output: mesh_grid
+          - np.array of size [d, k], where d is the number of points provided on the exterior of
+            the training space and k is the number of parameters (k == len(param_list)).
 
 
 
@@ -106,9 +107,10 @@ Module Contents
    .. py:method:: createTestGridSpaceForHull(param_list)
 
       Builds an initial uniform grid for the testing parameters when the test_space is 'hull'.
-          param_list: A list of parameter dictionaries
 
-          Output: gridSizes, mesh_grids, param_grid
+      param_list: A list of parameter dictionaries
+
+      Output: gridSizes, mesh_grids, param_grid
 
 
 
@@ -117,9 +119,10 @@ Module Contents
       This function builds an initial uniform grid for the testing parameters, and then
       returns any testing points which are within the convex hull of the provided
       training parameters.
-          param_list: A list of parameter dictionaries
 
-          Output: gridSizes, mesh_grids, test_space
+      param_list: A list of parameter dictionaries
+
+      Output: gridSizes, mesh_grids, test_space
 
 
 
