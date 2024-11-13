@@ -76,12 +76,17 @@ class ParameterSpace:
     def createInitialTrainSpaceForHull(self, param_list):
         '''
             Concatenates the provided lists of training points into a 2D array.
-            
-            param_list: A list of parameter dictionaries
+
+            Arguments
+            ---------
+            param_list : :obj:`list(dict)`
+                A list of parameter dictionaries
     
-            Output: mesh_grid
-                - np.array of size [d, k], where d is the number of points provided on the exterior of
-                  the training space and k is the number of parameters (k == len(param_list)).
+            Returns
+            -------
+            mesh_grids : :obj:`numpy.array`
+                np.array of size [d, k], where d is the number of points provided on the exterior of
+                the training space and k is the number of parameters (k == len(param_list)).
         '''
 
         paramRanges = []
@@ -115,10 +120,21 @@ class ParameterSpace:
     def createTestGridSpaceForHull(self, param_list):
         '''
             Builds an initial uniform grid for the testing parameters when the test_space is 'hull'. 
-            
-            param_list: A list of parameter dictionaries
+
+            Arguments
+            ---------
+            param_list : :obj:`list(dict)`
+                A list of parameter dictionaries
     
-            Output: gridSizes, mesh_grids, param_grid
+            Returns
+            -------
+            gridSizes : :obj:`list(Nx)`
+                A list containing the number of elements on the grid in each parameter.
+            mesh_grids : :obj:`numpy.array`
+                tuple of numpy nd arrays, corresponding to each parameter.
+                Dimension of the array equals to the number of parameters.
+            param_grid : :obj:`numpy.array`
+                numpy 2d array of size (grid size x number of parameters).
         '''
 
         paramRanges = []
@@ -138,9 +154,21 @@ class ParameterSpace:
             returns any testing points which are within the convex hull of the provided
             training parameters.
 
-            param_list: A list of parameter dictionaries
+            Arguments
+            ---------
+            param_list : :obj:`list(dict)`
+                A list of parameter dictionaries
     
-            Output: gridSizes, mesh_grids, test_space
+            Returns
+            -------
+            gridSizes : :obj:`list(Nx)`
+                A list containing the number of elements on the grid in each parameter.
+            mesh_grids : :obj:`numpy.array`
+                tuple of numpy nd arrays, corresponding to each parameter.
+                Dimension of the array equals to the number of parameters.
+            test_space : :obj:`numpy.array`
+                numpy 2d array of size [d, k], where d is the number of testing points within
+                convex hull of the training space and k is the number of parameters (k == len(param_list)).
         '''
 
         # Get the initial uniform grid over the training parameters
