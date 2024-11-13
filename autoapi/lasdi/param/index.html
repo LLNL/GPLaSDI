@@ -208,12 +208,16 @@
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.createInitialTrainSpaceForHull">
 <span class="sig-name descname"><span class="pre">createInitialTrainSpaceForHull</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace.createInitialTrainSpaceForHull" title="Permalink to this definition"></a></dt>
 <dd><p>Concatenates the provided lists of training points into a 2D array.</p>
-<p>param_list: A list of parameter dictionaries</p>
-<dl class="simple">
-<dt>Output: mesh_grid</dt><dd><ul class="simple">
-<li><p>np.array of size [d, k], where d is the number of points provided on the exterior of
-the training space and k is the number of parameters (k == len(param_list)).</p></li>
-</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>param_list</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list(dict)</span></code>) – A list of parameter dictionaries</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>mesh_grids</strong> – np.array of size [d, k], where d is the number of points provided on the exterior of
+the training space and k is the number of parameters (k == len(param_list)).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.array</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -227,8 +231,20 @@ the training space and k is the number of parameters (k == len(param_list)).</p>
 <dt class="sig sig-object py" id="lasdi.param.ParameterSpace.createTestGridSpaceForHull">
 <span class="sig-name descname"><span class="pre">createTestGridSpaceForHull</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.param.ParameterSpace.createTestGridSpaceForHull" title="Permalink to this definition"></a></dt>
 <dd><p>Builds an initial uniform grid for the testing parameters when the test_space is ‘hull’.</p>
-<p>param_list: A list of parameter dictionaries</p>
-<p>Output: gridSizes, mesh_grids, param_grid</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>param_list</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list(dict)</span></code>) – A list of parameter dictionaries</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>gridSizes</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list(Nx)</span></code>) – A list containing the number of elements on the grid in each parameter.</p></li>
+<li><p><strong>mesh_grids</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.array</span></code>) – tuple of numpy nd arrays, corresponding to each parameter.
+Dimension of the array equals to the number of parameters.</p></li>
+<li><p><strong>param_grid</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.array</span></code>) – numpy 2d array of size (grid size x number of parameters).</p></li>
+</ul>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -237,8 +253,21 @@ the training space and k is the number of parameters (k == len(param_list)).</p>
 <dd><p>This function builds an initial uniform grid for the testing parameters, and then
 returns any testing points which are within the convex hull of the provided
 training parameters.</p>
-<p>param_list: A list of parameter dictionaries</p>
-<p>Output: gridSizes, mesh_grids, test_space</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>param_list</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list(dict)</span></code>) – A list of parameter dictionaries</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>gridSizes</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list(Nx)</span></code>) – A list containing the number of elements on the grid in each parameter.</p></li>
+<li><p><strong>mesh_grids</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.array</span></code>) – tuple of numpy nd arrays, corresponding to each parameter.
+Dimension of the array equals to the number of parameters.</p></li>
+<li><p><strong>test_space</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.array</span></code>) – numpy 2d array of size [d, k], where d is the number of testing points within
+convex hull of the training space and k is the number of parameters (k == len(param_list)).</p></li>
+</ul>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
