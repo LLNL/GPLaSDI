@@ -75,7 +75,8 @@ class ParameterSpace:
     
     def createInitialTrainSpaceForHull(self, param_list):
         '''
-        Concatenates the provided lists of training points into a 2D array.
+            Concatenates the provided lists of training points into a 2D array.
+            
             param_list: A list of parameter dictionaries
     
             Output: mesh_grid
@@ -113,7 +114,8 @@ class ParameterSpace:
     
     def createTestGridSpaceForHull(self, param_list):
         '''
-        Builds an initial uniform grid for the testing parameters when the test_space is 'hull'. 
+            Builds an initial uniform grid for the testing parameters when the test_space is 'hull'. 
+            
             param_list: A list of parameter dictionaries
     
             Output: gridSizes, mesh_grids, param_grid
@@ -132,9 +134,10 @@ class ParameterSpace:
     
     def createTestHullSpace(self, param_list):
         '''
-        This function builds an initial uniform grid for the testing parameters, and then
-        returns any testing points which are within the convex hull of the provided
-        training parameters.
+            This function builds an initial uniform grid for the testing parameters, and then
+            returns any testing points which are within the convex hull of the provided
+            training parameters.
+
             param_list: A list of parameter dictionaries
     
             Output: gridSizes, mesh_grids, test_space
