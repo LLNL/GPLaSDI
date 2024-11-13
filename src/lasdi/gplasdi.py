@@ -163,6 +163,11 @@ class BayesianGLaSDI:
         n_train = ps.n_train()
         ld = self.latent_dynamics
 
+        self.training_loss = []
+        self.ae_loss = []
+        self.ld_loss = []
+        self.coef_loss = []
+
         '''
             determine number of iterations.
             Perform n_iter iterations until overall iterations hit max_iter.
@@ -183,6 +188,11 @@ class BayesianGLaSDI:
             max_coef = np.abs(coefs).max()
 
             loss = loss_ae + self.ld_weight * loss_ld / n_train + self.coef_weight * loss_coef / n_train
+
+            self.training_loss.append(loss.item())
+            self.ae_loss.append(loss_ae.item())
+            self.ld_loss.append(loss_ld.item())
+            self.coef_loss.append(loss_coef.item())
 
             loss.backward()
             self.optimizer.step()
@@ -267,7 +277,8 @@ class BayesianGLaSDI:
         dict_ = {'X_train': self.X_train, 'X_test': self.X_test, 'lr': self.lr, 'n_iter': self.n_iter,
                  'n_samples' : self.n_samples, 'best_coefs': self.best_coefs, 'max_iter': self.max_iter,
                  'max_iter': self.max_iter, 'ld_weight': self.ld_weight, 'coef_weight': self.coef_weight,
-                 'restart_iter': self.restart_iter, 'timer': self.timer.export(), 'optimizer': self.optimizer.state_dict()
+                 'restart_iter': self.restart_iter, 'timer': self.timer.export(), 'optimizer': self.optimizer.state_dict(),
+                 'training_loss' : self.training_loss, 'ae_loss' : self.ae_loss, 'ld_loss' : self.ld_loss, 'coeff_loss' : self.coef_loss
                  }
         return dict_
     

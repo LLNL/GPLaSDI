@@ -41,6 +41,27 @@ parameter_space:
   test_space:
     type: grid
 
+## An example if we want to provide training points on exterior 
+## of region and train in convex hull of training points
+# parameter_space:
+#   parameters:
+#     - name: a
+#       min: 0.7
+#       max: 0.9
+#       test_space_type: list
+#       sample_size: 21
+#       list: [0.70, 0.725, 0.75, 0.800, 0.85, 0.90]
+#       log_scale: false
+#     - name: w
+#       min: 0.9
+#       max: 1.1
+#       test_space_type: list
+#       sample_size: 21
+#       list: [0.90, 0.970, 1.00, 0.925, 0.98, 1.10]
+#       log_scale: false
+#   test_space:
+#     type: hull
+
 latent_space:
   type: ae
   ae:
