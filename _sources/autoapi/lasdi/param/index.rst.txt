@@ -110,7 +110,7 @@ Module Contents
 
       :Parameters: **param_list** (:obj:`list(dict)`) -- A list of parameter dictionaries
 
-      :returns: * **gridSizes** (:obj:`list(Nx)`) -- A list containing the number of elements on the grid in each parameter.
+      :returns: * **gridSizes** (:obj:`list(int)`) -- A list containing the number of elements on the grid in each parameter.
                 * **mesh_grids** (:obj:`numpy.array`) -- tuple of numpy nd arrays, corresponding to each parameter.
                   Dimension of the array equals to the number of parameters.
                 * **param_grid** (:obj:`numpy.array`) -- numpy 2d array of size (grid size x number of parameters).
@@ -125,7 +125,7 @@ Module Contents
 
       :Parameters: **param_list** (:obj:`list(dict)`) -- A list of parameter dictionaries
 
-      :returns: * **gridSizes** (:obj:`list(Nx)`) -- A list containing the number of elements on the grid in each parameter.
+      :returns: * **gridSizes** (:obj:`list(int)`) -- A list containing the number of elements on the grid in each parameter.
                 * **mesh_grids** (:obj:`numpy.array`) -- tuple of numpy nd arrays, corresponding to each parameter.
                   Dimension of the array equals to the number of parameters.
                 * **test_space** (:obj:`numpy.array`) -- numpy 2d array of size [d, k], where d is the number of testing points within

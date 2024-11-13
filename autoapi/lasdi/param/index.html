@@ -237,7 +237,7 @@ the training space and k is the number of parameters (k == len(param_list)).</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>gridSizes</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list(Nx)</span></code>) – A list containing the number of elements on the grid in each parameter.</p></li>
+<li><p><strong>gridSizes</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list(int)</span></code>) – A list containing the number of elements on the grid in each parameter.</p></li>
 <li><p><strong>mesh_grids</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.array</span></code>) – tuple of numpy nd arrays, corresponding to each parameter.
 Dimension of the array equals to the number of parameters.</p></li>
 <li><p><strong>param_grid</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.array</span></code>) – numpy 2d array of size (grid size x number of parameters).</p></li>
@@ -259,7 +259,7 @@ training parameters.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>gridSizes</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list(Nx)</span></code>) – A list containing the number of elements on the grid in each parameter.</p></li>
+<li><p><strong>gridSizes</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list(int)</span></code>) – A list containing the number of elements on the grid in each parameter.</p></li>
 <li><p><strong>mesh_grids</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.array</span></code>) – tuple of numpy nd arrays, corresponding to each parameter.
 Dimension of the array equals to the number of parameters.</p></li>
 <li><p><strong>test_space</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.array</span></code>) – numpy 2d array of size [d, k], where d is the number of testing points within
