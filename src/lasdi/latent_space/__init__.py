@@ -59,7 +59,6 @@ class Autoencoder(LatentSpace):
 
     def __init__(self, physics, config):
         super().__init__(physics, config)
-        # super(Autoencoder, self).__init__()
 
         self.space_dim = np.prod(self.qgrid_size)
         hidden_units = config['hidden_units']
