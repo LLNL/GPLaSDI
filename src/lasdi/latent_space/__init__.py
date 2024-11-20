@@ -25,18 +25,46 @@ def initial_condition_latent(param_grid, physics, autoencoder):
 
     return Z0
 
-class Autoencoder(torch.nn.Module):
+class LatentSpace(torch.nn.Module):
 
     def __init__(self, physics, config):
-        super(Autoencoder, self).__init__()
+        super(LatentSpace, self).__init__()
 
         self.qgrid_size = physics.qgrid_size
+        self.n_z = config['latent_dimension']
+
+        return
+
+    def forward(self, x):
+        raise RuntimeError("LatentSpace.forward: abstract method!")
+
+    def export(self):
+        dict_ = {'qgrid_size': self.qgrid_size,
+                 'n_z': self.n_z}
+        return dict_
+
+    def load(self, dict_):
+        """
+        Notes
+        -----
+        This abstract class only checks if the variables in restart file are the same as the instance attributes.
+        """
+
+        assert(dict_['qgrid_size'] == self.qgrid_size)
+        assert(dict_['n_z'] == self.n_z)
+        return
+
+
+class Autoencoder(LatentSpace):
+
+    def __init__(self, physics, config):
+        super().__init__(physics, config)
+        # super(Autoencoder, self).__init__()
+
         self.space_dim = np.prod(self.qgrid_size)
         hidden_units = config['hidden_units']
-        n_z = config['latent_dimension']
-        self.n_z = n_z
 
-        layer_sizes = [self.space_dim] + hidden_units + [n_z]
+        layer_sizes = [self.space_dim] + hidden_units + [self.n_z]
         #grab relevant initialization values from config
         act_type = config['activation'] if 'activation' in config else 'sigmoid'
         threshold = config["threshold"] if "threshold" in config else 0.1
@@ -60,9 +88,11 @@ class Autoencoder(torch.nn.Module):
         return x
     
     def export(self):
-        dict_ = {'autoencoder_param': self.cpu().state_dict()}
+        dict_ = super().export()
+        dict_['autoencoder_param'] = self.cpu().state_dict()
         return dict_
     
     def load(self, dict_):
+        super().load(dict_)
         self.load_state_dict(dict_['autoencoder_param'])
         return
