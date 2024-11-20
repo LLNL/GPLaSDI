@@ -41,15 +41,14 @@ class Autoencoder(torch.nn.Module):
         act_type = config['activation'] if 'activation' in config else 'sigmoid'
         threshold = config["threshold"] if "threshold" in config else 0.1
         value = config["value"] if "value" in config else 0.0
-        num_heads = config['num_heads'] if 'num_heads' in config else 1
 
         self.encoder = MultiLayerPerceptron(layer_sizes, act_type,
                                             reshape_index=0, reshape_shape=self.qgrid_size,
-                                            threshold=threshold, value=value, num_heads=num_heads)
+                                            threshold=threshold, value=value)
         
         self.decoder = MultiLayerPerceptron(layer_sizes[::-1], act_type,
                                             reshape_index=-1, reshape_shape=self.qgrid_size,
-                                            threshold=threshold, value=value, num_heads=num_heads)
+                                            threshold=threshold, value=value)
 
         return
 

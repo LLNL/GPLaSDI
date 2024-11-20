@@ -31,7 +31,7 @@ class MultiLayerPerceptron(torch.nn.Module):
 
     def __init__(self, layer_sizes,
                  act_type='sigmoid', reshape_index=None, reshape_shape=None,
-                 threshold=0.1, value=0.0, num_heads=1):
+                 threshold=0.1, value=0.0):
         super(MultiLayerPerceptron, self).__init__()
 
         # including input, hidden, output layers
@@ -53,19 +53,11 @@ class MultiLayerPerceptron(torch.nn.Module):
 
         # Initalize activation function
         self.act_type = act_type
-        self.use_multihead = False
         if act_type == "threshold":
             self.act = act_dict[act_type](threshold, value)
 
         elif act_type == "multihead":
-            self.use_multihead = True
-            if (self.n_layers > 3): # if you have more than one hidden layer
-                self.act = []
-                for i in range(self.n_layers-2):
-                    self.act += [act_dict[act_type](layer_sizes[i+1], num_heads)]
-            else:
-                self.act = [torch.nn.Identity()]  # No additional activation
-            self.act = torch.nn.ModuleList(self.fcs)
+            raise RuntimeError("MultiLayerPerceptron: MultiheadAttention requires a different architecture!")
 
         #all other activation functions initialized here
         else:
@@ -82,10 +74,7 @@ class MultiLayerPerceptron(torch.nn.Module):
 
         for i in range(self.n_layers-2):
             x = self.fcs[i](x) # apply linear layer
-            if (self.use_multihead):
-                x = self.apply_attention(self, x, i)
-            else:
-                x = self.act(x)
+            x = self.act(x)
 
         x = self.fcs[-1](x)
 
@@ -94,12 +83,6 @@ class MultiLayerPerceptron(torch.nn.Module):
             # in order to avoid data copying.
             x = x.view(list(x.shape[:-1]) + self.reshape_shape)
 
-        return x
-    
-    def apply_attention(self, x, act_idx):
-        x = x.unsqueeze(1)  # Add sequence dimension for attention
-        x, _ = self.act[act_idx](x, x, x) # apply attention
-        x = x.squeeze(1)  # Remove sequence dimension
         return x
     
     def init_weight(self):
