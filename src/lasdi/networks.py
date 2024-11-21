@@ -28,43 +28,126 @@ act_dict = {'ELU': torch.nn.ELU,
             }
 
 class MultiLayerPerceptron(torch.nn.Module):
+    """Vanilla multi-layer perceptron neural networks module.
+    """
 
     def __init__(self, layer_sizes,
                  act_type='sigmoid', reshape_index=None, reshape_shape=None,
                  threshold=0.1, value=0.0):
+        """
+        Parameters
+        ----------
+        layer_sizes : :obj:`list(int)`
+            List of vector dimensions of layers.
+        act_type : :obj:`str`, optional
+            Type of activation functions. By default :obj:`'sigmoid'` is used.
+            See :obj:`act_dict` for available types.
+        reshape_index : :obj:`int`, optinal
+            Index of layer to reshape input/output data. Either 0 or -1 is allowed.
+
+            - 0 : the first (input) layer
+            - -1 : the last (output) layer
+
+            By default the index is :obj:`None`, and reshaping is not executed.
+        reshape_shape : :obj:`list(int)`, optional
+            Target shape from/to which input/output data is reshaped.
+            Reshaping behavior changes by :attr:`reshape_index`.
+            By default the index is :obj:`None`, and reshaping is not executed.
+            For details on reshaping action, see :attr:`reshape_shape`.
+
+        Note
+        ----
+        :obj:`numpy.prod(reshape_shape) == layer_sizes[reshape_index]`
+
+        """
         super(MultiLayerPerceptron, self).__init__()
-
-        # including input, hidden, output layers
+        
         self.n_layers = len(layer_sizes)
+        """:obj:`int` : Depth of layers including input, hidden, output layers."""
+        
         self.layer_sizes = layer_sizes
+        """:obj:`list(int)` : Vector dimensions corresponding to each layer."""
 
-        # Linear features between layers
         self.fcs = []
+        """:obj:`torch.nn.ModuleList` : linear features between layers."""
         for k in range(self.n_layers-1):
             self.fcs += [torch.nn.Linear(layer_sizes[k], layer_sizes[k + 1])]
         self.fcs = torch.nn.ModuleList(self.fcs)
+
         self.init_weight()
 
         # Reshape input or output layer
-        assert((reshape_index is None) or (reshape_index in [0, -1]))
+        assert(reshape_index in [0, -1, None])
         assert((reshape_shape is None) or (np.prod(reshape_shape) == layer_sizes[reshape_index]))
         self.reshape_index = reshape_index
+        """:obj:`int` : Index of layer to reshape input/output data.
+
+        - 0 : the first (input) layer
+        - -1 : the last (output) layer
+        - :obj:`None` : no reshaping
+        """
         self.reshape_shape = reshape_shape
+        """:obj:`list(int)` : Target shape from/to which input/output data is reshaped.
+        For a reshape_shape :math:`[R_1, R_2, \ldots, R_n]`,
+
+        - if :attr:`reshape_index` is 0, the input data shape is changed as
+
+        .. math::
+            [\ldots, R_1, R_2, \ldots, R_n] \\longrightarrow [\ldots, \prod_{i=1}^n R_i]
+
+        - if :attr:`reshape_index` is -1, the output data shape is changed as
+
+        .. math::
+            [\ldots, \prod_{i=1}^n R_i] \\longrightarrow [\ldots, R_1, R_2, \ldots, R_n]
+
+        - :obj:`None` : no reshaping
+        """
 
         # Initalize activation function
         self.act_type = act_type
+        """:obj:`str` : Type of activation functions."""
+
         if act_type == "threshold":
-            self.act = act_dict[act_type](threshold, value)
+            act = act_dict[act_type](threshold, value)
+            """:obj:`torch.nn.Module` : Activation function used throughout the layers."""
 
         elif act_type == "multihead":
             raise RuntimeError("MultiLayerPerceptron: MultiheadAttention requires a different architecture!")
 
         #all other activation functions initialized here
         else:
-            self.act = act_dict[act_type]()
+            act = act_dict[act_type]()
+
+        self.act = act
+        """:obj:`torch.nn.Module` : Activation function used throughout the layers."""
         return
     
     def forward(self, x):
+        """Evaluate through the module.
+        
+        Parameters
+        ----------
+        x : :obj:`torch.Tensor`
+            Input data to pass into the module.
+
+        Note
+        ----
+        For :attr:`reshape_index` =0,
+        the last :math:`n` dimensions of :obj:`x` must match
+        :attr:`reshape_shape` :math:`=[R_1, R_2, \ldots, R_n]`.
+
+        Returns
+        -------
+        :obj:`torch.Tensor`
+            Output tensor evaluated from the module.
+
+        Note
+        ----
+        For :attr:`reshape_index` =-1,
+        the last dimension of the output tensor will be reshaped as
+        :attr:`reshape_shape` :math:`=[R_1, R_2, \ldots, R_n]`.
+        
+        """
         if (self.reshape_index == 0):
             # make sure the input has a proper shape
             assert(list(x.shape[-len(self.reshape_shape):]) == self.reshape_shape)
@@ -86,12 +169,15 @@ class MultiLayerPerceptron(torch.nn.Module):
         return x
     
     def init_weight(self):
+        """Initialize weights of linear features according to Xavier uniform distribution."""
+
         # TODO(kevin): support other initializations?
         for fc in self.fcs:
             torch.nn.init.xavier_uniform_(fc.weight)
         return
     
     def print_architecture(self):
+        """Print out the architecture of the module."""
         print(self.layer_sizes)
 
 class CNN2D(torch.nn.Module):
