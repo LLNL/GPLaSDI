@@ -151,17 +151,21 @@ class CNN2D(torch.nn.Module):
     def set_data_shape(self, data_shape : list):
         idx = 0 if (self.mode == CNN2D.Mode.Forward) else -1
 
-        if (len(data_shape) > 2):
-            if (data_shape[-3] != self.channels[idx]):
+        if (self.mode == CNN2D.Mode.Forward):
+            if (len(data_shape) > 2):
+                if (data_shape[-3] != self.channels[idx]):
+                    assert(self.channels[idx] == 1)
+                    self.batch_reshape = [np.prod(data_shape[:-2]), 1]
+                else:
+                    self.batch_reshape = [np.prod(data_shape[:-3]), self.channels[idx]]
+            elif (len(data_shape) == 2):
                 assert(self.channels[idx] == 1)
-                self.batch_reshape = [np.prod(data_shape[:-2]), 1]
-            else:
-                self.batch_reshape = [np.prod(data_shape[:-3]), self.channels[idx]]
-        elif (len(data_shape) == 2):
-            assert(self.channels[idx] == 1)
-            self.batch_reshape = [1]
+                self.batch_reshape = [1]
+
+            self.batch_reshape += data_shape[-2:]
+        else:
+            self.batch_reshape = list(data_shape)
         
-        self.batch_reshape += data_shape[-2:]
         self.layer_sizes[idx, 1:] = data_shape[-2:]
 
         if (self.mode == CNN2D.Mode.Forward):
@@ -175,7 +179,9 @@ class CNN2D(torch.nn.Module):
                                                 self.kernel_sizes[k], self.strides[k], self.paddings[k],
                                                 self.dilations[k], self.mode)
         
-        self.print_data_shape()
+        if (np.any(self.layer_sizes <= 0)):
+            self.print_data_shape()
+            raise RuntimeError("CNN2D.set_data_shape: given data shape does not fit with current architecture!")
         return
     
     def print_data_shape(self):
@@ -188,7 +194,7 @@ class CNN2D(torch.nn.Module):
         return
     
     def forward(self, x):
-        if (self.mode == CNN2D.Mode.Forward):
+        if ((self.batch_reshape is not None) and (self.mode == CNN2D.Mode.Forward)):
             x = x.view(self.batch_reshape)
 
         for i in range(self.n_layers-2):
@@ -197,7 +203,7 @@ class CNN2D(torch.nn.Module):
 
         x = self.fcs[-1](x)
 
-        if (self.mode == CNN2D.Mode.Backward):
+        if ((self.batch_reshape is not None) and (self.mode == CNN2D.Mode.Backward)):
             x = x.view(self.batch_reshape)
         return x
     
@@ -269,6 +275,16 @@ class CNN2D(torch.nn.Module):
         else:
             raise RuntimeError('CNN2D: Unknown mode %s!' % mode)
         
+        if ((mode == cls.Mode.Forward) and ((Hout > np.floor(Hout)) or (Wout > np.floor(Wout)))):
+            print("input shape: ", input_shape)
+            print("kernel size: ", kernel_size)
+            print("stride: ", stride)
+            print("padding: ", padding)
+            print("dilation: ", dilation)
+            print("resulting output shape: ", [Hout, Wout])
+            raise RuntimeError("CNN2D.compute_output_layer_size: given architecture will not return the same size backward. "
+                               "Adjust the architecture!")
+
         return [int(np.floor(Hout)), int(np.floor(Wout))]
     
     def init_weight(self):
