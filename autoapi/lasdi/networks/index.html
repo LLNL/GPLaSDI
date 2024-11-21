@@ -171,11 +171,16 @@
 <span class="sig-name descname"><span class="pre">init_weight</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.networks.MultiLayerPerceptron.init_weight" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="lasdi.networks.MultiLayerPerceptron.print_architecture">
+<span class="sig-name descname"><span class="pre">print_architecture</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.networks.MultiLayerPerceptron.print_architecture" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lasdi.networks.CNN2D">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lasdi.networks.</span></span><span class="sig-name descname"><span class="pre">CNN2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_sizes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strides</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paddings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dilations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'zeros'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">act_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ReLU'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.networks.CNN2D" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lasdi.networks.</span></span><span class="sig-name descname"><span class="pre">CNN2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_sizes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strides</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paddings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dilations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'zeros'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">act_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ReLU'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.networks.CNN2D" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
 <dl class="py class">
 <dt class="sig sig-object py" id="lasdi.networks.CNN2D.Mode">
@@ -196,11 +201,6 @@
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="lasdi.networks.CNN2D.channels">
-<span class="sig-name descname"><span class="pre">channels</span></span><a class="headerlink" href="#lasdi.networks.CNN2D.channels" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.networks.CNN2D.n_layers">
 <span class="sig-name descname"><span class="pre">n_layers</span></span><a class="headerlink" href="#lasdi.networks.CNN2D.n_layers" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -211,8 +211,8 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="lasdi.networks.CNN2D.kernel_sizes">
-<span class="sig-name descname"><span class="pre">kernel_sizes</span></span><a class="headerlink" href="#lasdi.networks.CNN2D.kernel_sizes" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="lasdi.networks.CNN2D.channels">
+<span class="sig-name descname"><span class="pre">channels</span></span><a class="headerlink" href="#lasdi.networks.CNN2D.channels" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -251,13 +251,13 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="lasdi.networks.CNN2D.fcs">
-<span class="sig-name descname"><span class="pre">fcs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.networks.CNN2D.fcs" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="lasdi.networks.CNN2D.kernel_sizes">
+<span class="sig-name descname"><span class="pre">kernel_sizes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.networks.CNN2D.kernel_sizes" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="lasdi.networks.CNN2D.batch_reshape">
-<span class="sig-name descname"><span class="pre">batch_reshape</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#lasdi.networks.CNN2D.batch_reshape" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="lasdi.networks.CNN2D.fcs">
+<span class="sig-name descname"><span class="pre">fcs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.networks.CNN2D.fcs" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -276,13 +276,8 @@
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="lasdi.networks.CNN2D.reshape_input_data">
-<span class="sig-name descname"><span class="pre">reshape_input_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.networks.CNN2D.reshape_input_data" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="lasdi.networks.CNN2D.reshape_output_data">
-<span class="sig-name descname"><span class="pre">reshape_output_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.networks.CNN2D.reshape_output_data" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="lasdi.networks.CNN2D.compute_kernel_size">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compute_kernel_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dilation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.networks.CNN2D.compute_kernel_size" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">

@@ -57,7 +57,10 @@ Module Contents
    .. py:method:: init_weight()
 
 
-.. py:class:: CNN2D(mode, channels, kernel_sizes, strides, paddings, dilations, groups=1, bias=True, padding_mode='zeros', act_type='ReLU')
+   .. py:method:: print_architecture()
+
+
+.. py:class:: CNN2D(layer_sizes, mode, strides, paddings, dilations, groups=1, bias=True, padding_mode='zeros', act_type='ReLU', data_shape=None)
 
    Bases: :py:obj:`torch.nn.Module`
 
@@ -82,16 +85,13 @@ Module Contents
 
 
 
-   .. py:attribute:: channels
-
-
    .. py:attribute:: n_layers
 
 
    .. py:attribute:: layer_sizes
 
 
-   .. py:attribute:: kernel_sizes
+   .. py:attribute:: channels
 
 
    .. py:attribute:: strides
@@ -115,13 +115,13 @@ Module Contents
    .. py:attribute:: act
 
 
-   .. py:attribute:: fcs
+   .. py:attribute:: kernel_sizes
       :value: []
 
 
 
-   .. py:attribute:: batch_reshape
-      :value: None
+   .. py:attribute:: fcs
+      :value: []
 
 
 
@@ -134,10 +134,9 @@ Module Contents
    .. py:method:: forward(x)
 
 
-   .. py:method:: reshape_input_data(x)
+   .. py:method:: compute_kernel_size(input_shape, output_shape, stride, padding, dilation, mode)
+      :classmethod:
 
-
-   .. py:method:: reshape_output_data(x)
 
 
    .. py:method:: compute_input_layer_size(output_shape, kernel_size, stride, padding, dilation, mode)

@@ -10,8 +10,10 @@ Classes
 .. autoapisummary::
 
    lasdi.latent_space.MultiLayerPerceptron
+   lasdi.latent_space.CNN2D
    lasdi.latent_space.LatentSpace
    lasdi.latent_space.Autoencoder
+   lasdi.latent_space.Conv2DAutoencoder
 
 
 Functions
@@ -51,6 +53,101 @@ Package Contents
 
 
    .. py:method:: forward(x)
+
+
+   .. py:method:: init_weight()
+
+
+   .. py:method:: print_architecture()
+
+
+.. py:class:: CNN2D(layer_sizes, mode, strides, paddings, dilations, groups=1, bias=True, padding_mode='zeros', act_type='ReLU', data_shape=None)
+
+   Bases: :py:obj:`torch.nn.Module`
+
+
+   .. py:class:: Mode
+
+      Bases: :py:obj:`Enum`
+
+
+      Generic enumeration.
+
+      Derive from this class to define new enumerations.
+
+
+
+      .. py:attribute:: Forward
+         :value: 1
+
+
+
+      .. py:attribute:: Backward
+
+
+
+   .. py:attribute:: n_layers
+
+
+   .. py:attribute:: layer_sizes
+
+
+   .. py:attribute:: channels
+
+
+   .. py:attribute:: strides
+
+
+   .. py:attribute:: paddings
+
+
+   .. py:attribute:: dilations
+
+
+   .. py:attribute:: groups
+
+
+   .. py:attribute:: bias
+
+
+   .. py:attribute:: padding_mode
+
+
+   .. py:attribute:: act
+
+
+   .. py:attribute:: kernel_sizes
+      :value: []
+
+
+
+   .. py:attribute:: fcs
+      :value: []
+
+
+
+   .. py:method:: set_data_shape(data_shape: list)
+
+
+   .. py:method:: print_data_shape()
+
+
+   .. py:method:: forward(x)
+
+
+   .. py:method:: compute_kernel_size(input_shape, output_shape, stride, padding, dilation, mode)
+      :classmethod:
+
+
+
+   .. py:method:: compute_input_layer_size(output_shape, kernel_size, stride, padding, dilation, mode)
+      :classmethod:
+
+
+
+   .. py:method:: compute_output_layer_size(input_shape, kernel_size, stride, padding, dilation, mode)
+      :classmethod:
+
 
 
    .. py:method:: init_weight()
@@ -113,5 +210,36 @@ Package Contents
 
       This abstract class only checks if the variables in restart file are the same as the instance attributes.
 
+
+
+.. py:class:: Conv2DAutoencoder(physics, config)
+
+   Bases: :py:obj:`LatentSpace`
+
+
+   .. py:attribute:: encoder
+
+
+   .. py:attribute:: decoder
+
+
+   .. py:method:: forward(x)
+
+
+   .. py:method:: export()
+
+
+   .. py:method:: load(dict_)
+
+      .. rubric:: Notes
+
+      This abstract class only checks if the variables in restart file are the same as the instance attributes.
+
+
+
+   .. py:method:: set_batch_shape(batch_shape)
+
+
+   .. py:method:: print_architecture()
 
 
