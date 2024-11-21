@@ -1,0 +1,155 @@
+lasdi.networks
+==============
+
+.. py:module:: lasdi.networks
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   lasdi.networks.act_dict
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   lasdi.networks.MultiLayerPerceptron
+   lasdi.networks.CNN2D
+
+
+Module Contents
+---------------
+
+.. py:data:: act_dict
+
+.. py:class:: MultiLayerPerceptron(layer_sizes, act_type='sigmoid', reshape_index=None, reshape_shape=None, threshold=0.1, value=0.0)
+
+   Bases: :py:obj:`torch.nn.Module`
+
+
+   .. py:attribute:: n_layers
+
+
+   .. py:attribute:: layer_sizes
+
+
+   .. py:attribute:: fcs
+      :value: []
+
+
+
+   .. py:attribute:: reshape_index
+
+
+   .. py:attribute:: reshape_shape
+
+
+   .. py:attribute:: act_type
+
+
+   .. py:method:: forward(x)
+
+
+   .. py:method:: init_weight()
+
+
+.. py:class:: CNN2D(mode, channels, kernel_sizes, strides, paddings, dilations, groups=1, bias=True, padding_mode='zeros', act_type='ReLU')
+
+   Bases: :py:obj:`torch.nn.Module`
+
+
+   .. py:class:: Mode
+
+      Bases: :py:obj:`Enum`
+
+
+      Generic enumeration.
+
+      Derive from this class to define new enumerations.
+
+
+
+      .. py:attribute:: Forward
+         :value: 1
+
+
+
+      .. py:attribute:: Backward
+
+
+
+   .. py:attribute:: channels
+
+
+   .. py:attribute:: n_layers
+
+
+   .. py:attribute:: layer_sizes
+
+
+   .. py:attribute:: kernel_sizes
+
+
+   .. py:attribute:: strides
+
+
+   .. py:attribute:: paddings
+
+
+   .. py:attribute:: dilations
+
+
+   .. py:attribute:: groups
+
+
+   .. py:attribute:: bias
+
+
+   .. py:attribute:: padding_mode
+
+
+   .. py:attribute:: act
+
+
+   .. py:attribute:: fcs
+      :value: []
+
+
+
+   .. py:attribute:: batch_reshape
+      :value: None
+
+
+
+   .. py:method:: set_data_shape(data_shape: list)
+
+
+   .. py:method:: print_data_shape()
+
+
+   .. py:method:: forward(x)
+
+
+   .. py:method:: reshape_input_data(x)
+
+
+   .. py:method:: reshape_output_data(x)
+
+
+   .. py:method:: compute_input_layer_size(output_shape, kernel_size, stride, padding, dilation, mode)
+      :classmethod:
+
+
+
+   .. py:method:: compute_output_layer_size(input_shape, kernel_size, stride, padding, dilation, mode)
+      :classmethod:
+
+
+
+   .. py:method:: init_weight()
+
+

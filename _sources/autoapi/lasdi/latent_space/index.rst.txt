@@ -4,20 +4,13 @@ lasdi.latent_space
 .. py:module:: lasdi.latent_space
 
 
-Attributes
-----------
-
-.. autoapisummary::
-
-   lasdi.latent_space.act_dict
-
-
 Classes
 -------
 
 .. autoapisummary::
 
    lasdi.latent_space.MultiLayerPerceptron
+   lasdi.latent_space.LatentSpace
    lasdi.latent_space.Autoencoder
 
 
@@ -29,18 +22,10 @@ Functions
    lasdi.latent_space.initial_condition_latent
 
 
-Module Contents
----------------
+Package Contents
+----------------
 
-.. py:data:: act_dict
-
-.. py:function:: initial_condition_latent(param_grid, physics, autoencoder)
-
-   Outputs the initial condition in the latent space: Z0 = encoder(U0)
-
-
-
-.. py:class:: MultiLayerPerceptron(layer_sizes, act_type='sigmoid', reshape_index=None, reshape_shape=None, threshold=0.1, value=0.0, num_heads=1)
+.. py:class:: MultiLayerPerceptron(layer_sizes, act_type='sigmoid', reshape_index=None, reshape_shape=None, threshold=0.1, value=0.0)
 
    Bases: :py:obj:`torch.nn.Module`
 
@@ -65,21 +50,19 @@ Module Contents
    .. py:attribute:: act_type
 
 
-   .. py:attribute:: use_multihead
-      :value: False
-
-
-
    .. py:method:: forward(x)
-
-
-   .. py:method:: apply_attention(x, act_idx)
 
 
    .. py:method:: init_weight()
 
 
-.. py:class:: Autoencoder(physics, config)
+.. py:function:: initial_condition_latent(param_grid, physics, autoencoder)
+
+   Outputs the initial condition in the latent space: Z0 = encoder(U0)
+
+
+
+.. py:class:: LatentSpace(physics, config)
 
    Bases: :py:obj:`torch.nn.Module`
 
@@ -87,10 +70,29 @@ Module Contents
    .. py:attribute:: qgrid_size
 
 
-   .. py:attribute:: space_dim
-
-
    .. py:attribute:: n_z
+
+
+   .. py:method:: forward(x)
+
+
+   .. py:method:: export()
+
+
+   .. py:method:: load(dict_)
+
+      .. rubric:: Notes
+
+      This abstract class only checks if the variables in restart file are the same as the instance attributes.
+
+
+
+.. py:class:: Autoencoder(physics, config)
+
+   Bases: :py:obj:`LatentSpace`
+
+
+   .. py:attribute:: space_dim
 
 
    .. py:attribute:: encoder
@@ -106,5 +108,10 @@ Module Contents
 
 
    .. py:method:: load(dict_)
+
+      .. rubric:: Notes
+
+      This abstract class only checks if the variables in restart file are the same as the instance attributes.
+
 
 

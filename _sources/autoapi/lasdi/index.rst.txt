@@ -17,6 +17,7 @@ Submodules
    /autoapi/lasdi/inputs/index
    /autoapi/lasdi/latent_dynamics/index
    /autoapi/lasdi/latent_space/index
+   /autoapi/lasdi/networks/index
    /autoapi/lasdi/param/index
    /autoapi/lasdi/physics/index
    /autoapi/lasdi/postprocess/index

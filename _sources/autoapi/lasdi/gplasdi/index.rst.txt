@@ -116,6 +116,26 @@ Module Contents
 
 
 
+   .. py:attribute:: training_loss
+      :value: []
+
+
+
+   .. py:attribute:: ae_loss
+      :value: []
+
+
+
+   .. py:attribute:: ld_loss
+      :value: []
+
+
+
+   .. py:attribute:: coef_loss
+      :value: []
+
+
+
    .. py:method:: train()
 
 
