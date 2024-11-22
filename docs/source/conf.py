@@ -25,6 +25,7 @@ extensions = [
 ]
 
 autoapi_dirs = ['../../src']
+autoapi_python_class_content = 'both'
  
 napoleon_google_docstring = False
 napoleon_use_param = False
