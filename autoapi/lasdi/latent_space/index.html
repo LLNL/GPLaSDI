@@ -17,6 +17,7 @@
       <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=a7e3f902"></script>
       <script src="../../../_static/doctools.js?v=888ff710"></script>
       <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -102,10 +103,10 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lasdi.latent_space.MultiLayerPerceptron" title="lasdi.latent_space.MultiLayerPerceptron"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiLayerPerceptron</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Vanilla multi-layer perceptron neural networks module.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lasdi.latent_space.CNN2D" title="lasdi.latent_space.CNN2D"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CNN2D</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Two-dimensional convolutional neural networks.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lasdi.latent_space.LatentSpace" title="lasdi.latent_space.LatentSpace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatentSpace</span></code></a></p></td>
 <td><p></p></td>
@@ -135,50 +136,169 @@
 <dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lasdi.latent_space.</span></span><span class="sig-name descname"><span class="pre">MultiLayerPerceptron</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_sizes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">act_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sigmoid'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reshape_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reshape_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
+<p>Vanilla multi-layer perceptron neural networks module.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul>
+<li><p><strong>layer_sizes</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list(int)</span></code>) – List of vector dimensions of layers.</p></li>
+<li><p><strong>act_type</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, optional) – Type of activation functions. By default <code class="xref py py-obj docutils literal notranslate"><span class="pre">'sigmoid'</span></code> is used.
+See <code class="xref py py-obj docutils literal notranslate"><span class="pre">act_dict</span></code> for available types.</p></li>
+<li><p><strong>reshape_index</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, optinal) – Index of layer to reshape input/output data. Either 0 or -1 is allowed.</p>
+<ul class="simple">
+<li><p>0 : the first (input) layer</p></li>
+<li><p>-1 : the last (output) layer</p></li>
+</ul>
+<p>By default the index is <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, and reshaping is not executed.</p>
+</li>
+<li><p><strong>reshape_shape</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list(int)</span></code>, optional) – Target shape from/to which input/output data is reshaped.
+Reshaping behavior changes by <a class="reference internal" href="#lasdi.latent_space.MultiLayerPerceptron.reshape_index" title="lasdi.latent_space.MultiLayerPerceptron.reshape_index"><code class="xref py py-attr docutils literal notranslate"><span class="pre">reshape_index</span></code></a>.
+By default the index is <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, and reshaping is not executed.
+For details on reshaping action, see <a class="reference internal" href="#lasdi.latent_space.MultiLayerPerceptron.reshape_shape" title="lasdi.latent_space.MultiLayerPerceptron.reshape_shape"><code class="xref py py-attr docutils literal notranslate"><span class="pre">reshape_shape</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.prod(reshape_shape)</span> <span class="pre">==</span> <span class="pre">layer_sizes[reshape_index]</span></code></p>
+</div>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron.n_layers">
 <span class="sig-name descname"><span class="pre">n_layers</span></span><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.n_layers" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Depth of layers including input, hidden, output layers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron.layer_sizes">
 <span class="sig-name descname"><span class="pre">layer_sizes</span></span><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.layer_sizes" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Vector dimensions corresponding to each layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list(int)</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron.fcs">
 <span class="sig-name descname"><span class="pre">fcs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.fcs" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>linear features between layers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.ModuleList</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron.reshape_index">
 <span class="sig-name descname"><span class="pre">reshape_index</span></span><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.reshape_index" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Index of layer to reshape input/output data.</p>
+<ul class="simple">
+<li><p>0 : the first (input) layer</p></li>
+<li><p>-1 : the last (output) layer</p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> : no reshaping</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron.reshape_shape">
 <span class="sig-name descname"><span class="pre">reshape_shape</span></span><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.reshape_shape" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Target shape from/to which input/output data is reshaped.
+For a reshape_shape <span class="math notranslate nohighlight">\([R_1, R_2, \ldots, R_n]\)</span>,</p>
+<ul class="simple">
+<li><p>if <a class="reference internal" href="#lasdi.latent_space.MultiLayerPerceptron.reshape_index" title="lasdi.latent_space.MultiLayerPerceptron.reshape_index"><code class="xref py py-attr docutils literal notranslate"><span class="pre">reshape_index</span></code></a> is 0, the input data shape is changed as</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[[\ldots, R_1, R_2, \ldots, R_n] \longrightarrow [\ldots, \prod_{i=1}^n R_i]\]</div>
+<ul class="simple">
+<li><p>if <a class="reference internal" href="#lasdi.latent_space.MultiLayerPerceptron.reshape_index" title="lasdi.latent_space.MultiLayerPerceptron.reshape_index"><code class="xref py py-attr docutils literal notranslate"><span class="pre">reshape_index</span></code></a> is -1, the output data shape is changed as</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[[\ldots, \prod_{i=1}^n R_i] \longrightarrow [\ldots, R_1, R_2, \ldots, R_n]\]</div>
+<ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code> : no reshaping</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list(int)</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron.act_type">
 <span class="sig-name descname"><span class="pre">act_type</span></span><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.act_type" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Type of activation functions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron.act">
+<span class="sig-name descname"><span class="pre">act</span></span><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.act" title="Permalink to this definition"></a></dt>
+<dd><p>Activation function used throughout the layers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.forward" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Evaluate through the module.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.Tensor</span></code>) – Input data to pass into the module.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For <a class="reference internal" href="#lasdi.latent_space.MultiLayerPerceptron.reshape_index" title="lasdi.latent_space.MultiLayerPerceptron.reshape_index"><code class="xref py py-attr docutils literal notranslate"><span class="pre">reshape_index</span></code></a> =0,
+the last <span class="math notranslate nohighlight">\(n\)</span> dimensions of <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code> must match
+<a class="reference internal" href="#lasdi.latent_space.MultiLayerPerceptron.reshape_shape" title="lasdi.latent_space.MultiLayerPerceptron.reshape_shape"><code class="xref py py-attr docutils literal notranslate"><span class="pre">reshape_shape</span></code></a> <span class="math notranslate nohighlight">\(=[R_1, R_2, \ldots, R_n]\)</span>.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Output tensor evaluated from the module.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.Tensor</span></code></p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For <a class="reference internal" href="#lasdi.latent_space.MultiLayerPerceptron.reshape_index" title="lasdi.latent_space.MultiLayerPerceptron.reshape_index"><code class="xref py py-attr docutils literal notranslate"><span class="pre">reshape_index</span></code></a> =-1,
+the last dimension of the output tensor will be reshaped as
+<a class="reference internal" href="#lasdi.latent_space.MultiLayerPerceptron.reshape_shape" title="lasdi.latent_space.MultiLayerPerceptron.reshape_shape"><code class="xref py py-attr docutils literal notranslate"><span class="pre">reshape_shape</span></code></a> <span class="math notranslate nohighlight">\(=[R_1, R_2, \ldots, R_n]\)</span>.</p>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron.init_weight">
 <span class="sig-name descname"><span class="pre">init_weight</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.init_weight" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize weights of linear features according to Xavier uniform distribution.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.latent_space.MultiLayerPerceptron.print_architecture">
 <span class="sig-name descname"><span class="pre">print_architecture</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_space.MultiLayerPerceptron.print_architecture" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Print out the architecture of the module.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -186,118 +306,399 @@
 <dt class="sig sig-object py" id="lasdi.latent_space.CNN2D">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lasdi.latent_space.</span></span><span class="sig-name descname"><span class="pre">CNN2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_sizes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strides</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paddings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dilations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'zeros'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">act_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ReLU'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_space.CNN2D" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
+<p>Two-dimensional convolutional neural networks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>layer_sizes</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.array</span></code>) – 2d array of tensor dimension of each layer.
+See <a class="reference internal" href="#lasdi.latent_space.CNN2D.layer_sizes" title="lasdi.latent_space.CNN2D.layer_sizes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">layer_sizes</span></code></a>.</p></li>
+<li><p><strong>mode</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – Direction of CNN
+- <cite>forward</cite>: contracting direction
+- <cite>backward</cite>: expanding direction</p></li>
+<li><p><strong>strides</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>) – List of strides corresponding to each layer.
+Each stride is either integer or tuple.</p></li>
+<li><p><strong>paddings</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>) – List of paddings corresponding to each layer.
+Each padding is either integer or tuple.</p></li>
+<li><p><strong>dilations</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>) – List of dilations corresponding to each layer.
+Each dilation is either integer or tuple.</p></li>
+<li><p><strong>groups</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, optional) – Groups that applies to all layers. By default 1</p></li>
+<li><p><strong>bias</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>, optional) – Bias that applies to all layers. By default <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></p></li>
+<li><p><strong>padding_mode</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, optional) – Padding_mode that applies to all layers. By default <code class="xref py py-obj docutils literal notranslate"><span class="pre">'zeros'</span></code></p></li>
+<li><p><strong>act_type</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, optional) – Activation function applied between all layers. By default <code class="xref py py-obj docutils literal notranslate"><span class="pre">'ReLU'</span></code>.
+See <code class="xref py py-obj docutils literal notranslate"><span class="pre">act_dict</span></code> for available types.</p></li>
+<li><p><strong>data_shape</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list(int)</span></code>, optional) – Data shape to/from which output/input data is reshaped.
+See <a class="reference internal" href="#lasdi.latent_space.CNN2D.data_shape" title="lasdi.latent_space.CNN2D.data_shape"><code class="xref py py-attr docutils literal notranslate"><span class="pre">data_shape</span></code></a> for details.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">len(strides)</span> <span class="pre">==</span> <span class="pre">layer_sizes.shape[0]</span> <span class="pre">-</span> <span class="pre">1</span></code></p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">len(paddings)</span> <span class="pre">==</span> <span class="pre">layer_sizes.shape[0]</span> <span class="pre">-</span> <span class="pre">1</span></code></p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">len(dilations)</span> <span class="pre">==</span> <span class="pre">layer_sizes.shape[0]</span> <span class="pre">-</span> <span class="pre">1</span></code></p>
+</div>
 <dl class="py class">
 <dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.Mode">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Mode</span></span><a class="headerlink" href="#lasdi.latent_space.CNN2D.Mode" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Enum</span></code></p>
-<p>Generic enumeration.</p>
-<p>Derive from this class to define new enumerations.</p>
+<p>Enumeration to specify direction of CNN.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.Mode.Forward">
 <span class="sig-name descname"><span class="pre">Forward</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#lasdi.latent_space.CNN2D.Mode.Forward" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Contracting direction</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.Mode.Backward">
 <span class="sig-name descname"><span class="pre">Backward</span></span><a class="headerlink" href="#lasdi.latent_space.CNN2D.Mode.Backward" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Expanding direction</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.n_layers">
 <span class="sig-name descname"><span class="pre">n_layers</span></span><a class="headerlink" href="#lasdi.latent_space.CNN2D.n_layers" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Depth of layers including input, hidden, output layers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.layer_sizes">
 <span class="sig-name descname"><span class="pre">layer_sizes</span></span><a class="headerlink" href="#lasdi.latent_space.CNN2D.layer_sizes" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>2d integer array of shape <span class="math notranslate nohighlight">\([n\_layers, 3]\)</span>,
+indicating tensor dimension of each layer.
+For <span class="math notranslate nohighlight">\(k\)</span>-th layer, the tensor dimension is</p>
+<div class="math notranslate nohighlight">
+\[layer\_sizes[k] = [channels, height, width]\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.array</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.channels">
 <span class="sig-name descname"><span class="pre">channels</span></span><a class="headerlink" href="#lasdi.latent_space.CNN2D.channels" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>list of channel size that
+determines architecture of each layer.
+For details on how architecture is determined,
+see <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html">torch API documentation</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list(int)</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.strides">
 <span class="sig-name descname"><span class="pre">strides</span></span><a class="headerlink" href="#lasdi.latent_space.CNN2D.strides" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>list of strides that
+determine architecture of each layer.
+Each stride can be either integer or tuple.
+For details on how architecture is determined,
+see <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html">torch API documentation</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.paddings">
 <span class="sig-name descname"><span class="pre">paddings</span></span><a class="headerlink" href="#lasdi.latent_space.CNN2D.paddings" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>list of paddings that
+determine architecture of each layer.
+Each padding can be either integer or tuple.
+For details on how architecture is determined,
+see <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html">torch API documentation</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.dilations">
 <span class="sig-name descname"><span class="pre">dilations</span></span><a class="headerlink" href="#lasdi.latent_space.CNN2D.dilations" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>list of dilations that
+determine architecture of each layer.
+Each dilation can be either integer or tuple.
+For details on how architecture is determined,
+see <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html">torch API documentation</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.groups">
 <span class="sig-name descname"><span class="pre">groups</span></span><a class="headerlink" href="#lasdi.latent_space.CNN2D.groups" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>groups that determine architecture of all layers.
+For details on how architecture is determined,
+see <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html">torch API documentation</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.bias">
 <span class="sig-name descname"><span class="pre">bias</span></span><a class="headerlink" href="#lasdi.latent_space.CNN2D.bias" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>bias that determine architecture of all layers.
+For details on how architecture is determined,
+see <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html">torch API documentation</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.padding_mode">
 <span class="sig-name descname"><span class="pre">padding_mode</span></span><a class="headerlink" href="#lasdi.latent_space.CNN2D.padding_mode" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>padding mode that determine architecture of all layers.
+For details on how architecture is determined,
+see <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html">torch API documentation</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.act">
 <span class="sig-name descname"><span class="pre">act</span></span><a class="headerlink" href="#lasdi.latent_space.CNN2D.act" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>activation function applied between all layers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.kernel_sizes">
 <span class="sig-name descname"><span class="pre">kernel_sizes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.latent_space.CNN2D.kernel_sizes" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>list of kernel_sizes that
+determine architecture of each layer.
+Each kernel_size can be either integer or tuple.
+Kernel size is automatically determined so that
+output of the corresponding layer has the shape of the next layer.</p>
+<p>For details on how architecture is determined,
+see <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html">torch API documentation</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.fcs">
 <span class="sig-name descname"><span class="pre">fcs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.latent_space.CNN2D.fcs" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>module list of
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Conv2d</span></code> (forward) or <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Conv2d</span></code> (backward).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.ModuleList</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.data_shape">
+<span class="sig-name descname"><span class="pre">data_shape</span></span><a class="headerlink" href="#lasdi.latent_space.CNN2D.data_shape" title="Permalink to this definition"></a></dt>
+<dd><p>tensor dimension of the training data
+that will be passed into/out of the module.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list(int)</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.batch_reshape">
+<span class="sig-name descname"><span class="pre">batch_reshape</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#lasdi.latent_space.CNN2D.batch_reshape" title="Permalink to this definition"></a></dt>
+<dd><p>tensor dimension to which input/output data is reshaped.</p>
+<ul class="simple">
+<li><p>Forward <code class="xref py py-attr docutils literal notranslate"><span class="pre">mode</span></code>: shape of 3d-/4d-array</p></li>
+<li><p>Backward <code class="xref py py-attr docutils literal notranslate"><span class="pre">mode</span></code>: shape of arbitrary nd-array</p></li>
+</ul>
+<p>Determined by <a class="reference internal" href="#lasdi.latent_space.CNN2D.set_data_shape" title="lasdi.latent_space.CNN2D.set_data_shape"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_data_shape()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list(int)</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.set_data_shape">
 <span class="sig-name descname"><span class="pre">set_data_shape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_shape</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_space.CNN2D.set_data_shape" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Set the batch reshape in order to reshape the input/output batches
+based on given training data shape.</p>
+<p>Forward <code class="xref py py-attr docutils literal notranslate"><span class="pre">mode</span></code>:</p>
+<blockquote>
+<div><p>For <a class="reference internal" href="#lasdi.latent_space.CNN2D.data_shape" title="lasdi.latent_space.CNN2D.data_shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_shape</span></code></a> <span class="math notranslate nohighlight">\(=[N_1,\ldots,N_m]\)</span>
+and the first layer size of <span class="math notranslate nohighlight">\([C_1, H_1, W_1]\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[batch\_reshape = [R_1, C_1, H_1, W_1],\]</div>
+<p>where <span class="math notranslate nohighlight">\(\prod_{i=1}^m N_i = R_1\times C_1\times H_1\times W_1\)</span>.</p>
+<p>If <span class="math notranslate nohighlight">\(m=2\)</span> and <span class="math notranslate nohighlight">\(C_1=1\)</span>, then</p>
+<div class="math notranslate nohighlight">
+\[batch\_reshape = [C_1, H_1, W_1].\]</div>
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For forward mode, <code class="xref py py-obj docutils literal notranslate"><span class="pre">data_shape[-2:]==self.layer_sizes[0,</span> <span class="pre">1:]</span></code> must be true.</p>
+</div>
+<p>Backward <code class="xref py py-attr docutils literal notranslate"><span class="pre">mode</span></code>:</p>
+<blockquote>
+<div><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">batch_shape</span></code> is the same as <a class="reference internal" href="#lasdi.latent_space.CNN2D.data_shape" title="lasdi.latent_space.CNN2D.data_shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_shape</span></code></a>.
+Output tensor of the module is reshaped as <a class="reference internal" href="#lasdi.latent_space.CNN2D.data_shape" title="lasdi.latent_space.CNN2D.data_shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_shape</span></code></a>.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data_shape</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list(int)</span></code>) – Shape of the input/output data tensor for forward/backward mode.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.print_data_shape">
 <span class="sig-name descname"><span class="pre">print_data_shape</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_space.CNN2D.print_data_shape" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Print out the data shape and architecture of the module.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_space.CNN2D.forward" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Evaluate through the module.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Tensor</span></code>) – Input tensor to pass into the module.</p>
+<ul class="simple">
+<li><p>Forward mode: nd array of shape <a class="reference internal" href="#lasdi.latent_space.CNN2D.data_shape" title="lasdi.latent_space.CNN2D.data_shape"><code class="xref py py-attr docutils literal notranslate"><span class="pre">data_shape</span></code></a></p></li>
+<li><p>Backward mode: Same shape as the output tensor of forward mode</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>Output tensor evaluated from the module.</p>
+<ul class="simple">
+<li><p>Forward mode: 3d array of shape <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.layer_sizes[-1]</span></code>,
+or 4d array of shape <code class="xref py py-obj docutils literal notranslate"><span class="pre">[self.batch_reshape[0]]</span> <span class="pre">+</span> <span class="pre">self.layer_sizes[-1]</span></code></p></li>
+<li><p>Backward mode: nd array of shape <a class="reference internal" href="#lasdi.latent_space.CNN2D.batch_reshape" title="lasdi.latent_space.CNN2D.batch_reshape"><code class="xref py py-attr docutils literal notranslate"><span class="pre">batch_reshape</span></code></a></p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Tensor</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.compute_kernel_size">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compute_kernel_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dilation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_space.CNN2D.compute_kernel_size" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Compute kernel size that produces desired output shape from given input shape.</p>
+<p>The formula is based on torch API documentation
+for <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html">Conv2d</a>
+and <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.ConvTranspose2d.html">ConvTranspose2d</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_shape</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple(int)</span></code>)</p></li>
+<li><p><strong>output_shape</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple(int)</span></code>)</p></li>
+<li><p><strong>stride</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple(int)</span></code>)</p></li>
+<li><p><strong>padding</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple(int)</span></code>)</p></li>
+<li><p><strong>dilation</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple(int)</span></code>)</p></li>
+<li><p><strong>mode</strong> (<a class="reference internal" href="#lasdi.latent_space.CNN2D.Mode" title="lasdi.latent_space.CNN2D.Mode"><code class="xref py py-class docutils literal notranslate"><span class="pre">CNN2D.Mode</span></code></a>) – Direction of CNN. Either <a class="reference internal" href="#lasdi.latent_space.CNN2D.Mode.Forward" title="lasdi.latent_space.CNN2D.Mode.Forward"><code class="xref py py-attr docutils literal notranslate"><span class="pre">CNN2D.Mode.Forward</span></code></a> or <a class="reference internal" href="#lasdi.latent_space.CNN2D.Mode.Backward" title="lasdi.latent_space.CNN2D.Mode.Backward"><code class="xref py py-attr docutils literal notranslate"><span class="pre">CNN2D.Mode.Backward</span></code></a></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of two integers indicating height and width of kernel.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list(int)</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.compute_input_layer_size">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compute_input_layer_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dilation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_space.CNN2D.compute_input_layer_size" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Compute input layer size that produces desired output shape with given kernel size.</p>
+<p>The formula is based on torch API documentation
+for <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html">Conv2d</a>
+and <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.ConvTranspose2d.html">ConvTranspose2d</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_shape</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple(int)</span></code>)</p></li>
+<li><p><strong>kernel_size</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple(int)</span></code>)</p></li>
+<li><p><strong>stride</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple(int)</span></code>)</p></li>
+<li><p><strong>padding</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple(int)</span></code>)</p></li>
+<li><p><strong>dilation</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple(int)</span></code>)</p></li>
+<li><p><strong>mode</strong> (<a class="reference internal" href="#lasdi.latent_space.CNN2D.Mode" title="lasdi.latent_space.CNN2D.Mode"><code class="xref py py-class docutils literal notranslate"><span class="pre">CNN2D.Mode</span></code></a>) – Direction of CNN. Either <a class="reference internal" href="#lasdi.latent_space.CNN2D.Mode.Forward" title="lasdi.latent_space.CNN2D.Mode.Forward"><code class="xref py py-attr docutils literal notranslate"><span class="pre">CNN2D.Mode.Forward</span></code></a> or <a class="reference internal" href="#lasdi.latent_space.CNN2D.Mode.Backward" title="lasdi.latent_space.CNN2D.Mode.Backward"><code class="xref py py-attr docutils literal notranslate"><span class="pre">CNN2D.Mode.Backward</span></code></a></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of two integers indicating height and width of input layer.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list(int)</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.compute_output_layer_size">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compute_output_layer_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dilation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_space.CNN2D.compute_output_layer_size" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Compute output layer size produced from given input shape and kernel size.</p>
+<p>The formula is based on torch API documentation
+for <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html">Conv2d</a>
+and <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.ConvTranspose2d.html">ConvTranspose2d</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_shape</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple(int)</span></code>)</p></li>
+<li><p><strong>kernel_size</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple(int)</span></code>)</p></li>
+<li><p><strong>stride</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple(int)</span></code>)</p></li>
+<li><p><strong>padding</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple(int)</span></code>)</p></li>
+<li><p><strong>dilation</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple(int)</span></code>)</p></li>
+<li><p><strong>mode</strong> (<a class="reference internal" href="#lasdi.latent_space.CNN2D.Mode" title="lasdi.latent_space.CNN2D.Mode"><code class="xref py py-class docutils literal notranslate"><span class="pre">CNN2D.Mode</span></code></a>) – Direction of CNN. Either <a class="reference internal" href="#lasdi.latent_space.CNN2D.Mode.Forward" title="lasdi.latent_space.CNN2D.Mode.Forward"><code class="xref py py-attr docutils literal notranslate"><span class="pre">CNN2D.Mode.Forward</span></code></a> or <a class="reference internal" href="#lasdi.latent_space.CNN2D.Mode.Backward" title="lasdi.latent_space.CNN2D.Mode.Backward"><code class="xref py py-attr docutils literal notranslate"><span class="pre">CNN2D.Mode.Backward</span></code></a></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of two integers indicating height and width of output layer.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list(int)</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lasdi.latent_space.CNN2D.init_weight">
 <span class="sig-name descname"><span class="pre">init_weight</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.latent_space.CNN2D.init_weight" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize weights of linear features according to Xavier uniform distribution.</p>
+</dd></dl>
 
 </dd></dl>
 

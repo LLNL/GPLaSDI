@@ -102,7 +102,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lasdi.gplasdi.BayesianGLaSDI" title="lasdi.gplasdi.BayesianGLaSDI"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BayesianGLaSDI</span></code></a></p></td>
-<td><p></p></td>
+<td><p>This class runs a full GPLaSDI training. It takes into input the autoencoder defined as a PyTorch object and the</p></td>
 </tr>
 </tbody>
 </table>
@@ -158,7 +158,11 @@ assert(len(gp_dictionnary) == param_grid.shape[0])</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lasdi.gplasdi.</span></span><span class="sig-name descname"><span class="pre">BayesianGLaSDI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">physics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">autoencoder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latent_dynamics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_space</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI" title="Permalink to this definition"></a></dt>
-<dd><dl class="py attribute">
+<dd><p>This class runs a full GPLaSDI training. It takes into input the autoencoder defined as a PyTorch object and the
+dictionnary containing all the training parameters.
+The “train” method with run the active learning training loop, compute the reconstruction and SINDy loss, train the GPs,
+and sample a new FOM data point.</p>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.X_train">
 <span class="sig-name descname"><span class="pre">X_train</span></span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.X_train" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
