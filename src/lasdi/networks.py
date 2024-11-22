@@ -181,15 +181,60 @@ class MultiLayerPerceptron(torch.nn.Module):
         print(self.layer_sizes)
 
 class CNN2D(torch.nn.Module):
+    """Two-dimensional convolutional neural networks."""
+
     from enum import Enum
     class Mode(Enum):
+        """Enumeration to specify direction of CNN."""
         Forward = 1
+        """Contracting direction"""
         Backward = -1
+        """Expanding direction"""
 
     def __init__(self, layer_sizes, mode,
                  strides, paddings, dilations,
                  groups=1, bias=True, padding_mode='zeros',
                  act_type='ReLU', data_shape=None):
+        """
+        Parameters
+        ----------
+        layer_sizes : :obj:`numpy.array`
+            2d array of tensor dimension of each layer.
+            See :attr:`layer_sizes`.
+        mode : :obj:`str`
+            Direction of CNN
+            - `forward`: contracting direction
+            - `backward`: expanding direction
+        strides : :obj:`list`
+            List of strides corresponding to each layer.
+            Each stride is either integer or tuple.
+        paddings : :obj:`list`
+            List of paddings corresponding to each layer.
+            Each padding is either integer or tuple.
+        dilations : :obj:`list`
+            List of dilations corresponding to each layer.
+            Each dilation is either integer or tuple.
+        groups : :obj:`int`, optional
+            Groups that applies to all layers. By default 1
+        bias : :obj:`bool`, optional
+            Bias that applies to all layers. By default :obj:`True`
+        padding_mode : :obj:`str`, optional
+            Padding_mode that applies to all layers. By default :obj:`'zeros'`
+        act_type : :obj:`str`, optional
+            Activation function applied between all layers. By default :obj:`'ReLU'`.
+            See :obj:`act_dict` for available types.
+        data_shape : :obj:`list(int)`, optional
+            Data shape to/from which output/input data is reshaped.
+            See :attr:`data_shape` for details.
+
+        Note
+        ----
+        :obj:`len(strides) == layer_sizes.shape[0] - 1`
+        
+        :obj:`len(paddings) == layer_sizes.shape[0] - 1`
+
+        :obj:`len(dilations) == layer_sizes.shape[0] - 1`
+        """
         super(CNN2D, self).__init__()
 
         if (mode == 'forward'):
@@ -202,8 +247,24 @@ class CNN2D(torch.nn.Module):
             raise RuntimeError('CNN2D: Unknown mode %s!' % mode)
         
         self.n_layers = len(layer_sizes)
+        """:obj:`int` : Depth of layers including input, hidden, output layers."""
+
         self.layer_sizes = layer_sizes
+        """:obj:`numpy.array` : 2d integer array of shape :math:`[n\_layers, 3]`,
+        indicating tensor dimension of each layer.
+        For :math:`k`-th layer, the tensor dimension is
+
+        .. math::
+            layer\_sizes[k] = [channels, height, width]
+        
+        """
+
         self.channels = [layer_sizes[k][0] for k in range(self.n_layers)]
+        """:obj:`list(int)` : list of channel size that
+        determines architecture of each layer.
+        For details on how architecture is determined,
+        see `torch API documentation <https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html>`_.
+        """
 
         # assert(len(kernel_sizes) == self.n_layers - 1)
         assert(len(strides) == self.n_layers - 1)
@@ -211,20 +272,63 @@ class CNN2D(torch.nn.Module):
         assert(len(dilations) == self.n_layers - 1)
         # self.kernel_sizes = kernel_sizes
         self.strides = strides
+        """:obj:`list` : list of strides that
+        determine architecture of each layer.
+        Each stride can be either integer or tuple.
+        For details on how architecture is determined,
+        see `torch API documentation <https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html>`_.
+        """
         self.paddings = paddings
+        """:obj:`list` : list of paddings that
+        determine architecture of each layer.
+        Each padding can be either integer or tuple.
+        For details on how architecture is determined,
+        see `torch API documentation <https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html>`_.
+        """
         self.dilations = dilations
+        """:obj:`list` : list of dilations that
+        determine architecture of each layer.
+        Each dilation can be either integer or tuple.
+        For details on how architecture is determined,
+        see `torch API documentation <https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html>`_.
+        """
 
         self.groups = groups
+        """:obj:`int` : groups that determine architecture of all layers.
+        For details on how architecture is determined,
+        see `torch API documentation <https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html>`_.
+        """
         self.bias = bias
+        """:obj:`bool` : bias that determine architecture of all layers.
+        For details on how architecture is determined,
+        see `torch API documentation <https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html>`_.
+        """
         self.padding_mode = padding_mode
+        """:obj:`str` : padding mode that determine architecture of all layers.
+        For details on how architecture is determined,
+        see `torch API documentation <https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html>`_.
+        """
 
         from lasdi.networks import act_dict
         # TODO(kevin): not use threshold activation for now.
         assert(act_type != 'threshold')
         self.act = act_dict[act_type]()
+        """:obj:`torch.nn.Module` : activation function applied between all layers."""
 
         self.kernel_sizes = []
+        """:obj:`list` : list of kernel_sizes that
+        determine architecture of each layer.
+        Each kernel_size can be either integer or tuple.
+        Kernel size is automatically determined so that
+        output of the corresponding layer has the shape of the next layer.
+
+        For details on how architecture is determined,
+        see `torch API documentation <https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html>`_.
+        """
         self.fcs = []
+        """:obj:`torch.nn.ModuleList` : module list of
+        :obj:`torch.nn.Conv2d` (forward) or :obj:`torch.nn.Conv2d` (backward)."""
+
         for k in range(self.n_layers - 1):
             kernel_size = self.compute_kernel_size(self.layer_sizes[k][1:], self.layer_sizes[k+1][1:],
                                                    self.strides[k], self.paddings[k], self.dilations[k], self.mode)
@@ -240,12 +344,58 @@ class CNN2D(torch.nn.Module):
         self.fcs = torch.nn.ModuleList(self.fcs)
         self.init_weight()
 
+        self.data_shape = data_shape
+        """:obj:`list(int)` : tensor dimension of the training data
+        that will be passed into/out of the module."""
+
+        self.batch_reshape = None
+        """:obj:`list(int)` : tensor dimension to which input/output data is reshaped.
+
+        - Forward :attr:`mode`: shape of 3d-/4d-array
+        - Backward :attr:`mode`: shape of arbitrary nd-array
+
+        Determined by :meth:`set_data_shape`.
+        """
         if (data_shape is not None):
             self.set_data_shape(data_shape)
 
         return
     
     def set_data_shape(self, data_shape : list):
+        """
+        Set the batch reshape in order to reshape the input/output batches
+        based on given training data shape.
+
+        Forward :attr:`mode`:
+
+            For :obj:`data_shape` :math:`=[N_1,\ldots,N_m]`
+            and the first layer size of :math:`[C_1, H_1, W_1]`,
+
+            .. math::
+                batch\_reshape = [R_1, C_1, H_1, W_1],
+
+            where :math:`\prod_{i=1}^m N_i = R_1\\times C_1\\times H_1\\times W_1`.
+
+            If :math:`m=2` and :math:`C_1=1`, then
+
+            .. math::
+                batch\_reshape = [C_1, H_1, W_1].
+
+        Note
+        ----
+        For forward mode, :obj:`data_shape[-2:]==self.layer_sizes[0, 1:]` must be true.
+
+
+        Backward :attr:`mode`:
+
+            :attr:`batch_shape` is the same as :obj:`data_shape`.
+            Output tensor of the module is reshaped as :obj:`data_shape`.
+
+        Parameters
+        ----------
+        data_shape : :obj:`list(int)`
+            Shape of the input/output data tensor for forward/backward mode.
+        """
         idx = 0 if (self.mode == CNN2D.Mode.Forward) else -1
 
         if (self.mode == CNN2D.Mode.Forward):
@@ -262,9 +412,13 @@ class CNN2D(torch.nn.Module):
             self.batch_reshape += data_shape[-2:]
         else:
             self.batch_reshape = list(data_shape)
+
+        self.data_shape = list(data_shape)
         return
     
     def print_data_shape(self):
+        """Print out the data shape and architecture of the module."""
+
         mode_str = "forward" if (self.mode == CNN2D.Mode.Forward) else "backward"
         print("mode: ", mode_str)
         print("batch reshape: ", self.batch_reshape)
@@ -275,6 +429,25 @@ class CNN2D(torch.nn.Module):
         return
     
     def forward(self, x):
+        """Evaluate through the module.
+        
+        Parameters
+        ----------
+        x : :obj:`torch.nn.Tensor`
+            Input tensor to pass into the module.
+
+            - Forward mode: nd array of shape :attr:`data_shape`
+            - Backward mode: Same shape as the output tensor of forward mode
+
+        Returns
+        -------
+        :obj:`torch.nn.Tensor`
+            Output tensor evaluated from the module.
+
+            - Forward mode: 3d array of shape :obj:`self.layer_sizes[-1]`,
+              or 4d array of shape :obj:`[self.batch_reshape[0]] + self.layer_sizes[-1]`
+            - Backward mode: nd array of shape :attr:`batch_reshape`
+        """
         if ((self.batch_reshape is not None) and (self.mode == CNN2D.Mode.Forward)):
             x = x.view(self.batch_reshape)
 
@@ -290,6 +463,28 @@ class CNN2D(torch.nn.Module):
     
     @classmethod
     def compute_kernel_size(cls, input_shape, output_shape, stride, padding, dilation, mode):
+        """Compute kernel size that produces desired output shape from given input shape.
+
+        The formula is based on torch API documentation
+        for `Conv2d <https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html>`_
+        and `ConvTranspose2d <https://pytorch.org/docs/stable/generated/torch.nn.ConvTranspose2d.html>`_.
+        
+        Parameters
+        ----------
+        input_shape : :obj:`int` or :obj:`tuple(int)`
+        output_shape : :obj:`int` or :obj:`tuple(int)`
+        stride : :obj:`int` or :obj:`tuple(int)`
+        padding : :obj:`int` or :obj:`tuple(int)`
+        dilation : :obj:`int` or :obj:`tuple(int)`
+        mode : :class:`CNN2D.Mode`
+            Direction of CNN. Either :attr:`CNN2D.Mode.Forward` or :attr:`CNN2D.Mode.Backward`
+
+        Returns
+        -------
+        :obj:`list(int)`
+            List of two integers indicating height and width of kernel.
+
+        """
         assert(len(input_shape) == 2)
         assert(len(output_shape) == 2)
         if (type(stride) is int):
@@ -322,6 +517,28 @@ class CNN2D(torch.nn.Module):
     
     @classmethod
     def compute_input_layer_size(cls, output_shape, kernel_size, stride, padding, dilation, mode):
+        """Compute input layer size that produces desired output shape with given kernel size.
+
+        The formula is based on torch API documentation
+        for `Conv2d <https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html>`_
+        and `ConvTranspose2d <https://pytorch.org/docs/stable/generated/torch.nn.ConvTranspose2d.html>`_.
+        
+        Parameters
+        ----------
+        output_shape : :obj:`int` or :obj:`tuple(int)`
+        kernel_size : :obj:`int` or :obj:`tuple(int)`
+        stride : :obj:`int` or :obj:`tuple(int)`
+        padding : :obj:`int` or :obj:`tuple(int)`
+        dilation : :obj:`int` or :obj:`tuple(int)`
+        mode : :class:`CNN2D.Mode`
+            Direction of CNN. Either :attr:`CNN2D.Mode.Forward` or :attr:`CNN2D.Mode.Backward`
+
+        Returns
+        -------
+        :obj:`list(int)`
+            List of two integers indicating height and width of input layer.
+
+        """
         assert(len(output_shape) == 2)
         if (type(kernel_size) is int):
             kernel_size = [kernel_size, kernel_size]
@@ -345,6 +562,28 @@ class CNN2D(torch.nn.Module):
 
     @classmethod
     def compute_output_layer_size(cls, input_shape, kernel_size, stride, padding, dilation, mode):
+        """Compute output layer size produced from given input shape and kernel size.
+
+        The formula is based on torch API documentation
+        for `Conv2d <https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html>`_
+        and `ConvTranspose2d <https://pytorch.org/docs/stable/generated/torch.nn.ConvTranspose2d.html>`_.
+        
+        Parameters
+        ----------
+        input_shape : :obj:`int` or :obj:`tuple(int)`
+        kernel_size : :obj:`int` or :obj:`tuple(int)`
+        stride : :obj:`int` or :obj:`tuple(int)`
+        padding : :obj:`int` or :obj:`tuple(int)`
+        dilation : :obj:`int` or :obj:`tuple(int)`
+        mode : :class:`CNN2D.Mode`
+            Direction of CNN. Either :attr:`CNN2D.Mode.Forward` or :attr:`CNN2D.Mode.Backward`
+
+        Returns
+        -------
+        :obj:`list(int)`
+            List of two integers indicating height and width of output layer.
+
+        """
         assert(len(input_shape) == 2)
         if (type(kernel_size) is int):
             kernel_size = [kernel_size, kernel_size]
@@ -377,6 +616,7 @@ class CNN2D(torch.nn.Module):
         return [int(np.floor(Hout)), int(np.floor(Wout))]
     
     def init_weight(self):
+        """Initialize weights of linear features according to Xavier uniform distribution."""
         # TODO(kevin): support other initializations?
         for fc in self.fcs:
             torch.nn.init.xavier_uniform_(fc.weight)
