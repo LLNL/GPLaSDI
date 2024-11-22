@@ -26,6 +26,34 @@ Module Contents
 
 .. py:data:: act_dict
 
+   Dictionary to activation functions.
+
+   - :obj:`'ELU'`: :obj:`torch.nn.ELU`
+   - :obj:`'hardshrink'`: :obj:`torch.nn.Hardshrink`
+   - :obj:`'hardsigmoid'`: :obj:`torch.nn.Hardsigmoid`
+   - :obj:`'hardtanh'`: :obj:`torch.nn.Hardtanh`
+   - :obj:`'hardswish'`: :obj:`torch.nn.Hardswish`
+   - :obj:`'leakyReLU'`: :obj:`torch.nn.LeakyReLU`
+   - :obj:`'logsigmoid'`: :obj:`torch.nn.LogSigmoid`
+   - :obj:`'multihead'`: :obj:`torch.nn.MultiheadAttention`
+   - :obj:`'PReLU'`: :obj:`torch.nn.PReLU`
+   - :obj:`'ReLU'`: :obj:`torch.nn.ReLU`
+   - :obj:`'ReLU6'`: :obj:`torch.nn.ReLU6`
+   - :obj:`'RReLU'`: :obj:`torch.nn.RReLU`
+   - :obj:`'SELU'`: :obj:`torch.nn.SELU`
+   - :obj:`'CELU'`: :obj:`torch.nn.CELU`
+   - :obj:`'GELU'`: :obj:`torch.nn.GELU`
+   - :obj:`'sigmoid'`: :obj:`torch.nn.Sigmoid`
+   - :obj:`'SiLU'`: :obj:`torch.nn.SiLU`
+   - :obj:`'mish'`: :obj:`torch.nn.Mish`
+   - :obj:`'softplus'`: :obj:`torch.nn.Softplus`
+   - :obj:`'softshrink'`: :obj:`torch.nn.Softshrink`
+   - :obj:`'tanh'`: :obj:`torch.nn.Tanh`
+   - :obj:`'tanhshrink'`: :obj:`torch.nn.Tanhshrink`
+   - :obj:`'threshold'`: :obj:`torch.nn.Threshold`
+
+   :type: :obj:`dict`
+
 .. py:class:: MultiLayerPerceptron(layer_sizes, act_type='sigmoid', reshape_index=None, reshape_shape=None, threshold=0.1, value=0.0)
 
    Bases: :py:obj:`torch.nn.Module`

@@ -103,7 +103,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lasdi.networks.act_dict" title="lasdi.networks.act_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">act_dict</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Dictionary to activation functions.</p></td>
 </tr>
 </tbody>
 </table>
@@ -126,7 +126,38 @@
 <dl class="py data">
 <dt class="sig sig-object py" id="lasdi.networks.act_dict">
 <span class="sig-prename descclassname"><span class="pre">lasdi.networks.</span></span><span class="sig-name descname"><span class="pre">act_dict</span></span><a class="headerlink" href="#lasdi.networks.act_dict" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Dictionary to activation functions.</p>
+<ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">'ELU'</span></code>: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.ELU</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">'hardshrink'</span></code>: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Hardshrink</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">'hardsigmoid'</span></code>: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Hardsigmoid</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">'hardtanh'</span></code>: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Hardtanh</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">'hardswish'</span></code>: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Hardswish</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">'leakyReLU'</span></code>: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.LeakyReLU</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">'logsigmoid'</span></code>: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.LogSigmoid</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">'multihead'</span></code>: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.MultiheadAttention</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">'PReLU'</span></code>: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.PReLU</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">'ReLU'</span></code>: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.ReLU</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">'ReLU6'</span></code>: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.ReLU6</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">'RReLU'</span></code>: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.RReLU</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">'SELU'</span></code>: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.SELU</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">'CELU'</span></code>: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.CELU</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">'GELU'</span></code>: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.GELU</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">'sigmoid'</span></code>: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Sigmoid</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">'SiLU'</span></code>: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.SiLU</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">'mish'</span></code>: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Mish</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">'softplus'</span></code>: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Softplus</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">'softshrink'</span></code>: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Softshrink</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">'tanh'</span></code>: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Tanh</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">'tanhshrink'</span></code>: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Tanhshrink</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">'threshold'</span></code>: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Threshold</span></code></p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lasdi.networks.MultiLayerPerceptron">
