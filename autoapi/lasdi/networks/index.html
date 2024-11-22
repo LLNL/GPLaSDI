@@ -630,7 +630,7 @@ Output tensor of the module is reshaped as <a class="reference internal" href="#
 <ul class="simple">
 <li><p>Forward mode: 3d array of shape <code class="xref py py-obj docutils literal notranslate"><span class="pre">self.layer_sizes[-1]</span></code>,
 or 4d array of shape <code class="xref py py-obj docutils literal notranslate"><span class="pre">[self.batch_reshape[0]]</span> <span class="pre">+</span> <span class="pre">self.layer_sizes[-1]</span></code></p></li>
-<li><p>Backward mode: nd array of shape <a class="reference internal" href="#lasdi.networks.CNN2D.batch_reshape" title="lasdi.networks.CNN2D.batch_reshape"><code class="xref py py-attr docutils literal notranslate"><span class="pre">batch_reshape</span></code></a></p></li>
+<li><p>Backward mode: nd array of shape <a class="reference internal" href="#lasdi.networks.CNN2D.data_shape" title="lasdi.networks.CNN2D.data_shape"><code class="xref py py-attr docutils literal notranslate"><span class="pre">data_shape</span></code></a> (equal to <code class="xref py py-attr docutils literal notranslate"><span class="pre">batch_shape</span></code>)</p></li>
 </ul>
 </p>
 </dd>

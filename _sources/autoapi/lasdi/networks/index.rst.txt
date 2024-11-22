@@ -432,7 +432,7 @@ Module Contents
 
                 - Forward mode: 3d array of shape :obj:`self.layer_sizes[-1]`,
                   or 4d array of shape :obj:`[self.batch_reshape[0]] + self.layer_sizes[-1]`
-                - Backward mode: nd array of shape :attr:`batch_reshape`
+                - Backward mode: nd array of shape :attr:`data_shape` (equal to :attr:`batch_shape`)
       :rtype: :obj:`torch.nn.Tensor`
 
 
