@@ -1,7 +1,6 @@
 import torch
 import numpy as np
 
-# activation dict
 act_dict = {'ELU': torch.nn.ELU,
             'hardshrink': torch.nn.Hardshrink,
             'hardsigmoid': torch.nn.Hardsigmoid,
@@ -26,6 +25,32 @@ act_dict = {'ELU': torch.nn.ELU,
             'tanhshrink': torch.nn.Tanhshrink,
             'threshold': torch.nn.Threshold,
             }
+""":obj:`dict` : Dictionary to activation functions.
+
+- :obj:`'ELU'`: :obj:`torch.nn.ELU`
+- :obj:`'hardshrink'`: :obj:`torch.nn.Hardshrink`
+- :obj:`'hardsigmoid'`: :obj:`torch.nn.Hardsigmoid`
+- :obj:`'hardtanh'`: :obj:`torch.nn.Hardtanh`
+- :obj:`'hardswish'`: :obj:`torch.nn.Hardswish`
+- :obj:`'leakyReLU'`: :obj:`torch.nn.LeakyReLU`
+- :obj:`'logsigmoid'`: :obj:`torch.nn.LogSigmoid`
+- :obj:`'multihead'`: :obj:`torch.nn.MultiheadAttention`
+- :obj:`'PReLU'`: :obj:`torch.nn.PReLU`
+- :obj:`'ReLU'`: :obj:`torch.nn.ReLU`
+- :obj:`'ReLU6'`: :obj:`torch.nn.ReLU6`
+- :obj:`'RReLU'`: :obj:`torch.nn.RReLU`
+- :obj:`'SELU'`: :obj:`torch.nn.SELU`
+- :obj:`'CELU'`: :obj:`torch.nn.CELU`
+- :obj:`'GELU'`: :obj:`torch.nn.GELU`
+- :obj:`'sigmoid'`: :obj:`torch.nn.Sigmoid`
+- :obj:`'SiLU'`: :obj:`torch.nn.SiLU`
+- :obj:`'mish'`: :obj:`torch.nn.Mish`
+- :obj:`'softplus'`: :obj:`torch.nn.Softplus`
+- :obj:`'softshrink'`: :obj:`torch.nn.Softshrink`
+- :obj:`'tanh'`: :obj:`torch.nn.Tanh`
+- :obj:`'tanhshrink'`: :obj:`torch.nn.Tanhshrink`
+- :obj:`'threshold'`: :obj:`torch.nn.Threshold`
+"""
 
 class MultiLayerPerceptron(torch.nn.Module):
     """Vanilla multi-layer perceptron neural networks module.
