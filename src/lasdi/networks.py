@@ -471,7 +471,7 @@ class CNN2D(torch.nn.Module):
 
             - Forward mode: 3d array of shape :obj:`self.layer_sizes[-1]`,
               or 4d array of shape :obj:`[self.batch_reshape[0]] + self.layer_sizes[-1]`
-            - Backward mode: nd array of shape :attr:`batch_reshape`
+            - Backward mode: nd array of shape :attr:`data_shape` (equal to :attr:`batch_shape`)
         """
         if ((self.batch_reshape is not None) and (self.mode == CNN2D.Mode.Forward)):
             x = x.view(self.batch_reshape)
