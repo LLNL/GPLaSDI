@@ -28,9 +28,13 @@ Package Contents
 .. py:class:: Physics(cfg, param_name=None)
 
    .. py:attribute:: dim
+      :value: -1
+
 
 
    .. py:attribute:: qdim
+      :value: -1
+
 
 
    .. py:attribute:: grid_size
@@ -53,9 +57,13 @@ Package Contents
 
 
    .. py:attribute:: nt
+      :value: -1
+
 
 
    .. py:attribute:: dt
+      :value: -1.0
+
 
 
    .. py:attribute:: t_grid
@@ -103,15 +111,23 @@ Package Contents
 
 
    .. py:attribute:: dim
+      :value: None
+
 
 
    .. py:attribute:: qdim
+      :value: None
+
 
 
    .. py:attribute:: grid_size
+      :value: None
+
 
 
    .. py:attribute:: qgrid_size
+      :value: None
+
 
       numpy nd-array, assuming the shape of:
       - 1d: (space_dim[0],)
@@ -126,9 +142,13 @@ Package Contents
 
 
    .. py:attribute:: nt
+      :value: None
+
 
 
    .. py:attribute:: dt
+      :value: None
+
 
 
    .. py:attribute:: t_grid

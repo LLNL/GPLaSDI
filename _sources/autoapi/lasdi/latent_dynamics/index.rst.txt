@@ -27,12 +27,18 @@ Package Contents
 .. py:class:: LatentDynamics(dim_, nt_)
 
    .. py:attribute:: dim
+      :value: -1
+
 
 
    .. py:attribute:: nt
+      :value: -1
+
 
 
    .. py:attribute:: ncoefs
+      :value: -1
+
 
 
    .. py:attribute:: coefs

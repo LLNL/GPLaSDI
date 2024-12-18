@@ -49,14 +49,6 @@ Module Contents
 
 .. py:class:: BayesianGLaSDI(physics, autoencoder, latent_dynamics, param_space, config)
 
-   
-   This class runs a full GPLaSDI training. It takes into input the autoencoder defined as a PyTorch object and the
-   dictionnary containing all the training parameters.
-   The "train" method with run the active learning training loop, compute the reconstruction and SINDy loss, train the GPs,
-   and sample a new FOM data point.
-
-
-
    .. py:attribute:: X_train
 
 
@@ -121,26 +113,6 @@ Module Contents
 
    .. py:attribute:: restart_iter
       :value: 0
-
-
-
-   .. py:attribute:: training_loss
-      :value: []
-
-
-
-   .. py:attribute:: ae_loss
-      :value: []
-
-
-
-   .. py:attribute:: ld_loss
-      :value: []
-
-
-
-   .. py:attribute:: coef_loss
-      :value: []
 
 
 

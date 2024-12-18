@@ -55,7 +55,6 @@
 <li class="toctree-l4"><a class="reference internal" href="../inputs/index.html">lasdi.inputs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../latent_dynamics/index.html">lasdi.latent_dynamics</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../latent_space/index.html">lasdi.latent_space</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../networks/index.html">lasdi.networks</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../param/index.html">lasdi.param</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../physics/index.html">lasdi.physics</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../postprocess/index.html">lasdi.postprocess</a></li>
@@ -102,7 +101,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lasdi.gplasdi.BayesianGLaSDI" title="lasdi.gplasdi.BayesianGLaSDI"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BayesianGLaSDI</span></code></a></p></td>
-<td><p>This class runs a full GPLaSDI training. It takes into input the autoencoder defined as a PyTorch object and the</p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
@@ -158,11 +157,7 @@ assert(len(gp_dictionnary) == param_grid.shape[0])</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lasdi.gplasdi.</span></span><span class="sig-name descname"><span class="pre">BayesianGLaSDI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">physics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">autoencoder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latent_dynamics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_space</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI" title="Permalink to this definition"></a></dt>
-<dd><p>This class runs a full GPLaSDI training. It takes into input the autoencoder defined as a PyTorch object and the
-dictionnary containing all the training parameters.
-The “train” method with run the active learning training loop, compute the reconstruction and SINDy loss, train the GPs,
-and sample a new FOM data point.</p>
-<dl class="py attribute">
+<dd><dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.X_train">
 <span class="sig-name descname"><span class="pre">X_train</span></span><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.X_train" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -265,26 +260,6 @@ and sample a new FOM data point.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.restart_iter">
 <span class="sig-name descname"><span class="pre">restart_iter</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.restart_iter" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.training_loss">
-<span class="sig-name descname"><span class="pre">training_loss</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.training_loss" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.ae_loss">
-<span class="sig-name descname"><span class="pre">ae_loss</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.ae_loss" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.ld_loss">
-<span class="sig-name descname"><span class="pre">ld_loss</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.ld_loss" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="lasdi.gplasdi.BayesianGLaSDI.coef_loss">
-<span class="sig-name descname"><span class="pre">coef_loss</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lasdi.gplasdi.BayesianGLaSDI.coef_loss" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">

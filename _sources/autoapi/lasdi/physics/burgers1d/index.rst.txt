@@ -52,15 +52,23 @@ Module Contents
 
 
    .. py:attribute:: offline
+      :value: False
+
 
 
    .. py:attribute:: nt
+      :value: None
+
 
 
    .. py:attribute:: grid_size
+      :value: None
+
 
 
    .. py:attribute:: qgrid_size
+      :value: None
+
 
       numpy nd-array, assuming the shape of:
       - 1d: (space_dim[0],)
@@ -70,15 +78,21 @@ Module Contents
 
 
    .. py:attribute:: xmin
+      :value: None
+
 
 
    .. py:attribute:: xmax
+      :value: None
+
 
 
    .. py:attribute:: dx
 
 
    .. py:attribute:: tmax
+      :value: None
+
 
 
    .. py:attribute:: dt
@@ -91,9 +105,13 @@ Module Contents
 
 
    .. py:attribute:: maxk
+      :value: 10
+
 
 
    .. py:attribute:: convergence_threshold
+      :value: 1e-08
+
 
 
    .. py:method:: initial_condition(param)

@@ -39,6 +39,8 @@ Module Contents
 
 
    .. py:attribute:: coef_norm_order
+      :value: 1
+
 
 
    .. py:attribute:: MSE
