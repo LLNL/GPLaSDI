@@ -46,7 +46,7 @@ class SINDy(LatentDynamics):
             if (numpy):
                 coefs = np.zeros([n_train, self.ncoefs])
             else:
-                coefs = torch.Tensor([n_train, self.ncoefs])
+                coefs = torch.zeros([n_train, self.ncoefs])
             loss_sindy, loss_coef = 0.0, 0.0
 
             for i in range(n_train):
