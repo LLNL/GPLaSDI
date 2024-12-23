@@ -141,6 +141,10 @@ class BayesianGLaSDI:
         self.best_loss = np.Inf
         self.best_coefs = None
         self.restart_iter = 0
+        self.training_loss = []
+        self.ae_loss = []
+        self.ld_loss = []
+        self.coef_loss = []
 
         self.X_train = torch.Tensor([])
         self.X_test = torch.Tensor([])
