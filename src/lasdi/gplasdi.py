@@ -145,6 +145,11 @@ class BayesianGLaSDI:
         self.X_train = torch.Tensor([])
         self.X_test = torch.Tensor([])
 
+        self.training_loss = []
+        self.ae_loss = []
+        self.ld_loss = []
+        self.coef_loss = []
+
         return
 
     def train(self):
@@ -162,11 +167,6 @@ class BayesianGLaSDI:
         ps = self.param_space
         n_train = ps.n_train()
         ld = self.latent_dynamics
-
-        self.training_loss = []
-        self.ae_loss = []
-        self.ld_loss = []
-        self.coef_loss = []
 
         '''
             determine number of iterations.
@@ -291,4 +291,9 @@ class BayesianGLaSDI:
         self.optimizer.load_state_dict(dict_['optimizer'])
         if (self.device != 'cpu'):
             optimizer_to(self.optimizer, self.device)
+
+        self.training_loss = dict_['training_loss']
+        self.ae_loss = dict_['ae_loss']
+        self.ld_loss = dict_['ld_loss']
+        self.coef_loss = dict_['coeff_loss']
         return
