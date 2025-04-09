@@ -5,6 +5,15 @@ from . import LatentDynamics
 from ..inputs import InputParser
 from ..fd import FDdict
 
+'''
+We use the same notation here as in the manuscript "Weak-Form Latent Space Dynamics Identification"
+https://arxiv.org/abs/2311.12880
+
+Pytorch version of weak-form SINDy originally implemented by Margaret Trautner. Adapted here
+for refactored version of GPLaSDI
+'''
+
+
 class wSINDy(LatentDynamics):
     fd_type = ''
     fd = None
@@ -42,6 +51,7 @@ class wSINDy(LatentDynamics):
         self.test_func_width = parser.getInput(['test_func_width'], fallback=50/(self.nt - 1))
         self.overlap = parser.getInput(['overlap'], fallback=0.8)
         self.pq = parser.getInput(['pq'], fallback=5)
+        self.LS_loss_type = parser.getInput(['LS_loss_type'], fallback='weak') #weak or strong
         
         self.T = self.dt * (self.nt - 1)
         self.Phis, self.dPhis = self.get_test_functions(self.T, self.nt, self.test_func_width,self.overlap, self.pq, test_func = self.test_func)
@@ -87,7 +97,10 @@ class wSINDy(LatentDynamics):
 
 
         if (compute_loss):
-            loss_wsindy = self.MSE(dZdt, Z_i @ coefs)
+            if self.LS_loss_type == 'strong':
+                loss_wsindy = self.MSE(dZdt, Z_i @ coefs)
+            else:
+                loss_wsindy = self.MSE(-self.dPhis @ Z, self.Phis @ Z_i @ coefs)
             # NOTE(kevin): by default, this will be L1 norm.
             loss_coef = torch.norm(coefs, self.coef_norm_order)
 
