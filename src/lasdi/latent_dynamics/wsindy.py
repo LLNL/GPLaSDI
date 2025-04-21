@@ -200,28 +200,45 @@ class wSINDy(LatentDynamics):
         t = torch.linspace(0,T,n_t)
 
         if test_func == 'bump':
+            L = test_func_width #T/50 # length of test function support
+            s = test_func_width*overlap # overlap
+            a_s, b_s = self.getUniformGrid(T, L, s, 1)
+
+            t = torch.linspace(0,T,n_t)
+            H = len(a_s)
+            print("Number of Bump test functions:", H)
+            
             Phis = torch.zeros((H,n_t))
             dPhis = torch.zeros((H,n_t))
-            eta = 1
-            a = T/(H+1)
+            d2Phis = torch.zeros((H,n_t))
+            # eta = 1
+            eta = 5
+            a = L/2
+            const = eta #bumps are of form e^( -eta/(1 - (x/a)^2 ) + const)
             # Make function integrate to 1
             # Numerical integration 
             nugget = 1e-7
             a_space = np.linspace(-a+nugget,a-nugget,1000)
             bump = np.exp(-eta/(1-(a_space/a)**2))
-            C = 1/np.trapz(bump,a_space)
+            C = 1/np.trapz(bump,a_space)/np.exp(const)
+
             h = torch.linspace(a,T-a,H)
-            # n_T = H + 2
-            
+
             for j, ji in enumerate(h):
                 for i, ti in enumerate(t):
-                    denom = 1- ((ti-ji)/a)**2
+                    x = (ti-ji)/a
+                    denom = 1 - x**2
+                    f = -eta/denom + const 
+                    fp = -eta/(denom**2)*2*x/a
+                    fpp = ( -eta/(denom**2)*2/a/a ) + ( -eta/(denom**3)*2*x/a * -2*x/a*-2 )
                     if denom > 0:
-                        Phis[j,i] = C*torch.exp(-eta/denom)
-                        dPhis[j,i] = -C*eta*2*((ji-ti)/a)*torch.exp(-eta/denom)/denom**2
+                        Phis[j,i] = C*torch.exp(f)
+                        dPhis[j,i] = C*torch.exp(f)*fp
+                        d2Phis[j,i] = C*( torch.exp(f)*(fp**2) + torch.exp(f)*fpp )
                     else:
                         Phis[j,i] = 0
                         dPhis[j,i] = 0
+                        d2Phis[j,i] = 0
 
         if test_func == 'PC-poly':
             L = test_func_width #T/50 # length of test function support
