@@ -12,6 +12,7 @@ Submodules
 
    /autoapi/lasdi/latent_dynamics/edmd/index
    /autoapi/lasdi/latent_dynamics/sindy/index
+   /autoapi/lasdi/latent_dynamics/sindy_high_order/index
 
 
 Classes
