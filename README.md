@@ -115,7 +115,9 @@ Core routines and classes are implemented in `src/lasdi` directory:
   * In the rising bubble example, an additional C file, ```PostProcess.c``` needs to be compiled before running GPLaSDI for the first time, using ```gcc PostProcess.c -o PP``` -->
  
 ## Citation
-[Bonneville, Christophe, Choi, Youngsoo Choi, Ghosh, Debojyoti Ghosh, and Belof, Jonathan L. "GPLaSDI: Gaussian process-based interpretable latent space dynamics identification through deep autoencoder." Computer Methods in Applied Mechanics and Engineering 418 (2024): 116535.](https://doi.org/10.1016/j.cma.2023.116535)
+> Bonneville, Christophe, Choi, Youngsoo Choi, Ghosh, Debojyoti Ghosh, and Belof, Jonathan L. <br>
+> "[GPLaSDI: Gaussian process-based interpretable latent space dynamics identification through deep autoencoder.](https://doi.org/10.1016/j.cma.2023.116535)" <br>
+> Computer Methods in Applied Mechanics and Engineering 418 (2024): 116535.
 
 ## Acknowledgement
 Y. Choi was supported for this work by the CHaRMNET Mathematical Multifaceted Integrated Capability Center (MMICC).
