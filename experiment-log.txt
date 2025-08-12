@@ -1,0 +1,1 @@
+Local conda environment created using python 3.7.10 named python3.7

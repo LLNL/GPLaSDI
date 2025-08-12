@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.spatial import Delaunay
 from .inputs import InputParser
+import pdb
 
 def get_1dspace_from_list(config):
     Nx = len(config['list'])
@@ -42,16 +43,28 @@ class ParameterSpace:
             self.param_name += [param['name']]
 
         test_space_type = parser.getInput(['test_space', 'type'], datatype=str)
+        custom_train_space = parser.getInput(['custom_train_space'], fallback=False)
+        if (custom_train_space):
+            custom_space_path = parser.getInput(['custom_space_path'], datatype=str)
+            assert (custom_space_path is not None), 'Custom space path must be provided if custom_train_space is True.'
+
+            # Load custom_train_space from file
+            self.train_space = np.load(custom_space_path)
+            self.n_init = self.train_space.shape[0]
+        else:
+
+            if (test_space_type == 'grid'):
+                self.train_space = self.createInitialTrainSpace(self.param_list)
+                self.n_init = self.train_space.shape[0]
+
+            if (test_space_type == 'hull'):
+                assert self.n_param >=2, 'Must have at least 2 parameters if test_space is \'hull\' '
+                self.train_space = self.createInitialTrainSpaceForHull(self.param_list)
+                self.n_init = self.train_space.shape[0]
+
         if (test_space_type == 'grid'):
-            self.train_space = self.createInitialTrainSpace(self.param_list)
-            self.n_init = self.train_space.shape[0]
-
             self.test_grid_sizes, self.test_meshgrid, self.test_space = self.createTestGridSpace(self.param_list)
-        if (test_space_type == 'hull'):
-            assert self.n_param >=2, 'Must have at least 2 parameters if test_space is \'hull\' '
-            self.train_space = self.createInitialTrainSpaceForHull(self.param_list)
-            self.n_init = self.train_space.shape[0]
-
+        elif (test_space_type == 'hull'):
             self.test_grid_sizes, self.test_meshgrid, self.test_space = self.createTestHullSpace(self.param_list)
 
         return
@@ -70,8 +83,10 @@ class ParameterSpace:
             maxval = param['max']
             paramRanges += [np.array([minval, maxval])]
 
+        
         mesh_grids = self.createHyperMeshGrid(paramRanges)
         return self.createHyperGridSpace(mesh_grids)
+
     
     def createInitialTrainSpaceForHull(self, param_list):
         '''

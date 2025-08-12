@@ -15,7 +15,8 @@ def compute_errors(X_pred, physics, X_test):
     
     X_pred = X_pred.reshape(X_pred.shape[0], -1)
     X_test = X_test.reshape(X_test.shape[0], -1)
-    rel_error = np.linalg.norm(X_pred - X_test, axis=1) / np.linalg.norm(X_test, axis=1)
+    # rel_error = np.linalg.norm(X_pred - X_test, axis=1) / np.linalg.norm(X_test, axis=1)
+    rel_error = np.linalg.norm(X_pred - X_test) / np.linalg.norm(X_test)
 
     return rel_error.max(), residual
 

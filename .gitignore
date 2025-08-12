@@ -7,4 +7,15 @@ examples/results
 examples/checkpoint
 *.npy
 build
+*.h5
 docs/build
+
+*.jpg
+*.png
+*.jpeg
+*.gif
+*.pdf
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+

@@ -57,18 +57,34 @@ def main():
     print("Trainer to be initialized...")
     trainer, param_space, physics, latent_space, latent_dynamics = initialize_trainer(config, restart_file)
 
-    if ((not use_restart) and physics.offline):
-        raise RuntimeError("Offline physics solver needs to use restart files!")
+    # if ((not use_restart) and physics.offline):
+    #     raise RuntimeError("Offline physics solver needs to use restart files!")
+    if physics.offline: 
+        pick_samples(trainer, config)
+        run_samples(trainer, config)
 
-    result, next_step = step(trainer, current_step, config, use_restart)
 
-    if (result is Result.Fail):
-        raise RuntimeError('Previous step has failed. Stopping the workflow.')
-    elif (result is Result.Success):
-        print("Previous step succeeded. Preparing for the next step.")
-        result = Result.Unexecuted
-    elif (result is Result.Complete):
-        print("Workflow is finished.")
+    trainer.train()
+
+    while (trainer.restart_iter < trainer.max_iter):
+        if (trainer.restart_iter <= trainer.max_greedy_iter):
+            # perform greedy sampling to pick up new samples
+            pick_samples(trainer, config)
+            # update training data with newly picked samples
+            run_samples(trainer, config)
+
+        # train over given training data
+        trainer.train()
+    
+    # result, next_step = step(trainer, current_step, config, use_restart)
+
+    # if (result is Result.Fail):
+    #     raise RuntimeError('Previous step has failed. Stopping the workflow.')
+    # elif (result is Result.Success):
+    #     print("Previous step succeeded. Preparing for the next step.")
+    #     result = Result.Unexecuted
+    # elif (result is Result.Complete):
+    #     print("Workflow is finished.")
 
     # save restart (or final) file.
     import time
@@ -89,8 +105,7 @@ def main():
                  'latent_space': latent_space.export(),
                  'latent_dynamics': latent_dynamics.export(),
                  'trainer': trainer.export(),
-                 'timestamp': date_str,
-                 'next_step': next_step,
+                 'timestamp': date_str, #'next_step': next_step,
                  'result': result, # TODO(kevin): do we need to save result?
                  }
     
@@ -291,7 +306,8 @@ def run_samples(trainer, config, save_samples = False):
                 trainer.X_test = torch.tensor(new_X_test, dtype=torch.float32)
             
             # verify dimensions match expected parameter space sizes
-            assert(trainer.X_train.size(0) == trainer.param_space.n_train())
+            
+            assert(trainer.X_train.size(0) == trainer.param_space.n_train(),"trainer.X_train is size %d, but expected %d" % (trainer.X_train.size(0), trainer.param_space.n_train()))
             assert(trainer.X_test.size(0) == trainer.param_space.n_test())
 
             # since solutions are loaded from file, go to training phase directly
