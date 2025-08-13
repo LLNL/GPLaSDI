@@ -1,0 +1,14 @@
+name: python3.9
+channels:
+  - defaults
+dependencies:
+  - python=3.9
+  - pytorch==2.5.1
+  - scipy
+  - matplotlib
+  - scikit-learn
+  - pyyaml
+  - ipykernel
+  - tqdm
+  - conda-forge::hdf5storage
+prefix: /Users/margaret/anaconda3/envs/python3.9
