@@ -25,7 +25,7 @@ echo "Python version: $(python --version)"
 
 # Run the LaSDI command
 echo "Starting LaSDI run..."
-lasdi burgers1d-nonadaptive.yml
+lasdi /usr/workspace/trautner/GPLaSDI/examples/burgers1d-nonadaptive.yml
 
 # Print completion time
 echo "Job completed at: $(date)"
