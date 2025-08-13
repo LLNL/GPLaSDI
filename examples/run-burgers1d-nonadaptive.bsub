@@ -23,6 +23,9 @@ conda activate pyenv-3.9
 echo "Python path: $(which python)"
 echo "Python version: $(python --version)"
 
+# Print working directory
+echo "Current working directory: $(pwd)"
+
 # Run the LaSDI command
 echo "Starting LaSDI run..."
 lasdi /usr/workspace/trautner/GPLaSDI/examples/burgers1d-nonadaptive.yml

@@ -14,16 +14,16 @@ lasdi:
 
 workflow:
   use_restart: false
-  restart_file: restarts/burgers1d.restart.npy
+  restart_file: /usr/workspace/trautner/GPLaSDI/examples/restarts/burgers1d.restart.npy
   offline_greedy_sampling:
-    train_param_file: sampling/non-adaptive_train.burgers1d.h5
-    test_param_file: sampling/new_test.burgers1d.h5
-    train_sol_file: sampling/non-adaptive_Xtrain.burgers1d.h5
-    test_sol_file: sampling/new_Xtest.burgers1d.h5
+    train_param_file: /usr/workspace/trautner/GPLaSDI/examples/sampling/non-adaptive_train.burgers1d.h5
+    test_param_file: /usr/workspace/trautner/GPLaSDI/examples/sampling/new_test.burgers1d.h5
+    train_sol_file: /usr/workspace/trautner/GPLaSDI/examples/sampling/non-adaptive_Xtrain.burgers1d.h5
+    test_sol_file: /usr/workspace/trautner/GPLaSDI/examples/sampling/new_Xtest.burgers1d.h5
 
 parameter_space:
   custom_train_space: true
-  custom_space_path: sampling/FNO_param_train_20_burgers1d.npy
+  custom_space_path: /usr/workspace/trautner/GPLaSDI/examples/sampling/FNO_param_train_20_burgers1d.npy
   parameters:
     - name: a
       min: 0.7
