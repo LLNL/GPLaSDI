@@ -1,0 +1,86 @@
+Job ID: 7699151
+Job started at: Tue Aug 12 16:53:08 PDT 2025
+Running on host: lassen552
+Current directory: /usr/workspace/trautner/GPLaSDI/examples
+Activating conda environment: pyenv-3.9
+Python path: /g/g20/trautner/.conda/envs/pyenv-3.9/bin/python
+Python version: Python 3.9.18
+Starting LaSDI run...
+config file: burgers1d-nonadaptive.yml
+Job completed at: Tue Aug 12 16:53:14 PDT 2025
+logout
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@lassen710>
+Subject: Job 7699151: <lasdi_burgers1d_NA> in cluster <lassen> Done
+
+Job <lasdi_burgers1d_NA> was submitted from host <lassen708> by user <trautner> in cluster <lassen> at Tue Aug 12 16:38:36 2025
+Job was executed on host(s) <1*lassen710>, in queue <pbatch>, as user <trautner> in cluster <lassen> at Tue Aug 12 16:53:03 2025
+                            <40*lassen552>
+</g/g20/trautner> was used as the home directory.
+</usr/workspace/trautner/GPLaSDI/examples> was used as the working directory.
+Started at Tue Aug 12 16:53:03 2025
+Terminated at Tue Aug 12 16:53:15 2025
+Results reported at Tue Aug 12 16:53:15 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/bash
+#BSUB -J lasdi_burgers1d_NA
+#BSUB -o output_%J.out
+#BSUB -e error_%J.err
+#BSUB -W 10:00
+#BSUB -q pbatch
+
+# Print job information
+echo "Job ID: $LSB_JOBID"
+echo "Job started at: $(date)"
+echo "Running on host: $(hostname)"
+echo "Current directory: $(pwd)"
+
+# Initialize conda
+source ~/.bashrc
+eval "$(conda shell.bash hook)"
+
+# Activate the conda environment
+echo "Activating conda environment: pyenv-3.9"
+conda activate pyenv-3.9
+
+# Verify environment is activated
+echo "Python path: $(which python)"
+echo "Python version: $(python --version)"
+
+# Run the LaSDI command
+echo "Starting LaSDI run..."
+lasdi burgers1d-nonadaptive.yml
+
+# Print completion time
+echo "Job completed at: $(date)"
+
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   0.14 sec.
+    Max Memory :                                 -
+    Average Memory :                             -
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              -
+    Max Threads :                                -
+    Run time :                                   11 sec.
+    Turnaround time :                            879 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <error_7699151.err> for stderr output of this job.
+

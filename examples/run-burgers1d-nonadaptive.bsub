@@ -1,0 +1,31 @@
+#!/bin/bash
+#BSUB -J lasdi_burgers1d_NA
+#BSUB -o output_%J.out
+#BSUB -e error_%J.err
+#BSUB -W 10:00
+#BSUB -q pbatch
+
+# Print job information
+echo "Job ID: $LSB_JOBID"
+echo "Job started at: $(date)"
+echo "Running on host: $(hostname)"
+echo "Current directory: $(pwd)"
+
+# Initialize conda
+source ~/.bashrc
+eval "$(conda shell.bash hook)"
+
+# Activate the conda environment
+echo "Activating conda environment: pyenv-3.9"
+conda activate pyenv-3.9
+
+# Verify environment is activated
+echo "Python path: $(which python)"
+echo "Python version: $(python --version)"
+
+# Run the LaSDI command
+echo "Starting LaSDI run..."
+lasdi burgers1d-nonadaptive.yml
+
+# Print completion time
+echo "Job completed at: $(date)"
