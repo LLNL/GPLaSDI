@@ -76,12 +76,12 @@ latent_dynamics:
     coef_norm_order: fro
     higher_order_terms: 1 
     extra_functions: []
-  type: edmd
-  edmd: 
-    fd_type: sbp12
-    coef_norm_order: fro
-    higher_order_terms: 0
-    extra_functions: []    
+  #type: edmd
+  #edmd: 
+  #fd_type: sbp12
+  # coef_norm_order: fro
+  # higher_order_terms: 0
+  # extra_functions: []    
 
 physics:
   type: burgers1d
