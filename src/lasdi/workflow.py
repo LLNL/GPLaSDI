@@ -8,8 +8,7 @@ from .enums import *
 from .gplasdi import BayesianGLaSDI
 from .latent_space import Autoencoder
 from .latent_dynamics.sindy import SINDy
-from .latent_dynamics.sindy_high_order import SINDy as sindy_high
-from .latent_dynamics.edmd import edmd
+from .latent_dynamics.edmd import EDMD 
 from .physics.burgers1d import Burgers1D
 from .param import ParameterSpace
 from .inputs import InputParser
@@ -18,7 +17,7 @@ trainer_dict = {'gplasdi': BayesianGLaSDI}
 
 latent_dict = {'ae': Autoencoder}
 
-ld_dict = {'edmd': edmd}
+ld_dict = {'edmd': EDMD}
 
 physics_dict = {'burgers1d': Burgers1D}
 

@@ -13,7 +13,7 @@ def get_function_from_string(func_str):
     module = importlib.import_module(module_name)
     return getattr(module, func_name)
 
-class edmd(LatentDynamics):
+class EDMD(LatentDynamics):
     fd_type = ''
     fd = None
     fd_oper = None
