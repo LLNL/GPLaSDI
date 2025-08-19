@@ -11,8 +11,13 @@ from .latent_dynamics.sindy import SINDy
 from .physics.burgers1d import Burgers1D
 from .param import ParameterSpace
 from .inputs import InputParser
+from .postprocess import count_params, compute_errors
 import pdb
 import os.path
+import time
+from lasdi.latent_space import initial_condition_latent
+from lasdi.gp import fit_gps
+from lasdi.gplasdi import sample_roms, average_rom
 
 
 trainer_dict = {'gplasdi': BayesianGLaSDI}
@@ -31,6 +36,7 @@ parser.add_argument('config_file', metavar='string', type=str,
 def main():
     args = parser.parse_args(sys.argv[1:])
     print("config file: %s" % args.config_file)
+
 
     with open(args.config_file, 'r') as f:
         config = yaml.safe_load(f)
@@ -54,6 +60,7 @@ def main():
         current_step = NextStep.PickSample
         result = Result.Unexecuted
     
+    start_time = time.time()
     print("Trainer to be initialized...")
     trainer, param_space, physics, latent_space, latent_dynamics = initialize_trainer(config, restart_file)
 
@@ -87,16 +94,21 @@ def main():
     #     print("Workflow is finished.")
 
     # save restart (or final) file.
-    import time
+        
+    train_time = time.time() - start_time
     date = time.localtime()
     date_str = "{month:02d}_{day:02d}_{year:04d}_{hour:02d}_{minute:02d}"
     date_str = date_str.format(month = date.tm_mon, day = date.tm_mday, year = date.tm_year, hour = date.tm_hour + 3, minute = date.tm_min)
+    exp_key = cfg_parser.getInput(['exp_key'], fallback=None)
+
     if (use_restart):
         # rename old restart file if exists.
         if (os.path.isfile(restart_filename)):
             old_timestamp = restart_file['timestamp']
             os.rename(restart_filename, restart_filename + '.' + old_timestamp)
         save_file = restart_filename
+    elif (exp_key is not None):
+        save_file = exp_key + '.npy'
     else:
         save_file = 'lasdi_' + date_str + '.npy'
     
@@ -106,10 +118,28 @@ def main():
                  'latent_dynamics': latent_dynamics.export(),
                  'trainer': trainer.export(),
                  'timestamp': date_str, #'next_step': next_step,
-                 'result': result, # TODO(kevin): do we need to save result?
+                 'result': result} 
+    
+    start_time = time.time()
+    max_rel_err, avg_rel_err, num_params = eval_model(config, save_dict)
+    eval_time = time.time() - start_time
+    save_dict = {'parameters': param_space.export(),
+                 'physics': physics.export(),
+                 'latent_space': latent_space.export(),
+                 'latent_dynamics': latent_dynamics.export(),
+                 'trainer': trainer.export(),
+                 'timestamp': date_str, #'next_step': next_step,
+                 'result': result, # TODO(kevin): do we need to save result?,}
+                'max_rel_err': max_rel_err,
+                'avg_rel_err': avg_rel_err,
+                'num_params': num_params,
+                    'train_time': train_time,
+                'eval_time': eval_time,
                  }
     
     np.save(save_file, save_dict)
+
+
 
     return
 
@@ -390,6 +420,57 @@ def collect_samples(trainer, config):
 
     next_step, result = NextStep.Train, Result.Success
     return result, next_step
+
+
+def eval_model(config, save_dict):
+
+    restart_file = save_dict
+    trainer, param_space, physics, autoencoder, sindy = initialize_trainer(config, restart_file)
+
+    num_params = count_params(autoencoder)
+
+    coefs = restart_file['trainer']['best_coefs']
+    X_train = restart_file['trainer']['X_train']
+    X_test = restart_file['trainer']['X_test']
+
+    paramspace_dict = restart_file['parameters']
+    param_train = paramspace_dict['train_space']
+    param_grid = paramspace_dict['test_space']
+    test_meshgrid = paramspace_dict['test_meshgrid']
+    test_grid_sizes = paramspace_dict['test_grid_sizes']
+    n_samples = config['lasdi']['gplasdi']['n_samples']
+    n_init = paramspace_dict['n_init']
+
+    n_a_grid, n_w_grid = test_grid_sizes
+    a_grid, w_grid = test_meshgrid
+
+    physics_dict = restart_file['physics']
+    t_grid = physics_dict['t_grid']
+    x_grid = physics_dict['x_grid']
+    t_mesh, x_mesh = np.meshgrid(t_grid, x_grid)
+    Dt = physics_dict['dt']
+    Dx = physics_dict['dx']
+
+    time_dim, space_dim = t_grid.shape[0], x_grid.shape[0]
+    n_coef = restart_file['latent_dynamics']['ncoefs']
+
+    Z0 = initial_condition_latent(param_grid, physics, autoencoder)
+
+    gp_dictionnary = fit_gps(param_space.train_space, coefs)
+
+    Zis_samples = sample_roms(autoencoder, physics, sindy, gp_dictionnary, param_grid, n_samples)
+    Zis_mean = average_rom(autoencoder, physics, sindy, gp_dictionnary, param_grid)
+
+    X_pred_mean = autoencoder.decoder(torch.Tensor(Zis_mean)).detach().numpy()
+
+    avg_rel_error = np.zeros(param_grid.shape[0])
+    for k in range(param_grid.shape[0]):
+        avg_rel_error[k], _ = compute_errors(X_pred_mean[k], physics, X_test[k].numpy())
+
+    max_rel_error = avg_rel_error.max()
+    avg_avg_rel_error = avg_rel_error.mean()
+
+    return max_rel_error, avg_avg_rel_error, num_params
 
 if __name__ == "__main__":
     main()

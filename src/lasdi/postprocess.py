@@ -1,6 +1,16 @@
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
+import yaml
+from lasdi.param import ParameterSpace
+
+
+
+def count_params(self):
+        n_params = 0
+        for param in self.parameters():
+            n_params += param.numel()
+        return n_params
 
 def compute_errors(X_pred, physics, X_test):
 

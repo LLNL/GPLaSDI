@@ -1,0 +1,80 @@
+exp_key: burgers1d-NA-MI15000-HU150
+lasdi:
+  gplasdi:
+    coef_weight: 1.0e-06
+    ld_weight: 0.1
+    lr: 0.001
+    max_greedy_iter: 0
+    max_iter: 15000
+    n_iter: 2000
+    n_samples: 20
+    path_checkpoint: checkpoint
+    path_results: results
+  type: gplasdi
+latent_dynamics:
+  sindy:
+    coef_norm_order: fro
+    fd_type: sbp12
+  type: sindy
+latent_space:
+  ae:
+    hidden_units:
+    - 150
+    latent_dimension: 5
+  type: ae
+parameter_space:
+  custom_space_path: /usr/workspace/trautner/GPLaSDI/examples/sampling/FNO_param_train_20_burgers1d.npy
+  custom_train_space: true
+  parameters:
+  - log_scale: false
+    max: 0.9
+    min: 0.7
+    name: a
+    sample_size: 21
+    test_space_type: uniform
+  - list:
+    - 0.9
+    - 0.91
+    - 0.92
+    - 0.93
+    - 0.94
+    - 0.95
+    - 0.96
+    - 0.97
+    - 0.98
+    - 0.99
+    - 1.0
+    - 1.01
+    - 1.02
+    - 1.03
+    - 1.04
+    - 1.05
+    - 1.06
+    - 1.07
+    - 1.08
+    - 1.09
+    - 1.1
+    max: 1.1
+    min: 0.9
+    name: w
+    test_space_type: list
+  test_space:
+    type: grid
+physics:
+  burgers1d:
+    grid_size:
+    - 1001
+    number_of_timesteps: 1001
+    offline_driver: true
+    simulation_time: 1.0
+    xmax: 3.0
+    xmin: -3.0
+  type: burgers1d
+workflow:
+  offline_greedy_sampling:
+    test_param_file: /usr/workspace/trautner/GPLaSDI/examples/sampling/new_test.burgers1d.h5
+    test_sol_file: /usr/workspace/trautner/GPLaSDI/examples/sampling/new_Xtest.burgers1d.h5
+    train_param_file: /usr/workspace/trautner/GPLaSDI/examples/sampling/non-adaptive_train.burgers1d.h5
+    train_sol_file: /usr/workspace/trautner/GPLaSDI/examples/sampling/non-adaptive_Xtrain.burgers1d.h5
+  restart_file: /usr/workspace/trautner/GPLaSDI/examples/restarts/burgers1d.restart.npy
+  use_restart: false

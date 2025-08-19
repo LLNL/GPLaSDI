@@ -156,6 +156,10 @@ class Autoencoder(torch.nn.Module):
         self.decoder = MultiLayerPerceptron(layer_sizes[::-1], act_type,
                                             reshape_index=-1, reshape_shape=self.qgrid_size,
                                             threshold=threshold, value=value, num_heads=num_heads)
+        
+        # Print number of parameters
+        n_params = self.count_params()
+        print(f'Autoencoder has {n_params} parameters.')
 
         return
 
@@ -173,3 +177,9 @@ class Autoencoder(torch.nn.Module):
     def load(self, dict_):
         self.load_state_dict(dict_['autoencoder_param'])
         return
+    
+    def count_params(self):
+        n_params = 0
+        for param in self.parameters():
+            n_params += param.numel()
+        return n_params
