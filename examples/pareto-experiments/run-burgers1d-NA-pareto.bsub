@@ -42,7 +42,7 @@ var2=${var2_values[$var2_idx]}
 
 # Run the LaSDI command
 echo "Starting LaSDI run..."
-lasdi /usr/workspace/trautner/GPLaSDI/examples/pareto-experiments/burgers1d-NA-MI${var1}-HU${var2}.yml
+lasdi burgers1d-NA-MI${var1}-HU${var2}/config.yml
 
 # Print completion time
 echo "Job completed at: $(date)"
