@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/g/g20/trautner/.conda/envs/pyenv-3.9/bin/lasdi", line 8, in <module>
+    sys.exit(main())
+  File "/g/g20/trautner/.conda/envs/pyenv-3.9/lib/python3.9/site-packages/lasdi/workflow.py", line 41, in main
+    with open(args.config_file, 'r') as f:
+FileNotFoundError: [Errno 2] No such file or directory: 'burgers1d-NA-MI5000-HU25/config.yml'

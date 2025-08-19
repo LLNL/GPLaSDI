@@ -1,0 +1,104 @@
+Job ID: 7747979
+Job started at: Tue Aug 19 11:24:07 PDT 2025
+Running on host: lassen285
+Current directory: /usr/workspace/trautner/GPLaSDI/examples/pareto-experiments
+Activating conda environment: pyenv-3.9
+Python path: /g/g20/trautner/.conda/envs/pyenv-3.9/bin/python
+Python version: Python 3.9.18
+Current working directory: /usr/workspace/trautner
+Starting LaSDI run...
+config file: burgers1d-NA-MI5000-HU25/config.yml
+Job completed at: Tue Aug 19 11:24:14 PDT 2025
+logout
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@lassen710>
+Subject: Job 7747979[1]: <pareto-NA[1-3]> in cluster <lassen> Done
+
+Job <pareto-NA[1-3]> was submitted from host <lassen709> by user <trautner> in cluster <lassen> at Tue Aug 19 11:23:59 2025
+Job was executed on host(s) <1*lassen710>, in queue <pbatch>, as user <trautner> in cluster <lassen> at Tue Aug 19 11:24:02 2025
+                            <40*lassen285>
+</g/g20/trautner> was used as the home directory.
+</usr/workspace/trautner/GPLaSDI/examples/pareto-experiments> was used as the working directory.
+Started at Tue Aug 19 11:24:02 2025
+Terminated at Tue Aug 19 11:24:14 2025
+Results reported at Tue Aug 19 11:24:14 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/bash
+#BSUB -J "pareto-NA[1-3]"
+#BSUB -o output_%I.out
+#BSUB -e error_%I.err
+#BSUB -W 00:05
+#BSUB -q pbatch
+
+# Print job information
+echo "Job ID: $LSB_JOBID"
+echo "Job started at: $(date)"
+echo "Running on host: $(hostname)"
+echo "Current directory: $(pwd)"
+
+# Initialize conda
+source ~/.bashrc
+eval "$(conda shell.bash hook)"
+
+# Activate the conda environment
+echo "Activating conda environment: pyenv-3.9"
+conda activate pyenv-3.9
+
+# Verify environment is activated
+echo "Python path: $(which python)"
+echo "Python version: $(python --version)"
+
+# Print working directory
+echo "Current working directory: $(pwd)"
+
+var1_values=(5000 10000 15000 20000)
+var2_values=(25 50 100 150)
+
+# Calculate indices (LSB_JOBINDEX is 1-based)
+job_idx=$((LSB_JOBINDEX - 1))  # Convert to 0-based
+
+# Calculate which combination this job represents
+var1_idx=$((job_idx / 4))      # Integer division
+var2_idx=$((job_idx % 4))      # Modulo
+
+# Get the actual values
+var1=${var1_values[$var1_idx]}
+var2=${var2_values[$var2_idx]}
+
+# Run the LaSDI command
+echo "Starting LaSDI run..."
+lasdi burgers1d-NA-MI${var1}-HU${var2}/config.yml
+
+# Print completion time
+echo "Job completed at: $(date)"
+
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   0.19 sec.
+    Max Memory :                                 -
+    Average Memory :                             -
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              -
+    Max Threads :                                -
+    Run time :                                   13 sec.
+    Turnaround time :                            15 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <error_1.err> for stderr output of this job.
+

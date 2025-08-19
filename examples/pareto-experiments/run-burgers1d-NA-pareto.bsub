@@ -1,8 +1,8 @@
 #!/bin/bash
-#BSUB -J "pareto-NA[1-16]"
+#BSUB -J "pareto-NA[1-3]"
 #BSUB -o output_%I.out
 #BSUB -e error_%I.err
-#BSUB -W 10:00
+#BSUB -W 00:05
 #BSUB -q pbatch
 
 # Print job information
@@ -42,7 +42,7 @@ var2=${var2_values[$var2_idx]}
 
 # Run the LaSDI command
 echo "Starting LaSDI run..."
-lasdi burgers1d-NA-MI${var1}-HU${var2}/config.yml
+lasdi burgers1d-NA-MI${var1}-HU${var2}/config.yaml
 
 # Print completion time
 echo "Job completed at: $(date)"
