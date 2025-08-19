@@ -26,6 +26,10 @@ echo "Python version: $(python --version)"
 # Print working directory
 echo "Current working directory: $(pwd)"
 
+cd GPLaSDI/examples/pareto-experiments/
+
+echo "Current working directory after change: $(pwd)"
+
 var1_values=(5000 10000 15000 20000)
 var2_values=(25 50 100 150)
 
