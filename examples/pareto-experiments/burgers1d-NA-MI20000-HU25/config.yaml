@@ -1,15 +1,16 @@
-exp_key: burgers1d-NA-MI15000-HU100
+exp_key: burgers1d-NA-MI20000-HU25
 lasdi:
   gplasdi:
     coef_weight: 1.0e-06
     ld_weight: 0.1
     lr: 0.001
     max_greedy_iter: 0
-    max_iter: 15000
-    n_iter: 2000
+    max_iter: 20000
+    n_iter: 20000
     n_samples: 20
-    path_checkpoint: checkpoint
+    path_checkpoint: burgers1d-NA-MI20000-HU25/checkpoint
     path_results: results
+    results: burgers1d-NA-MI20000-HU25
   type: gplasdi
 latent_dynamics:
   sindy:
@@ -19,7 +20,7 @@ latent_dynamics:
 latent_space:
   ae:
     hidden_units:
-    - 100
+    - 25
     latent_dimension: 5
   type: ae
 parameter_space:

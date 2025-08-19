@@ -1,0 +1,48 @@
+#!/bin/bash
+#BSUB -J "pareto-NA[1-16]"
+#BSUB -o output_%I.out
+#BSUB -e error_%I.err
+#BSUB -W 10:00
+#BSUB -q pbatch
+
+# Print job information
+echo "Job ID: $LSB_JOBID"
+echo "Job started at: $(date)"
+echo "Running on host: $(hostname)"
+echo "Current directory: $(pwd)"
+
+# Initialize conda
+source ~/.bashrc
+eval "$(conda shell.bash hook)"
+
+# Activate the conda environment
+echo "Activating conda environment: pyenv-3.9"
+conda activate pyenv-3.9
+
+# Verify environment is activated
+echo "Python path: $(which python)"
+echo "Python version: $(python --version)"
+
+# Print working directory
+echo "Current working directory: $(pwd)"
+
+var1_values=(5000 10000 15000 20000)
+var2_values=(25 50 100 150)
+
+# Calculate indices (LSB_JOBINDEX is 1-based)
+job_idx=$((LSB_JOBINDEX - 1))  # Convert to 0-based
+
+# Calculate which combination this job represents
+var1_idx=$((job_idx / 4))      # Integer division
+var2_idx=$((job_idx % 4))      # Modulo
+
+# Get the actual values
+var1=${var1_values[$var1_idx]}
+var2=${var2_values[$var2_idx]}
+
+# Run the LaSDI command
+echo "Starting LaSDI run..."
+lasdi /usr/workspace/trautner/GPLaSDI/examples/pareto-experiments/burgers1d-NA-MI${var1}-HU${var2}.yml
+
+# Print completion time
+echo "Job completed at: $(date)"

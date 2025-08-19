@@ -1,30 +1,30 @@
-exp_key: 'burgers1d-nonadaptive'
+exp_key: 'burgers1d-debug'
 lasdi:
   type: gplasdi
   gplasdi:
     # device: mps
     n_samples: 20
     lr: 0.001
-    max_iter: 20000 #34000 #28000
-    n_iter: 2000 #2000
+    max_iter: 2 #34000 #28000
+    n_iter: 2 #2000
     max_greedy_iter: 0 #34000 #28000
     ld_weight: 0.1
     coef_weight: 1.e-6
-    path_checkpoint: checkpoint
-    path_results: results
+    path_checkpoint: pareto-experiments/burgers1d-debug/checkpoint
+    path_results: pareto-experiments/burgers1d-debug/
 
 workflow:
   use_restart: false
   restart_file: /usr/workspace/trautner/GPLaSDI/examples/restarts/burgers1d.restart.npy
   offline_greedy_sampling:
-    train_param_file: /usr/workspace/trautner/GPLaSDI/examples/sampling/non-adaptive_train.burgers1d.h5
-    test_param_file: /usr/workspace/trautner/GPLaSDI/examples/sampling/new_test.burgers1d.h5
-    train_sol_file: /usr/workspace/trautner/GPLaSDI/examples/sampling/non-adaptive_Xtrain.burgers1d.h5
-    test_sol_file: /usr/workspace/trautner/GPLaSDI/examples/sampling/new_Xtest.burgers1d.h5
+    train_param_file: sampling/non-adaptive_train.burgers1d.h5
+    test_param_file: sampling/new_test.burgers1d.h5
+    train_sol_file: sampling/non-adaptive_Xtrain.burgers1d.h5
+    test_sol_file: sampling/new_Xtest.burgers1d.h5
 
 parameter_space:
   custom_train_space: true
-  custom_space_path: /usr/workspace/trautner/GPLaSDI/examples/sampling/FNO_param_train_20_burgers1d.npy
+  custom_space_path: sampling/FNO_param_train_20_burgers1d.npy
   parameters:
     - name: a
       min: 0.7
