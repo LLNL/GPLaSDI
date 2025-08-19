@@ -284,11 +284,11 @@ def pick_samples(trainer, config):
     train_param_file = cfg_parser.getInput(['workflow', 'offline_greedy_sampling', 'train_param_file'], fallback="new_train.h5")
     Path(dirname(train_param_file)).mkdir(parents=True, exist_ok=True)
 
-    with h5py.File(train_param_file, 'w') as f:
-        f.create_dataset("train_params", new_sample.shape, data=new_sample)
-        f.create_dataset("parameters", (len(trainer.param_space.param_name),), data=trainer.param_space.param_name)
-        f.attrs["n_params"] = trainer.param_space.n_param
-        f.attrs["new_points"] = new_sample.shape[0]
+    # with h5py.File(train_param_file, 'w') as f:
+    #     f.create_dataset("train_params", new_sample.shape, data=new_sample)
+    #     f.create_dataset("parameters", (len(trainer.param_space.param_name),), data=trainer.param_space.param_name)
+    #     f.attrs["n_params"] = trainer.param_space.n_param
+    #     f.attrs["new_points"] = new_sample.shape[0]
 
     # clean up the previous test parameter point file.
     test_param_file = cfg_parser.getInput(['workflow', 'offline_greedy_sampling', 'test_param_file'], fallback="new_test.h5")
