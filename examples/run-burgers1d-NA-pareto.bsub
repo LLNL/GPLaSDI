@@ -1,5 +1,5 @@
 #!/bin/bash
-#BSUB -J lasdi_burgers1d_NA
+#BSUB -J "pareto-NA[1-2]"
 #BSUB -o output_%I.out
 #BSUB -e error_%I.err
 #BSUB -W 00:02
