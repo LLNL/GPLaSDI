@@ -30,7 +30,7 @@ cd GPLaSDI/examples/pareto-experiments/
 
 echo "Current working directory after change: $(pwd)"
 
-var1_values=(5000 10000 15000 20000)
+var1_values=(27800) 
 var2_values=(25 50 100 150)
 
 # Calculate indices (LSB_JOBINDEX is 1-based)

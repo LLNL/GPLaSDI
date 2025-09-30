@@ -6,7 +6,8 @@ with open(template_file, 'r') as file:
     template = yaml.safe_load(file)
 
 # Modify variables lasdi: gplasdi: max_iter and latent space: ae: hidden_units:
-max_iters = [5000, 10000, 15000, 20000]
+# max_iters = [5000, 10000, 15000, 20000]
+max_iters = [27800]
 hidden_units = [25, 50, 100, 150]
 for max_iter in max_iters:
     for hidden_unit in hidden_units:
