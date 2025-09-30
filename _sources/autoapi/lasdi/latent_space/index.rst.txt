@@ -19,6 +19,8 @@ Classes
 
    lasdi.latent_space.MultiLayerPerceptron
    lasdi.latent_space.Autoencoder
+   lasdi.latent_space.MLPWithMask
+   lasdi.latent_space.AutoEncoderWithMask
 
 
 Functions
@@ -38,6 +40,13 @@ Module Contents
 
    Outputs the initial condition in the latent space: Z0 = encoder(U0)
 
+   :Parameters: * **param_grid** (:obj:`numpy.array`) -- A 2d array of shape `(n_param, param_dim)` for parameter points to obtain initial condition.
+                * **physics** (:obj:`lasdi.physics.Physics`) -- Physics class to generate initial condition.
+                * **autoencoder** (:obj:`lasdi.latent_space.Autoencoder`) -- Autoencoder class to encode initial conditions into latent variables.
+
+   :returns: **Z0** -- a torch tensor of size `(n_param, n_z)`, where `n_z` is the latent variable dimension
+             defined by `autoencoder`.
+   :rtype: :obj:`torch.Tensor`
 
 
 .. py:class:: MultiLayerPerceptron(layer_sizes, act_type='sigmoid', reshape_index=None, reshape_shape=None, threshold=0.1, value=0.0, num_heads=1)
@@ -45,38 +54,102 @@ Module Contents
    Bases: :py:obj:`torch.nn.Module`
 
 
+   A standard multi-layer perceptron (MLP) module.
+
+
    .. py:attribute:: n_layers
+
+      Depth of MLP including input, hidden, and output layers.
+
+      :type: :obj:`int`
 
 
    .. py:attribute:: layer_sizes
+
+      Widths of each MLP layer, including input, hidden and output layers.
+
+      :type: :obj:`list(int)`
 
 
    .. py:attribute:: fcs
       :value: []
 
 
+      torch module list of :math:`(self.n\_layers-1)` linear layers,
+      connecting from input to output layers.
+
+      :type: :obj:`torch.nn.ModuleList`
+
 
    .. py:attribute:: reshape_index
       :value: None
 
+
+      Index of the layer to reshape.
+
+      * 0: Input data is n-dimensional and will be squeezed into 1d tensor for MLP input.
+      * 1: Output data should be n-dimensional and MLP output will be reshaped as such.
+
+      :type: :obj:`int`
 
 
    .. py:attribute:: reshape_shape
       :value: None
 
 
+      Shape of the layer to be reshaped.
+
+      * :math:`(self.reshape_index=0)`: Shape of the input data that will be squeezed into 1d tensor for MLP input.
+      * :math:`(self.reshape_index=1)`: Shape of the output data into which MLP output shall be reshaped.
+
+      :type: :obj:`list(int)`
+
 
    .. py:attribute:: act_type
       :value: 'sigmoid'
 
+
+      type of activation function
+
+      :type: :obj:`str`
 
 
    .. py:attribute:: use_multihead
       :value: False
 
 
+      switch to use multihead attention.
+
+      Warning:
+          this attribute is obsolete and will be removed in future.
+
+      :type: :obj:`bool`
+
+
+   .. py:attribute:: act
+      :value: None
+
+
+      activation function
+
+      :type: :obj:`torch.nn.Module`
+
 
    .. py:method:: forward(x)
+
+      Pass the input through the MLP layers.
+
+      Args:
+          x (:obj:`torch.Tensor`): n-dimensional torch.Tensor for input data.
+
+      Note:
+          * If :obj:`self.reshape_index == 0`, then the last n dimensions of :obj:`x` must match :obj:`self.reshape_shape`. In other words, :obj:`list(x.shape[-len(self.reshape_shape):]) == self.reshape_shape`
+          * If :obj:`self.reshape_index == -1`, then the last layer output :obj:`z` is reshaped into :obj:`self.reshape_shape`. In other words, :obj:`list(z.shape[-len(self.reshape_shape):]) == self.reshape_shape`
+
+      Returns:
+          n-dimensional torch.Tensor for output data.
+
+
 
 
    .. py:method:: apply_attention(x, act_idx)
@@ -84,10 +157,28 @@ Module Contents
 
    .. py:method:: init_weight()
 
+      Initialize the weights and biases of the linear layers.
+
+      Returns:
+          Does not return a value.
+
+
+
 
 .. py:class:: Autoencoder(physics, config)
 
    Bases: :py:obj:`torch.nn.Module`
+
+
+   A standard autoencoder using MLP.
+
+   Args:
+       physics (:obj:`lasdi.physics.Physics`): Physics class that specifies full-order model solution dimensions.
+
+       config: (:obj:`dict`): options for autoencoder. It must include the following keys and values.
+           * :obj:`'hidden_units'`: a list of integers for the widths of hidden layers.
+           * :obj:`'latent_dimension'`: integer for the latent space dimension.
+           * :obj:`'activation'`: string for type of activation function.
 
 
    .. py:attribute:: qgrid_size
@@ -112,5 +203,133 @@ Module Contents
 
 
    .. py:method:: load(dict_)
+
+
+.. py:class:: MLPWithMask(mlp)
+
+   Bases: :py:obj:`MultiLayerPerceptron`
+
+
+   Multi-layer perceptron with additional mask output.
+
+   Args:
+       mlp (:obj:`lasdi.latent_space.MultiLayerPerceptron`): MultiLayerPerceptron class to copy.
+       The same architecture, activation function, reshaping will be used.
+
+
+
+   .. py:attribute:: n_layers
+
+      Depth of MLP including input, hidden, and output layers.
+
+      :type: :obj:`int`
+
+
+   .. py:attribute:: layer_sizes
+
+      Widths of each MLP layer, including input, hidden and output layers.
+
+      :type: :obj:`list(int)`
+
+
+   .. py:attribute:: fcs
+
+      torch module list of :math:`(self.n\_layers-1)` linear layers,
+      connecting from input to output layers.
+
+      :type: :obj:`torch.nn.ModuleList`
+
+
+   .. py:attribute:: reshape_index
+
+      Index of the layer to reshape.
+
+      * 0: Input data is n-dimensional and will be squeezed into 1d tensor for MLP input.
+      * 1: Output data should be n-dimensional and MLP output will be reshaped as such.
+
+      :type: :obj:`int`
+
+
+   .. py:attribute:: reshape_shape
+
+      Shape of the layer to be reshaped.
+
+      * :math:`(self.reshape_index=0)`: Shape of the input data that will be squeezed into 1d tensor for MLP input.
+      * :math:`(self.reshape_index=1)`: Shape of the output data into which MLP output shall be reshaped.
+
+      :type: :obj:`list(int)`
+
+
+   .. py:attribute:: act_type
+
+      type of activation function
+
+      :type: :obj:`str`
+
+
+   .. py:attribute:: use_multihead
+
+      switch to use multihead attention.
+
+      Warning:
+          this attribute is obsolete and will be removed in future.
+
+      :type: :obj:`bool`
+
+
+   .. py:attribute:: act
+
+      activation function
+
+      :type: :obj:`torch.nn.Module`
+
+
+   .. py:attribute:: bool_d
+
+      additional linear layer to output a mask variable.
+
+      :type: :obj:`torch.nn.Linear`
+
+
+   .. py:attribute:: sigmoid
+
+      mask output passes through the sigmoid activation function to ensure :math:`[0, 1]`.
+
+      :type: :obj:`torch.nn.Sigmoid`
+
+
+   .. py:method:: forward(x)
+
+      Pass the input through the MLP layers.
+
+      Args:
+          x (:obj:`torch.Tensor`): n-dimensional torch.Tensor for input data.
+
+      Note:
+          * If :obj:`self.reshape_index == 0`, then the last n dimensions of :obj:`x` must match :obj:`self.reshape_shape`. In other words, :obj:`list(x.shape[-len(self.reshape_shape):]) == self.reshape_shape`
+          * If :obj:`self.reshape_index == -1`, then the last layer outputs :obj:`xval` and :obj:`xbool` are reshaped into :obj:`self.reshape_shape`. In other words, :obj:`list(xval.shape[-len(self.reshape_shape):]) == self.reshape_shape`
+
+      Returns:
+          xval (:obj:`torch.Tensor`): n-dimensional torch.Tensor for output data.
+          xbool (:obj:`torch.Tensor`): n-dimensional torch.Tensor for output mask.
+
+
+
+
+.. py:class:: AutoEncoderWithMask(physics, config)
+
+   Bases: :py:obj:`Autoencoder`
+
+
+   Autoencoder class with additional mask output.
+
+   Its decoder is :obj:`lasdi.latent_space.MLPWithMask`,
+   which has an additional mask output.
+
+   Note:
+       Unlike the standard autoencoder, the decoder output will have two outputs (with the same shape of the input of the encoder).
+
+
+   .. py:attribute:: decoder
 
 
