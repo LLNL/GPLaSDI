@@ -8,6 +8,7 @@ from .enums import *
 from .gplasdi import BayesianGLaSDI
 from .latent_space import Autoencoder
 from .latent_dynamics.sindy import SINDy
+from .latent_dynamics.edmd import EDMD 
 from .physics.burgers1d import Burgers1D
 from .param import ParameterSpace
 from .inputs import InputParser
@@ -16,7 +17,7 @@ trainer_dict = {'gplasdi': BayesianGLaSDI}
 
 latent_dict = {'ae': Autoencoder}
 
-ld_dict = {'sindy': SINDy}
+ld_dict = {'edmd': EDMD}
 
 physics_dict = {'burgers1d': Burgers1D}
 
@@ -151,6 +152,7 @@ def initialize_trainer(config, restart_file=None):
 
     physics = initialize_physics(config, param_space.param_name)
     latent_space = initialize_latent_space(physics, config)
+
     if (restart_file is not None):
         latent_space.load(restart_file['latent_space'])
 
@@ -158,7 +160,10 @@ def initialize_trainer(config, restart_file=None):
     ld_type = config['latent_dynamics']['type']
     assert(ld_type in config['latent_dynamics'])
     assert(ld_type in ld_dict)
-    latent_dynamics = ld_dict[ld_type](latent_space.n_z, physics.nt, config['latent_dynamics'])
+
+    # Updating the dynamics callback to account for the higher order terms and other non linear functions from the .yml file. 
+
+    latent_dynamics = ld_dict[ld_type](latent_space.n_z, config['latent_dynamics'][ld_type]['higher_order_terms'], config['latent_dynamics'][ld_type]['extra_functions'], physics.nt, config['latent_dynamics'])
     if (restart_file is not None):
         latent_dynamics.load(restart_file['latent_dynamics'])
 
