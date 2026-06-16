@@ -11,6 +11,7 @@ Submodules
    :maxdepth: 1
 
    /autoapi/lasdi/latent_dynamics/sindy/index
+   /autoapi/lasdi/latent_dynamics/wsindy/index
 
 
 Classes

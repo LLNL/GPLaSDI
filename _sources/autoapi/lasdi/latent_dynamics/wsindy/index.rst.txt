@@ -1,0 +1,137 @@
+lasdi.latent_dynamics.wsindy
+============================
+
+.. py:module:: lasdi.latent_dynamics.wsindy
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   lasdi.latent_dynamics.wsindy.wSINDy
+
+
+Module Contents
+---------------
+
+.. py:class:: wSINDy(dim, nt, dt, config)
+
+   Bases: :py:obj:`lasdi.latent_dynamics.LatentDynamics`
+
+
+   .. py:attribute:: fd_type
+      :value: ''
+
+
+
+   .. py:attribute:: fd
+      :value: None
+
+
+
+   .. py:attribute:: fd_oper
+      :value: None
+
+
+
+   .. py:attribute:: ncoefs
+
+
+   .. py:attribute:: dt
+
+
+   .. py:attribute:: coef_norm_order
+      :value: 1
+
+
+
+   .. py:attribute:: MSE
+
+
+   .. py:attribute:: test_func
+      :value: 'PC-poly'
+
+
+
+   .. py:attribute:: test_func_width
+
+
+   .. py:attribute:: overlap
+      :value: 0.8
+
+
+
+   .. py:attribute:: pq
+      :value: 5
+
+
+
+   .. py:attribute:: LS_loss_type
+      :value: 'weak'
+
+
+
+   .. py:attribute:: T
+
+
+   .. py:method:: calibrate(Z, dt, compute_loss=True, numpy=False)
+
+      loop over all train cases, if Z dimension is 3
+
+
+
+   .. py:method:: compute_time_derivative(Z, Dt)
+
+      Builds the SINDy dataset, assuming only linear terms in the SINDy dataset. The time derivatives are computed through
+      finite difference.
+
+      Z is the encoder output (2D tensor), with shape [time_dim, space_dim]
+      Dt is the size of timestep (assumed to be a uniform scalar)
+
+      The output dZdt is a 2D tensor with the same shape of Z.
+
+
+
+
+   .. py:method:: simulate(coefs, z0, t_grid)
+
+      Integrates each system of ODEs corresponding to each training points, given the initial condition Z0 = encoder(U0)
+
+
+
+
+   .. py:method:: export()
+
+
+   .. py:method:: getUniformGrid(T, L, s, p)
+
+      generates uniform grid for test functions
+      s is overlap
+      L is test function width
+
+
+
+   .. py:method:: get_test_functions(T, n_t, test_func_width, overlap, pq, test_func='PC-poly', H=30)
+
+      H: number of test functions compactly supported on time
+      interval [0,T], assumes equally spaces
+      n_t: number of time points, assumes equally spaced
+
+      returns: Phis: dim (H, n_t), each of H test functions evaluated at n_t time points
+              dPhis: dim (H, n_t), each of H test function time derivatives evaluated at n_t time points
+
+
+
+   .. py:method:: compute_Gk_bk(n_s, Phi, dPhi, Theta, U)
+
+      n_s: reduced dim
+      Phi: dimension (H,n_T)
+      dPhi: dimension (H,n_T)
+      Theta: dimension (n_T, J)
+
+      Gk = I_{n_s} \otimes \Phi \Theta :  dimension (H*n_s,J*n_s)
+      bk = -vec(dPhi*U): dimension (H*n_s)
+
+
+

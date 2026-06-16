@@ -68,7 +68,7 @@ Module Contents
 
 .. py:function:: pick_samples(trainer, config)
 
-.. py:function:: run_samples(trainer, config)
+.. py:function:: run_samples(trainer, config, save_samples=False)
 
 .. py:function:: collect_samples(trainer, config)
 
