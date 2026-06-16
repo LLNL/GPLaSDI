@@ -11,6 +11,9 @@ from .latent_dynamics.sindy import SINDy
 from .physics.burgers1d import Burgers1D
 from .param import ParameterSpace
 from .inputs import InputParser
+import pdb
+import os.path
+
 
 trainer_dict = {'gplasdi': BayesianGLaSDI}
 
@@ -51,6 +54,7 @@ def main():
         current_step = NextStep.PickSample
         result = Result.Unexecuted
     
+    print("Trainer to be initialized...")
     trainer, param_space, physics, latent_space, latent_dynamics = initialize_trainer(config, restart_file)
 
     if ((not use_restart) and physics.offline):
@@ -261,9 +265,39 @@ def pick_samples(trainer, config):
 '''
     update trainer.X_train and trainer.X_test based on param_space.train_space and param_space.test_space.
 '''
-def run_samples(trainer, config):
+def run_samples(trainer, config, save_samples = False):
+    
     if trainer.physics.offline:
-        raise RuntimeError("Current physics solver is offline. RunSamples stage cannot be run online!")
+        # load samples from hdf5 file.
+        print("Loading samples from hdf5 file...")
+        if (trainer.X_train.size(0) > 0):
+            # if we have already loaded training solutions, skip loading. Additional samples collected in collect_samples
+            pass
+        else:
+            cfg_parser = InputParser(config)
+
+            # Load training solutions
+            train_sol_file = cfg_parser.getInput(['workflow', 'offline_greedy_sampling', 'train_sol_file'], datatype=str)
+            with h5py.File(train_sol_file, 'r') as f:
+                new_X_train = f['train_sol'][...]
+            trainer.X_train = torch.tensor(new_X_train, dtype=torch.float32)
+
+            # Load test solutions if test file exists
+            test_param_file = cfg_parser.getInput(['workflow', 'offline_greedy_sampling', 'test_param_file'], fallback=None)
+            if (os.path.isfile(test_param_file)):
+                test_sol_file = cfg_parser.getInput(['workflow', 'offline_greedy_sampling', 'test_sol_file'], datatype=str)
+                with h5py.File(test_sol_file, 'r') as f:
+                    new_X_test = f['test_sol'][...]
+                trainer.X_test = torch.tensor(new_X_test, dtype=torch.float32)
+            
+            # verify dimensions match expected parameter space sizes
+            assert(trainer.X_train.size(0) == trainer.param_space.n_train())
+            assert(trainer.X_test.size(0) == trainer.param_space.n_test())
+
+            # since solutions are loaded from file, go to training phase directly
+            next_step, result = NextStep.Train, Result.Success
+            return result, next_step
+
 
     cfg_parser = InputParser(config)
 
@@ -286,6 +320,19 @@ def run_samples(trainer, config):
         trainer.X_test = torch.cat([trainer.X_test, new_X], dim = 0)
         assert(trainer.X_test.size(0) == trainer.param_space.n_test())
 
+    # Save X_train and X_test if requested
+    if save_samples:
+        # Save training solutions
+        train_sol_file = cfg_parser.getInput(['workflow', 'offline_greedy_sampling', 'train_sol_file'], datatype=str)
+        with h5py.File(train_sol_file, 'w') as f:
+            f.create_dataset("train_sol", trainer.X_train.shape, data=trainer.X_train.detach().cpu().numpy())
+        
+        # Save test solutions if they exist
+        if trainer.X_test.size(0) > 0:
+            test_sol_file = cfg_parser.getInput(['workflow', 'offline_greedy_sampling', 'test_sol_file'], datatype=str)
+            with h5py.File(test_sol_file, 'w') as f:
+                f.create_dataset("test_sol", trainer.X_test.shape, data=trainer.X_test.detach().cpu().numpy())
+    
     # Since FOM simulations are already collected, we go to training phase directly.
     next_step, result = NextStep.Train, Result.Success
     return result, next_step
