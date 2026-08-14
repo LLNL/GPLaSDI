@@ -5,7 +5,7 @@
     u_t = kappa u_xx + g(t) s(x),   u(0,t)=u(L,t)=0,   u(x,0)=0
 
 The "input parameter" is the entire forcing schedule g(t), drawn randomly
-per trajectory. The IC is rest for every trajectory, so the ONLY thing that
+per trajectory. The IC is zero for every trajectory, so the ONLY thing that
 distinguishes one trajectory from another is its forcing function g(t).
 
 This is the case interpolation-based LaSDI cannot easily handle
